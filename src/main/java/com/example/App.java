@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
-import com.exmaple.config.MvcConfig;
-import com.exmaple.config.SecurityConfig;
+import com.example.config.MvcConfig;
+import com.example.config.SecurityConfig;
 
 @SpringBootApplication
 @Import({ MvcConfig.class, SecurityConfig.class })

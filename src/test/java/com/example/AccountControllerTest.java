@@ -1,5 +1,7 @@
 package com.example;
 
+import com.example.daos.UserRepository;
+import com.example.models.User;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,9 +26,15 @@ public class AccountControllerTest {
 
     private MockMvc mockMvc;
 
+    @Autowired
+    UserRepository repository;
+
     @Before
     public void setUp() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        // 存两个用户试一试
+        repository.save(new User("test1", "123"));
+        repository.save(new User("test2", "123"));
     }
 
 
@@ -34,6 +42,13 @@ public class AccountControllerTest {
     public void registration() throws Exception {
         mockMvc.perform(post("/register").param("username", "user").param("password", "password"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getToken() throws Exception {
+        mockMvc.perform(get("/api/token").param("username", "test1").param("password", "123"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("这就是一个加密了的 Token"));
     }
 
 }

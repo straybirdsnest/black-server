@@ -1,4 +1,4 @@
-package com.exmaple.config.restful;
+package com.example.config.restful;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
