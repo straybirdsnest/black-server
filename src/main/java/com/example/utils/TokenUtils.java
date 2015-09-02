@@ -1,4 +1,4 @@
-package com.example.config.restful;
+package com.example.utils;
 
 /**
  * Created by yy on 8/30/15.

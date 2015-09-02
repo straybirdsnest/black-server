@@ -2,11 +2,12 @@ package com.example.controllers;
 
 import com.example.daos.UserRepository;
 import com.example.models.User;
-import com.example.config.restful.TokenUtils;
+import com.example.utils.TokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -22,6 +23,11 @@ public class AccountController {
 	public void register(String username, String password){
 		log.info(username + " " + password + "注册");
 	}
+
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public ModelAndView register(){
+        return new ModelAndView("register");
+    }
 	
 	@RequestMapping(value = "/username-available", method = RequestMethod.GET)
 	public boolean checkUsernameAvailable(String username) {
