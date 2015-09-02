@@ -65,20 +65,18 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- JSON Web Token -->
-		<!--<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt</artifactId>
-			<version>0.5.1</version>
-		</dependency>-->
 		<dependency>
 			<groupId>org.bitbucket.b_c</groupId>
 			<artifactId>jose4j</artifactId>
 			<version>0.4.4</version>
 		</dependency>
-
-
+		<dependency>
+ 			<groupId>com.corundumstudio.socketio</groupId>
+ 			<artifactId>netty-socketio</artifactId>
+ 			<version>1.7.6</version>
+		</dependency>
 	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>
