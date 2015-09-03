@@ -1,7 +1,6 @@
 package com.example.daos;
 
 import com.example.models.User;
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
