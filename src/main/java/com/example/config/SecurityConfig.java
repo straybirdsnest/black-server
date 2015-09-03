@@ -25,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests()
 				.antMatchers("/register").permitAll()
                 .antMatchers("/api/token").permitAll()
-				.antMatchers("/api/**").authenticated()
+                .antMatchers("/api/**").authenticated()
 				.and()
                 .addFilterAfter(new CustomTokenAuthenticationFilter("/api/**"), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

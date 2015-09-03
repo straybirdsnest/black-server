@@ -9,11 +9,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 public class ChatRoomController {
-	
+
 	static final Logger logger = LoggerFactory.getLogger(ChatRoomController.class);
-	
-	@RequestMapping(value="/chatroom", method = RequestMethod.GET)
-	public ModelAndView enterChatRoom(){
+
+	@RequestMapping(value = "/chatroom", method = RequestMethod.GET)
+	public ModelAndView enterChatRoom() {
 		logger.info("a request to chatroom hit.");
 		return new ModelAndView("chatroom");
 	}
