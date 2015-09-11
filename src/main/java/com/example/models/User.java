@@ -2,23 +2,28 @@ package com.example.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created by yy on 8/30/15.
  */
 @Entity
+@Table(name = "T_USERS")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private int id;
+
+    @Column(name = "account", nullable = false)
     private String username;
+
+    @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "enabled", columnDefinition = "int", length = 1)
+    private boolean enabled;
 
     protected User() {}
 
@@ -34,11 +39,11 @@ public class User {
                 id, username, password);
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -58,4 +63,13 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
 }

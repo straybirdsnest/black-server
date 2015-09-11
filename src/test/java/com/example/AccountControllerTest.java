@@ -1,7 +1,7 @@
 package com.example;
 
 import com.example.daos.UserRepository;
-import com.example.models.User;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,8 +13,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = App.class)
@@ -22,26 +24,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AccountControllerTest {
 
     @Autowired
-    private WebApplicationContext context;
-
-    private MockMvc mockMvc;
-
-    @Autowired
     UserRepository repository;
+    @Autowired
+    private WebApplicationContext context;
+    private MockMvc mockMvc;
 
     @Before
     public void setUp() throws Exception {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-        // 存两个用户试一试
-        repository.save(new User("test1", "123"));
-        repository.save(new User("test2", "123"));
+    }
+
+    @After
+    public void cleanUp() throws Exception {
     }
 
 
     @Test
     public void registration() throws Exception {
         mockMvc.perform(post("/register").param("username", "user").param("password", "password"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string("注册成功"));
     }
 
     @Test

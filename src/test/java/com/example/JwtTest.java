@@ -29,8 +29,8 @@ public class JwtTest {
         System.out.println("Serialized Encrypted JWE: " + serializedJwe);
 
         // 解密
-        jwe = new JsonWebEncryption();
-        jwe.setKey(key);
+        //jwe = new JsonWebEncryption();
+        //jwe.setKey(key);
         jwe.setCompactSerialization(serializedJwe);
         System.out.println("Payload: " + jwe.getPayload());
     }
