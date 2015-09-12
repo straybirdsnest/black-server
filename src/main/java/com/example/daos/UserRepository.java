@@ -10,8 +10,10 @@ import java.util.List;
  * Created by yy on 8/30/15.
  */
 @Repository
-public interface UserRepository extends CrudRepository<User, Long>{
+public interface UserRepository extends CrudRepository<User, Integer> {
 
     List<User> findByUsername(String username);
+
+    User findOneByUsername(String username);
 
 }
