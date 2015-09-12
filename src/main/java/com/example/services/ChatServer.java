@@ -8,15 +8,17 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 
+@Deprecated
 public class ChatServer {
 	public static final int CHAT_SERVER_PORT = 8081;
 
 	private SocketIOServer socketIOServer = null;
 
 	public ChatServer(Configuration configuration) {
-		configuration.setHostname("192.168.1.111");
-		configuration.setOrigin("http://192.168.1.111:8080");
-		configuration.setPort(CHAT_SERVER_PORT);
+        //configuration.setHostname("192.168.1.100");
+        configuration.setHostname("localhost");
+        //configuration.setOrigin("http://192.168.1.100:8080");
+        configuration.setPort(CHAT_SERVER_PORT);
 		socketIOServer = new SocketIOServer(configuration);
 
 		socketIOServer.addConnectListener(new ConnectListener() {
