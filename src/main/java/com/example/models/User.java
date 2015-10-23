@@ -1,8 +1,11 @@
 package com.example.models;
 
+import com.example.models.games.dota2.SteamAccount;
+import com.example.utils.EncodePasswordUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by yy on 8/30/15.
@@ -14,7 +17,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private Long userId;
 
     @Column(name = "account", nullable = false)
     private String username;
@@ -25,26 +28,32 @@ public class User {
     @Column(name = "enabled", columnDefinition = "int", length = 1)
     private boolean enabled;
 
+    @ManyToMany
+    private List<UserGroup> userGroups;
+
+    @OneToMany
+    private List<SteamAccount> steamAccounts;
+
     protected User() {}
 
     public User(String username, String password){
         this.username = username;
-        this.password = password;
+        this.password = EncodePasswordUtil.encode(password);
     }
 
     @Override
     public String toString() {
         return String.format(
-                "User[id=%d, username='%s', password='%s']",
-                id, username, password);
+                "User[userId=%d, username='%s', password='%s']",
+                userId, username, password);
     }
 
-    public int getId() {
-        return id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
@@ -61,7 +70,8 @@ public class User {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+
+        this.password = EncodePasswordUtil.encode(password);
     }
 
     public boolean isEnabled() {
@@ -72,4 +82,19 @@ public class User {
         this.enabled = enabled;
     }
 
+    public List<UserGroup> getUserGroups() {
+        return userGroups;
+    }
+
+    public void setUserGroups(List<UserGroup> userGroups) {
+        this.userGroups = userGroups;
+    }
+
+    public List<SteamAccount> getSteamAccounts() {
+        return steamAccounts;
+    }
+
+    public void setSteamAccounts(List<SteamAccount> steamAccounts) {
+        this.steamAccounts = steamAccounts;
+    }
 }

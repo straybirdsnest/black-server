@@ -1,7 +1,7 @@
 package com.example.config;
 
-import com.example.config.restful.CustomTokenAuthenticationFilter;
 import com.example.config.restful.RestAuthenticationEntryPoint;
+import com.example.services.SecurityUserDetailsService;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
@@ -14,14 +14,16 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.security.Key;
 
 @Configuration
 @EnableWebMvcSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private SecurityUserDetailsService securityUserDetailsService;
 
     @Autowired
     RestAuthenticationEntryPoint entryPoint;
@@ -31,18 +33,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http
 				.authorizeRequests()
 				.antMatchers("/register").permitAll()
+                .antMatchers("/login").permitAll()
                 .antMatchers("/api/token").permitAll()
+				.antMatchers("/api/**").permitAll();
+				/*
                 .antMatchers("/api/**").authenticated()
-				.and()
+                .and()
                 .addFilterAfter(new CustomTokenAuthenticationFilter("/api/**"), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling().authenticationEntryPoint(entryPoint);
+                */
 	}
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
+		//auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
+        auth.userDetailsService(securityUserDetailsService).passwordEncoder(new BCryptPasswordEncoder());
 	}
 
 	@Bean

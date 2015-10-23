@@ -71,7 +71,7 @@ public class DataModelTest {
         List<User> users = q.list();
 
         for (User u : users) {
-            System.out.println("已删除用户 (ID: " + u.getId() + ")");
+            System.out.println("已删除用户 (ID: " + u.getUserId() + ")");
             session.delete(u);
         }
     }
