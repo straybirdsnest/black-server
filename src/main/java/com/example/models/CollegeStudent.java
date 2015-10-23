@@ -6,7 +6,7 @@ import javax.persistence.*;
  * Created by yy on 9/11/15.
  */
 @Entity
-@Table(name = "t_persons")
+@Table(name = "tPerson")
 public class CollegeStudent extends User {
 
     private String name;

@@ -10,10 +10,8 @@ import javax.persistence.*;
 public class Image {
 
     @Id
-    @Column(columnDefinition = "char", length = 32)
+    @Column(columnDefinition="VARCHAR(32)")
     private String id;
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum")
     private Type type;
     @Lob
     @Column(columnDefinition = "blob")

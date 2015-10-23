@@ -44,6 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling().authenticationEntryPoint(entryPoint);
                 */
+        // disable csrf proetection for no browser application will be served
+		http.csrf().disable();
 	}
 
 	@Autowired
