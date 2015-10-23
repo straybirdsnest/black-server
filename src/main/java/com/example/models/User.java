@@ -11,7 +11,7 @@ import java.util.List;
  * Created by yy on 8/30/15.
  */
 @Entity
-@Table(name = "T_USERS")
+@Table(name = "tUser")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 

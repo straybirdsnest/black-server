@@ -4,14 +4,12 @@ import com.example.daos.UserGroupRepository;
 import com.example.daos.UserRepository;
 import com.example.models.User;
 import com.example.models.UserGroup;
-import com.example.services.UserService;
 import com.example.utils.EncodePasswordUtil;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
