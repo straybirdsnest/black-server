@@ -7,6 +7,7 @@ import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -23,13 +24,16 @@ public class AccountController {
     @Autowired
     JsonWebEncryption jwe;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public String register(String username, String password) {
 
         User u = repository.findOneByUsername(username);
 
         if (u == null) {
-            repository.save(new User(username, password));
+            repository.save(new User(username, passwordEncoder.encode(password)));
             log.info("新用户 " + username + " 注册成功");
             return "注册成功";
         }
@@ -47,21 +51,21 @@ public class AccountController {
         return true;
     }
 
-    @RequestMapping(value = "/api/token", method = RequestMethod.GET)
-    @ResponseBody
-    public String getToken(@RequestParam String username, @RequestParam String password) {
-        User u = repository.findOneByUsername(username);
-        if (u == null) return "";
-        if (u.getPassword().equals(password)) {
-            // 从用户信息生成 token
-            jwe.setPayload(u.getId() + (new Date()).toString());
-            try {
-                return jwe.getCompactSerialization();
-            } catch (JoseException e) {
-                e.printStackTrace();
-                return "";
-            }
-        }
-        return "";
-    }
+//    @RequestMapping(value = "/api/token", method = RequestMethod.GET)
+//    @ResponseBody
+//    public String getToken(@RequestParam String username, @RequestParam String password) {
+//        User u = repository.findOneByUsername(username);
+//        if (u == null) return "";
+//        if (u.getPassword().equals(password)) {
+//            // 从用户信息生成 token
+//            jwe.setPayload(u.getId() + (new Date()).toString());
+//            try {
+//                return jwe.getCompactSerialization();
+//            } catch (JoseException e) {
+//                e.printStackTrace();
+//                return "";
+//            }
+//        }
+//        return "";
+//    }
 }
