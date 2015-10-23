@@ -10,6 +10,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -30,25 +31,48 @@ public class AccountControllerTest {
     private MockMvc mockMvc;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
     }
 
     @After
-    public void cleanUp() throws Exception {
+    public void cleanUp() {
     }
 
 
     @Test
     public void registration() throws Exception {
-        mockMvc.perform(post("/register").param("username", "user").param("password", "password"))
+        mockMvc.perform(post("/register")
+                .param("username", "张全蛋")
+                .param("password", "password"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("注册成功"));
     }
 
     @Test
+    public void registerAndGetToken() throws Exception {
+        mockMvc.perform(post("/register")
+                .param("username", "张全蛋")
+                .param("password", "password"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("注册成功"));
+
+        MvcResult result = mockMvc.perform(get("/api/token")
+                .param("username", "张全蛋")
+                .param("password", "password000"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String token = result.getResponse().getContentAsString();
+
+        System.out.println(">>> Token String: " + token);
+    }
+
+    @Test
     public void getToken() throws Exception {
-        mockMvc.perform(get("/api/token").param("username", "test1").param("password", "123"))
+        mockMvc.perform(get("/api/token")
+                .param("username", "test1")
+                .param("password", "123"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("这就是一个加密了的 Token"));
     }

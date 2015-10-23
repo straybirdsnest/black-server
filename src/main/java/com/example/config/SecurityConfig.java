@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.config.restful.CustomTokenAuthenticationFilter;
 import com.example.config.restful.RestAuthenticationEntryPoint;
 import com.example.services.SecurityUserDetailsService;
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
@@ -10,13 +11,22 @@ import org.jose4j.lang.ByteUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 @Configuration
 @EnableWebMvcSecurity
@@ -28,29 +38,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     RestAuthenticationEntryPoint entryPoint;
 
+    @Autowired
+    Environment env;
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 				.authorizeRequests()
 				.antMatchers("/register").permitAll()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/api/token").permitAll()
-				.antMatchers("/api/**").permitAll();
-				/*
                 .antMatchers("/api/**").authenticated()
                 .and()
                 .addFilterAfter(new CustomTokenAuthenticationFilter("/api/**"), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling().authenticationEntryPoint(entryPoint);
-                */
 	}
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		//auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
-        auth.userDetailsService(securityUserDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+        auth.jdbcAuthentication().passwordEncoder(passwordEncoder());
 	}
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
 
 	@Bean
 	public JsonWebEncryption jsonWebEncryption() {
@@ -61,5 +74,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		jwe.setKey(key);
 		return jwe;
 	}
+
+    @Bean
+    public SecretKeySpec key() throws NoSuchAlgorithmException{
+        KeyGenerator kgen = KeyGenerator.getInstance("AES");
+        String key = env.getProperty("blackserver.secretkey");
+        kgen.init(128, new SecureRandom(key.getBytes()));
+        byte[] enCodeFormat = kgen.generateKey().getEncoded();
+        SecretKeySpec result = new SecretKeySpec(enCodeFormat, "AES");
+        Token.setKey(result);
+        return result;
+    }
 
 }
