@@ -3,20 +3,15 @@ package com.example.controllers;
 import com.example.daos.UserGroupRepository;
 import com.example.daos.UserRepository;
 import com.example.models.User;
-import com.example.models.UserGroup;
-import com.example.services.UserService;
-import com.example.utils.EncodePasswordUtil;
 import org.jose4j.jwe.JsonWebEncryption;
-import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.ArrayList;
-import java.util.Date;
 
 @RestController
 public class AccountController {

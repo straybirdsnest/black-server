@@ -6,14 +6,12 @@ import javax.persistence.*;
  * Created by yy on 9/11/15.
  */
 @Entity
-@Table(name = "t_image")
+@Table(name = "tImage")
 public class Image {
 
     @Id
-    @Column(columnDefinition = "char", length = 32)
+    @Column(columnDefinition="VARCHAR(32)")
     private String id;
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum")
     private Type type;
     @Lob
     @Column(columnDefinition = "blob")

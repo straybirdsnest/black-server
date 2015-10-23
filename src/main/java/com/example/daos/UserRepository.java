@@ -13,7 +13,6 @@ import java.util.List;
  */
 @Repository
 @Transactional
-@ResponseBody
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
     List<User> findByUsername(String username);

@@ -11,7 +11,7 @@ import java.util.List;
  * Created by yy on 8/30/15.
  */
 @Entity
-@Table(name = "T_USERS")
+@Table(name = "tUser")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
@@ -27,6 +27,9 @@ public class User {
 
     @Column(name = "enabled", columnDefinition = "int", length = 1)
     private boolean enabled;
+
+    @OneToOne
+    private CollegeStudent collegeStudent;
 
     @ManyToMany
     private List<UserGroup> userGroups;
@@ -96,5 +99,13 @@ public class User {
 
     public void setSteamAccounts(List<SteamAccount> steamAccounts) {
         this.steamAccounts = steamAccounts;
+    }
+
+    public CollegeStudent getCollegeStudent() {
+        return collegeStudent;
+    }
+
+    public void setCollegeStudent(CollegeStudent collegeStudent) {
+        this.collegeStudent = collegeStudent;
     }
 }

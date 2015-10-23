@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
-@Table(name = "t_user_group")
+@Table(name = "tUserGroup")
 public class UserGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
