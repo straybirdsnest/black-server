@@ -6,32 +6,32 @@ import javax.persistence.*;
  * Created by yy on 9/11/15.
  */
 @Entity
-@Table(name = "td_academy")
+@Table(name = "tdAcademy")
 public class Academy {
 
     @Id
     @GeneratedValue
-    private int id;
+    private int academyId;
 
-    private String name;
+    private String academyName;
 
     @ManyToOne(cascade = {CascadeType.PERSIST})
     private College college;
 
-    public int getId() {
-        return id;
+    public int getAcademyId() {
+        return academyId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setAcademyId(int acadamyId) {
+        this.academyId = acadamyId;
     }
 
-    public String getName() {
-        return name;
+    public String getAcademyName() {
+        return academyName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAcademyName(String academyName) {
+        this.academyName = academyName;
     }
 
     public College getCollege() {

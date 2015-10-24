@@ -1,6 +1,6 @@
 package com.example.controllers;
 
-import com.example.daos.UserGroupRepository;
+import com.example.daos.UserAuthorityRepository;
 import com.example.daos.UserRepository;
 import com.example.models.User;
 import org.jose4j.jwe.JsonWebEncryption;
@@ -22,7 +22,7 @@ public class AccountController {
     UserRepository repository;
 
     @Autowired
-    private UserGroupRepository userGroupRepository;
+    private UserAuthorityRepository userAuthorityRepository;
 
     @Autowired
     JsonWebEncryption jwe;

@@ -6,8 +6,8 @@ import javax.persistence.*;
  * Created by yy on 9/11/15.
  */
 @Entity
-@Table(name = "tPerson")
-public class CollegeStudent extends User {
+@Table(name = "tUserProfile")
+public class UserProfile extends User {
 
     private String name;
 
@@ -18,7 +18,7 @@ public class CollegeStudent extends User {
     private Academy academy;
 
     @OneToOne
-    @JoinColumn(name = "head_photo_id")
+    @JoinColumn(name = "avatar")
     private Image avatar;
 
     @Column(name = "attention")

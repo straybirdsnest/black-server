@@ -6,33 +6,32 @@ import javax.persistence.*;
  * Created by yy on 9/11/15.
  */
 @Entity
-@Table(name = "td_college")
+@Table(name = "tdCollege")
 public class College {
 
     @Id
     @GeneratedValue
-    private int id;
+    private int collegeId;
 
-    @Column(length = 255)
-    private String name;
+    private String collegeName;
 
     @Column(length = 20)
     private String area;
 
-    public int getId() {
-        return id;
+    public int getCollegeId() {
+        return collegeId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setCollegeId(int id) {
+        this.collegeId = id;
     }
 
-    public String getName() {
-        return name;
+    public String getCollegeName() {
+        return collegeName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCollegeName(String collegeName) {
+        this.collegeName = collegeName;
     }
 
     public String getArea() {

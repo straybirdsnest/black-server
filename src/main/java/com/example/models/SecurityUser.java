@@ -14,18 +14,18 @@ public class SecurityUser extends User implements UserDetails{
         super.setUsername(user.getUsername());
         super.setPassword(user.getPassword());
         super.setEnabled(user.isEnabled());
-        super.setUserGroups(user.getUserGroups());
+        super.setUserAuthorities(user.getUserAuthorities());
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        ArrayList<UserGroup> userGroups = (ArrayList<UserGroup>) getUserGroups();
-        Iterator<UserGroup> userGroupIterator = userGroups.iterator();
-        UserGroup userGroup = null;
+        ArrayList<UserAuthority> userAuthorities = (ArrayList<UserAuthority>) getUserAuthorities();
+        Iterator<UserAuthority> userGroupIterator = userAuthorities.iterator();
+        UserAuthority userAuthority = null;
         while (userGroupIterator.hasNext()) {
-            userGroup = userGroupIterator.next();
-            authorities.add(new SimpleGrantedAuthority(userGroup.getGroupName()));
+            userAuthority = userGroupIterator.next();
+            authorities.add(new SimpleGrantedAuthority(userAuthority.getAuthorityName()));
         }
         return authorities;
     }

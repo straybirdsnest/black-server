@@ -5,6 +5,7 @@ import com.example.utils.EncodePasswordUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -19,20 +20,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userId;
 
-    @Column(name = "account", nullable = false)
+    @Column(name = "account")
+    @NotNull
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
+    @NotNull
     private String password;
 
     @Column(name = "enabled", columnDefinition = "int", length = 1)
     private boolean enabled;
 
     @OneToOne
-    private CollegeStudent collegeStudent;
+    private UserProfile userProfile;
 
     @ManyToMany
-    private List<UserGroup> userGroups;
+    private List<UserAuthority> userAuthorities;
 
     @OneToMany
     private List<SteamAccount> steamAccounts;
@@ -85,12 +88,12 @@ public class User {
         this.enabled = enabled;
     }
 
-    public List<UserGroup> getUserGroups() {
-        return userGroups;
+    public List<UserAuthority> getUserAuthorities() {
+        return userAuthorities;
     }
 
-    public void setUserGroups(List<UserGroup> userGroups) {
-        this.userGroups = userGroups;
+    public void setUserAuthorities(List<UserAuthority> userAuthorities) {
+        this.userAuthorities = userAuthorities;
     }
 
     public List<SteamAccount> getSteamAccounts() {
@@ -101,11 +104,11 @@ public class User {
         this.steamAccounts = steamAccounts;
     }
 
-    public CollegeStudent getCollegeStudent() {
-        return collegeStudent;
+    public UserProfile getUserProfile() {
+        return userProfile;
     }
 
-    public void setCollegeStudent(CollegeStudent collegeStudent) {
-        this.collegeStudent = collegeStudent;
+    public void setUserProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
     }
 }

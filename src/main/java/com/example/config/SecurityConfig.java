@@ -44,22 +44,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
-				.authorizeRequests()
+						.authorizeRequests()
 				.antMatchers("/register").permitAll()
-                .antMatchers("/api/**").authenticated()
+                .antMatchers("/api/**").authenticated();
+        /*
                 .and()
                 .addFilterAfter(new CustomTokenAuthenticationFilter("/api/**"), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling().authenticationEntryPoint(entryPoint);
+        */
         // disable csrf proetection for no browser application will be served
-		http.csrf().disable();
+        http.csrf().disable();
 	}
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		//auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
-        auth.jdbcAuthentication().passwordEncoder(passwordEncoder());
+		// auth.inMemoryAuthentication().withUser("user").password("password").roles("USER");
+        // auth.jdbcAuthentication().passwordEncoder(passwordEncoder());
+        auth.userDetailsService(securityUserDetailsService);
 	}
 
     @Bean

@@ -10,35 +10,35 @@ import javax.persistence.*;
 public class Image {
 
     @Id
-    @Column(columnDefinition="VARCHAR(32)")
-    private String id;
-    private Type type;
+    @Column(columnDefinition="varchar(32)")
+    private String imageId;
+    private Type imageType;
     @Lob
     @Column(columnDefinition = "blob")
-    private byte[] data;
+    private byte[] imageData;
 
-    public String getId() {
-        return id;
+    public String getImageId() {
+        return imageId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setImageId(String id) {
+        this.imageId = id;
     }
 
-    public Type getType() {
-        return type;
+    public Type getImageType() {
+        return imageType;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setImageType(Type imageType) {
+        this.imageType = imageType;
     }
 
-    public byte[] getData() {
-        return data;
+    public byte[] getImageData() {
+        return imageData;
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
     }
 
     public enum Type {
