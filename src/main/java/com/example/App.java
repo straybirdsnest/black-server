@@ -15,7 +15,6 @@ import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.stereotype.Component;
 
 @SpringBootApplication
-//@Import({MvcConfig.class, SecurityConfig.class, DataConfig.class})
 @Component
 public class App implements ApplicationListener<ApplicationEvent> {
 
