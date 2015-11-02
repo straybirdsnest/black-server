@@ -15,16 +15,6 @@ import org.springframework.core.env.Environment;
 @Configuration
 public class ChatServerConfig {
 
-	/*@Bean(initMethod = "startServer", destroyMethod = "stopServer")
-    public ChatServer chatServer() {
-		return new ChatServer(configuration());
-	}
-
-	@Bean
-	public com.corundumstudio.socketio.Configuration configuration() {
-		return new com.corundumstudio.socketio.Configuration();
-	}*/
-
     @Autowired
     Environment env;
 
