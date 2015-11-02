@@ -1,8 +1,6 @@
 package com.example;
 
-import com.example.models.profiles.Academy;
-import com.example.models.profiles.College;
-import com.example.models.core.User;
+import com.example.models.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Test;
@@ -33,31 +31,31 @@ public class DataModelTest {
 
     }
 
-    @Test
-    @Transactional
-    @Rollback(false)
-    public void saveUser() {
-        UserProfile s = new UserProfile();
-
-        s.setName("李铁蛋");
-        s.setUsername("test1");
-        s.setPassword("1qasde32w");
-
-        College c = new College();
-        c.setName("哈尔滨佛教大学");
-
-        Academy a = new Academy();
-        a.setName("第二炮兵学院");
-        a.setCollege(c);
-
-        s.setCollege(c);
-
-        s.setAcademy(a);
-
-        Session session = em.unwrap(Session.class);
-        session.save(s);
-
-    }
+//    @Test
+//    @Transactional
+//    @Rollback(false)
+//    public void saveUser() {
+//        CollegeStudent s = new CollegeStudent();
+//
+//        s.setName("李铁蛋");
+//        s.setUsername("test1");
+//        s.setPassword("1qasde32w");
+//
+//        College c = new College();
+//        c.setName("哈尔滨佛教大学");
+//
+//        Academy a = new Academy();
+//        a.setName("第二炮兵学院");
+//        a.setCollege(c);
+//
+//        s.setCollege(c);
+//
+//        s.setAcademy(a);
+//
+//        Session session = em.unwrap(Session.class);
+//        session.save(s);
+//
+//    }
 
     @Test
     @Transactional
@@ -65,7 +63,7 @@ public class DataModelTest {
     public void deleteUser() {
         Session session = em.unwrap(Session.class);
 
-        Query q = session.createQuery("from UserProfile s where s.name like '李%'");
+        Query q = session.createQuery("from CollegeStudent s where s.name like '李%'");
 
         List<User> users = q.list();
 
