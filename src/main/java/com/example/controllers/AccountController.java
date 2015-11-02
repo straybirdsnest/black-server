@@ -40,9 +40,4 @@ public class AccountController {
     public ModelAndView register() {
         return new ModelAndView("register");
     }
-
-    @RequestMapping(value = "/username-available", method = RequestMethod.GET)
-    public boolean checkUsernameAvailable(String username) {
-        return true;
-    }
 }
