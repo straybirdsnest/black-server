@@ -2,9 +2,8 @@ package com.example.controllers;
 
 import com.example.Api;
 import com.example.daos.UserRepo;
-import com.example.models.ApiResult;
-import com.example.models.Token;
 import com.example.models.User;
+import com.example.services.TokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,9 @@ public class AccountController {
     @Autowired
     UserRepo userRepo;
 
+    @Autowired
+    TokenService tokenService;
+
     /**
      * @param phone
      * @return
@@ -31,7 +33,7 @@ public class AccountController {
         if (u == null) {
             User user = new User(phone);
             userRepo.save(user);
-            return Api.result(SUCCESS).param("token").value(new Token(user));
+            return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
         }
         return Api.result(ERR_PHONE_EXISTED);
     }

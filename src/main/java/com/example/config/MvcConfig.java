@@ -17,8 +17,4 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         registry.addViewController("/console").setViewName("console");
     }
 
-//    @Override
-//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-//        converters.add(new MappingJackson2HttpMessageConverter());
-//    }
 }
