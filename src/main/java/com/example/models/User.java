@@ -1,10 +1,7 @@
 package com.example.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 /**
@@ -12,50 +9,31 @@ import javax.persistence.Id;
  */
 @Entity
 public class User {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-    private String username;
-    private String password;
+    @GeneratedValue
+    private int id;
+    private String phone;
 
-
-    protected User() {}
-
-    public User(String username, String password){
-        this.username = username;
-        this.password = password;
+    protected User() {
     }
 
-    @Override
-    public String toString() {
-        return String.format(
-                "User[id=%d, username='%s', password='%s']",
-                id, username, password);
+    public User(String phone) {
+        this.phone = phone;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @JsonIgnore
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

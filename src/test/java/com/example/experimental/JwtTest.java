@@ -1,4 +1,4 @@
-package com.example;
+package com.example.experimental;
 
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
@@ -29,8 +29,8 @@ public class JwtTest {
         System.out.println("Serialized Encrypted JWE: " + serializedJwe);
 
         // 解密
-        jwe = new JsonWebEncryption();
-        jwe.setKey(key);
+        //jwe = new JsonWebEncryption();
+        //jwe.setKey(key);
         jwe.setCompactSerialization(serializedJwe);
         System.out.println("Payload: " + jwe.getPayload());
     }
