@@ -1,4 +1,4 @@
-package com.example;
+package com.example.experimental;
 
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;

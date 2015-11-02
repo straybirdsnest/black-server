@@ -1,6 +1,6 @@
 package com.example;
 
-import com.example.daos.UserRepository;
+import com.example.daos.UserRepo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AccountControllerTest {
 
     @Autowired
-    UserRepository repository;
+    UserRepo repository;
     @Autowired
     private WebApplicationContext context;
     private MockMvc mockMvc;

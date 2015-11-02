@@ -1,8 +1,12 @@
 package com.example.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.util.List;
 
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
@@ -13,19 +17,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         registry.addViewController("/console").setViewName("console");
     }
 
-	/*@Bean
-	public ViewResolver viewResolver() {
-		ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-		templateResolver.setTemplateMode("LEGACYHTML5");
-		templateResolver.setPrefix("templates/");
-		templateResolver.setSuffix(".html");
-		templateResolver.setCacheable(false);
-		SpringTemplateEngine engine = new SpringTemplateEngine();
-		engine.setTemplateResolver(templateResolver);
-
-		ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-		viewResolver.setTemplateEngine(engine);
-		return viewResolver;
-	}*/
-
+//    @Override
+//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+//        converters.add(new MappingJackson2HttpMessageConverter());
+//    }
 }

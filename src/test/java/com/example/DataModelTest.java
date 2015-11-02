@@ -1,8 +1,5 @@
 package com.example;
 
-import com.example.models.Academy;
-import com.example.models.College;
-import com.example.models.CollegeStudent;
 import com.example.models.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -34,31 +31,31 @@ public class DataModelTest {
 
     }
 
-    @Test
-    @Transactional
-    @Rollback(false)
-    public void saveUser() {
-        CollegeStudent s = new CollegeStudent();
-
-        s.setName("李铁蛋");
-        s.setUsername("test1");
-        s.setPassword("1qasde32w");
-
-        College c = new College();
-        c.setName("哈尔滨佛教大学");
-
-        Academy a = new Academy();
-        a.setName("第二炮兵学院");
-        a.setCollege(c);
-
-        s.setCollege(c);
-
-        s.setAcademy(a);
-
-        Session session = em.unwrap(Session.class);
-        session.save(s);
-
-    }
+//    @Test
+//    @Transactional
+//    @Rollback(false)
+//    public void saveUser() {
+//        CollegeStudent s = new CollegeStudent();
+//
+//        s.setName("李铁蛋");
+//        s.setUsername("test1");
+//        s.setPassword("1qasde32w");
+//
+//        College c = new College();
+//        c.setName("哈尔滨佛教大学");
+//
+//        Academy a = new Academy();
+//        a.setName("第二炮兵学院");
+//        a.setCollege(c);
+//
+//        s.setCollege(c);
+//
+//        s.setAcademy(a);
+//
+//        Session session = em.unwrap(Session.class);
+//        session.save(s);
+//
+//    }
 
     @Test
     @Transactional
@@ -71,7 +68,7 @@ public class DataModelTest {
         List<User> users = q.list();
 
         for (User u : users) {
-            System.out.println("已删除用户 (ID: " + u.getUserId() + ")");
+            System.out.println("已删除用户 (ID: " + u.getId() + ")");
             session.delete(u);
         }
     }

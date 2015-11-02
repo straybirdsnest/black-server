@@ -1,11 +1,9 @@
 package com.example.controllers;
 
-import com.example.daos.UserRepository;
-import com.example.models.User;
+import com.example.daos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -16,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestfulController {
 
     @Autowired
-    UserRepository userRepo;
+    UserRepo userRepo;
 
     /**
      * /api/token 的请求会经过 Spring Security 默认的
