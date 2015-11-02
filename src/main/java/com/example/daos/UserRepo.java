@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Repository
 @Transactional
-public interface UserRepo extends PagingAndSortingRepository<User, Long> {
+public interface UserRepo extends PagingAndSortingRepository<User, Integer> {
 
     User findOneByPhone(String phone);
 
