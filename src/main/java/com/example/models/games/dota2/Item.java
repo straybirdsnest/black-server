@@ -1,7 +1,5 @@
 package com.example.models.games.dota2;
 
-import com.example.models.Image;
-
 /**
  * Created by yy on 9/11/15.
  */

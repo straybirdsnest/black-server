@@ -1,14 +1,12 @@
 package com.example.models.games.dota2;
 
-import com.example.models.Image;
-
 /**
  * Created by yy on 9/11/15.
  */
 public class Hero {
     private Long heroId;
     private String name;
-    private Image icon;
+    //private Image icon;
 
     public Long getHeroId() {
         return heroId;
@@ -26,6 +24,7 @@ public class Hero {
         this.name = name;
     }
 
+    /*
     public Image getIcon() {
         return icon;
     }
@@ -33,4 +32,5 @@ public class Hero {
     public void setIcon(Image icon) {
         this.icon = icon;
     }
+    */
 }

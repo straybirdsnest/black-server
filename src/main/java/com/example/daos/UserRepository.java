@@ -1,10 +1,9 @@
 package com.example.daos;
 
-import com.example.models.User;
+import com.example.models.core.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -15,8 +14,8 @@ import java.util.List;
 @Transactional
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
-    List<User> findByUsername(String username);
+    List<User> findByNickname(String nickname);
 
-    User findOneByUsername(String username);
+    User findOneByNickname(String nickname);
 
 }

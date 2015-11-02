@@ -1,6 +1,6 @@
 package com.example.daos;
 
-import com.example.models.College;
+import com.example.models.profiles.College;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

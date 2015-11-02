@@ -1,10 +1,10 @@
 package com.example.models.games.dota2;
 
-import com.example.models.User;
+import com.example.models.core.User;
 
 import javax.persistence.*;
 
-@Entity
+//@Entity
 @Table(name = "tSteamAccount")
 public class SteamAccount {
     @Id

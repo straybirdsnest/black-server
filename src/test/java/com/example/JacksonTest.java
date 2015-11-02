@@ -1,6 +1,6 @@
 package com.example;
 
-import com.example.models.User;
+import com.example.models.core.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 

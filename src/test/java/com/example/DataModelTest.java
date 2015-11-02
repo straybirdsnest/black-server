@@ -1,9 +1,8 @@
 package com.example;
 
-import com.example.models.Academy;
-import com.example.models.College;
-import com.example.models.UserProfile;
-import com.example.models.User;
+import com.example.models.profiles.Academy;
+import com.example.models.profiles.College;
+import com.example.models.core.User;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Test;
@@ -45,10 +44,10 @@ public class DataModelTest {
         s.setPassword("1qasde32w");
 
         College c = new College();
-        c.setCollegeName("哈尔滨佛教大学");
+        c.setName("哈尔滨佛教大学");
 
         Academy a = new Academy();
-        a.setAcademyName("第二炮兵学院");
+        a.setName("第二炮兵学院");
         a.setCollege(c);
 
         s.setCollege(c);
@@ -71,7 +70,7 @@ public class DataModelTest {
         List<User> users = q.list();
 
         for (User u : users) {
-            System.out.println("已删除用户 (ID: " + u.getUserId() + ")");
+            System.out.println("已删除用户 (ID: " + u.getId() + ")");
             session.delete(u);
         }
     }

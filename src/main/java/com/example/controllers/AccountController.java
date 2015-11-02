@@ -2,7 +2,7 @@ package com.example.controllers;
 
 import com.example.daos.UserAuthorityRepository;
 import com.example.daos.UserRepository;
-import com.example.models.User;
+import com.example.models.core.User;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
