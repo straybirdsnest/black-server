@@ -36,6 +36,4 @@ public class TokenService {
         return userRepo.findOne(id);
     }
 
-
-
 }

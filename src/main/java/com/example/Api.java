@@ -2,9 +2,6 @@ package com.example;
 
 import java.util.Map;
 
-/**
- * Created by yy on 11/2/15.
- */
 public class Api {
     public static final int SUCCESS = 0;
     public static final int ERR_PHONE_EXISTED = 1;
