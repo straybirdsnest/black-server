@@ -4,14 +4,14 @@ import com.example.daos.UserRepo;
 import com.example.models.User;
 import com.example.utils.Cryptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * 用于生成 Token 字符串
  * Token 是由用户ID（int, 4 个字节），经过 AES 加密的base64字符串
  * 为了简单，暂且这样定
  */
-@Component
+@Service
 public class TokenService {
 
     @Autowired
@@ -35,7 +35,5 @@ public class TokenService {
         id = (id << 8) | data[3];
         return userRepo.findOne(id);
     }
-
-
 
 }
