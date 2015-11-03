@@ -1,32 +1,40 @@
 package com.example.models;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tActivity")
 public class Activity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Integer id;
-    private LocalDate startTime;
-    private LocalDate endTime;
+
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
+
     private String location;
+
     @ManyToOne
-    @JoinColumn(name = "promoter", referencedColumnName = "id")
+    @JoinColumn(name = "promoter_id")
     private User promoter;
-    @Lob
+
     @Column(columnDefinition = "text")
     private String content;
-    @Column(columnDefinition = "enum('match', 'black')")
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum")
     private Type type;
-    @Column(columnDefinition = "enum('ready', 'running', 'stopped')")
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum")
     private Status status;
-    @Lob
+
     @Column(columnDefinition = "text")
     private String remarks;
-    @OneToOne
-    @JoinColumn(name = "group", referencedColumnName = "id")
+
+    @ManyToOne
+    @JoinColumn(name = "group_id")
     private Group group;
 
     public Integer getId() {
@@ -37,19 +45,19 @@ public class Activity {
         this.id = id;
     }
 
-    public LocalDate getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDate startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDate getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDate endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 
@@ -116,5 +124,4 @@ public class Activity {
     public enum Status {
         READY, RUNNING, STOPPED
     }
-
 }

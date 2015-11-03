@@ -1,6 +1,7 @@
 package com.example;
 
 import com.corundumstudio.socketio.SocketIOServer;
+import com.example.dev.DevHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -21,17 +22,18 @@ import org.springframework.stereotype.Component;
 @SpringBootApplication
 @Component
 public class App implements ApplicationListener<ApplicationEvent>, ApplicationContextAware {
-    private static final Logger log = LoggerFactory.getLogger(App.class);
     public static final String CFG_TOKEN_LIFETIME = "blackserver.token.lifetime";
     public static final String CFG_CHAT_HOST = "blackserver.chat.host";
     public static final String CFG_CHAT_PORT = "blackserver.chat.port";
+    private static final Logger log = LoggerFactory.getLogger(App.class);
     public static int tokenLifetime;
     @Autowired
     private SocketIOServer chatServer;
 
-	public static void main(String[] args) {
-		SpringApplication.run(App.class, args);
-	}
+    public static void main(String[] args) {
+        DevHelper.initDb(args);
+        SpringApplication.run(App.class, args);
+    }
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
