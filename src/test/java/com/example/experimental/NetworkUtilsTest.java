@@ -10,9 +10,6 @@ import java.net.NetworkInterface;
 import java.net.URL;
 import java.util.Enumeration;
 
-/**
- * Created by yy on 9/12/15.
- */
 public class NetworkUtilsTest {
     @Test
     public void howToGetLanIp() throws Exception {

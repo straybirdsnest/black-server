@@ -9,9 +9,6 @@ import org.junit.Test;
 
 import java.security.Key;
 
-/**
- * Created by yy on 8/30/15.
- */
 public class JwtTest {
     @Test
     public void simple() throws Exception{

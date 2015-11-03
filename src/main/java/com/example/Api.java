@@ -13,9 +13,6 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by yy on 11/2/15.
- */
 public class Api {
     public static final String RESULT_FILTER_NAME = "apiResultFilter";
     public static final int SUCCESS = 0;
