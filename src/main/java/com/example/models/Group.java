@@ -1,21 +1,22 @@
 package com.example.models;
 
 import javax.persistence.*;
-import java.sql.Blob;
 
 @Entity
-@Table(name = "tGroup")
 public class Group {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Integer id;
+
     private String name;
+
     private String intro;
-    @Lob
+
     @Column(columnDefinition = "mediumblob")
-    private Blob logo;
+    private byte[] logo;
+
     @OneToOne
-    @JoinColumn(name = "page", referencedColumnName = "id")
+    @JoinColumn(name = "page_id")
     private Page page;
 
     public Integer getId() {
@@ -42,11 +43,11 @@ public class Group {
         this.intro = intro;
     }
 
-    public Blob getLogo() {
+    public byte[] getLogo() {
         return logo;
     }
 
-    public void setLogo(Blob logo) {
+    public void setLogo(byte[] logo) {
         this.logo = logo;
     }
 

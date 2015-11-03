@@ -36,4 +36,13 @@ public class TokenService {
         return userRepo.findOne(id);
     }
 
+    public int getUserId(String token) {
+        byte[] data = Cryptor.decrypt(token);
+        int id = data[0];
+        id = (id << 8) | data[1];
+        id = (id << 8) | data[2];
+        id = (id << 8) | data[3];
+        return id;
+    }
+
 }
