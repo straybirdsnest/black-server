@@ -3,7 +3,7 @@ package com.example.models;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Blob;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -13,8 +13,10 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "int")
     private Integer id;
 
+    @Column(columnDefinition = "varchar(20)")
     @NotNull
     private String phone;
 
@@ -22,15 +24,17 @@ public class User {
     @NotNull
     private String password;
 
+    @Column(columnDefinition = "varchar(100)")
     @NotNull
     private String email;
 
+    @Column(columnDefinition = "varchar(20)")
     private String nickname;
 
-    @Column(name = "realname")
+    @Column(name = "realname", columnDefinition = "varchar(20)")
     private String realName;
 
-    @Column(name = "idcard")
+    @Column(name = "idcard", columnDefinition = "varchar(18)")
     private String idCard;
 
     private boolean enabled;
@@ -38,11 +42,11 @@ public class User {
     @Column(columnDefinition = "enum('male','female','secret')")
     private Gender gender;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "college", referencedColumnName = "id")
     private College college;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "academy", referencedColumnName = "id")
     private Academy academy;
 
@@ -50,12 +54,15 @@ public class User {
     @Column(columnDefinition = "mediumblob")
     private Blob avatar;
 
-    private LocalDate birthday;
+    @Column(columnDefinition = "date")
+    private Instant birthday;
+    @Column(columnDefinition = "timestamp")
+    private Instant regTime;
 
-    private LocalDate regTime;
-
+    @Column(columnDefinition = "varchar(39)")
     private String regIp;
 
+    @Column(columnDefinition = "varchar(200)")
     private String regGps;
 
     @ManyToMany
@@ -68,15 +75,24 @@ public class User {
             })
     private List<User> friends;
 
-    @ManyToMany
-    @JoinTable(name = "tFriendship",
-            joinColumns = {
-                    @JoinColumn(name = "user_b", referencedColumnName = "id")
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "user_a", referencedColumnName = "id")
-            })
+    @ManyToMany(mappedBy = "friends")
     private List<User> friendsOf;
+
+    @ManyToMany
+    @JoinTable(name = "tSubscription",
+            joinColumns =
+                    {
+                            @JoinColumn(name = "broadcaster", referencedColumnName = "id")
+                    },
+            inverseJoinColumns =
+                    {
+                            @JoinColumn(name = "subscriber", referencedColumnName = "id")
+                    }
+            )
+    private List<User> subscriptions;
+
+    @ManyToMany(mappedBy = "subscriptions")
+    private List<User> broadcaster;
 
     protected User() {
     }
@@ -88,8 +104,8 @@ public class User {
     @Override
     public String toString() {
         return String.format(
-                "User[id=%d, nickname='%s', password='%s']",
-                id, nickname, password);
+                "User[id=%d, phone='%s', password='%s']",
+                id, phone, password);
     }
 
     public Integer getId() {
@@ -188,19 +204,19 @@ public class User {
         this.avatar = avatar;
     }
 
-    public LocalDate getBirthday() {
+    public Instant getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(LocalDate birthday) {
+    public void setBirthday(Instant birthday) {
         this.birthday = birthday;
     }
 
-    public LocalDate getRegTime() {
+    public Instant getRegTime() {
         return regTime;
     }
 
-    public void setRegTime(LocalDate regTime) {
+    public void setRegTime(Instant regTime) {
         this.regTime = regTime;
     }
 
@@ -226,6 +242,30 @@ public class User {
 
     public void setFriends(List<User> friends) {
         this.friends = friends;
+    }
+
+    public List<User> getFriendsOf() {
+        return friendsOf;
+    }
+
+    public void setFriendsOf(List<User> friendsOf) {
+        this.friendsOf = friendsOf;
+    }
+
+    public List<User> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(List<User> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
+
+    public List<User> getBroadcaster() {
+        return broadcaster;
+    }
+
+    public void setBroadcaster(List<User> broadcaster) {
+        this.broadcaster = broadcaster;
     }
 
     public enum Gender {

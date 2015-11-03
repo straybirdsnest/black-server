@@ -1,16 +1,20 @@
 package com.example.models;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.Instant;
 
 @Entity
 @Table(name = "tActivity")
 public class Activity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "int")
     private Integer id;
-    private LocalDate startTime;
-    private LocalDate endTime;
+    @Column(columnDefinition = "datetime")
+    private Instant startTime;
+    @Column(columnDefinition = "datetime")
+    private Instant endTime;
+    @Column(columnDefinition = "varchar(100)")
     private String location;
     @ManyToOne
     @JoinColumn(name = "promoter", referencedColumnName = "id")
@@ -37,19 +41,19 @@ public class Activity {
         this.id = id;
     }
 
-    public LocalDate getStartTime() {
+    public Instant getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(LocalDate startTime) {
+    public void setStartTime(Instant startTime) {
         this.startTime = startTime;
     }
 
-    public LocalDate getEndTime() {
+    public Instant getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDate endTime) {
+    public void setEndTime(Instant endTime) {
         this.endTime = endTime;
     }
 

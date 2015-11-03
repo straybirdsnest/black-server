@@ -8,8 +8,11 @@ import java.sql.Blob;
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "int")
     private Integer id;
+    @Column(columnDefinition = "varchar(50)")
     private String name;
+    @Column(columnDefinition = "varchar(200)")
     private String intro;
     @Lob
     @Column(columnDefinition = "mediumblob")
@@ -17,6 +20,8 @@ public class Group {
     @OneToOne
     @JoinColumn(name = "page", referencedColumnName = "id")
     private Page page;
+    @OneToOne(mappedBy = "group")
+    private Activity activity;
 
     public Integer getId() {
         return id;
@@ -56,5 +61,13 @@ public class Group {
 
     public void setPage(Page page) {
         this.page = page;
+    }
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
     }
 }

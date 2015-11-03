@@ -18,14 +18,14 @@ public class ActivityTypeConverter implements AttributeConverter<Activity.Type, 
     }
 
     @Override
-    public Activity.Type convertToEntityAttribute(String type) {
-        switch (type) {
+    public Activity.Type convertToEntityAttribute(String dbData) {
+        switch (dbData) {
             case "match":
                 return Activity.Type.MATCH;
             case "black":
                 return Activity.Type.BLACK;
             default:
-                throw new IllegalArgumentException("Unknown type " + type);
+                throw new IllegalArgumentException("Unknown type " + dbData);
         }
     }
 }

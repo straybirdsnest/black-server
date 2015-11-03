@@ -21,8 +21,8 @@ public class ActivityStatusConverter implements AttributeConverter<Activity.Stat
     }
 
     @Override
-    public Activity.Status convertToEntityAttribute(String status) {
-        switch (status) {
+    public Activity.Status convertToEntityAttribute(String dbData) {
+        switch (dbData) {
             case "ready":
                 return Activity.Status.READY;
             case "running":
@@ -30,7 +30,7 @@ public class ActivityStatusConverter implements AttributeConverter<Activity.Stat
             case "stopped":
                 return Activity.Status.STOPPED;
             default:
-                throw new IllegalArgumentException("Unknown status " + status);
+                throw new IllegalArgumentException("Unknown status " + dbData);
         }
     }
 }

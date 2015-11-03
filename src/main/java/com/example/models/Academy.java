@@ -9,8 +9,9 @@ public class Academy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "int")
     private Integer id;
-
+    @Column(columnDefinition = "varchar(30)")
     private String name;
 
     @Lob

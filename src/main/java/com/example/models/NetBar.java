@@ -2,29 +2,20 @@ package com.example.models;
 
 import javax.persistence.*;
 import java.sql.Blob;
-import java.util.List;
 
 @Entity
-@Table(name = "tCollege")
-public class College {
-
+@Table(name="tNetbar")
+public class NetBar {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "int")
     private Integer id;
     @Column(columnDefinition = "varchar(30)")
     private String name;
-    @Column(columnDefinition = "varchar(30)")
-    private String nameExt;
-
-    @Lob
     @Column(columnDefinition = "mediumblob")
     private Blob logo;
     @Column(columnDefinition = "varchar(200)")
     private String location;
-
-    @OneToMany(mappedBy = "college")
-    private List<Academy> academies;
 
     public Integer getId() {
         return id;
@@ -42,12 +33,12 @@ public class College {
         this.name = name;
     }
 
-    public String getNameExt() {
-        return nameExt;
+    public Blob getLogo() {
+        return logo;
     }
 
-    public void setNameExt(String nameExt) {
-        this.nameExt = nameExt;
+    public void setLogo(Blob logo) {
+        this.logo = logo;
     }
 
     public String getLocation() {
@@ -56,13 +47,5 @@ public class College {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public Blob getLogo() {
-        return logo;
-    }
-
-    public void setLogo(Blob logo) {
-        this.logo = logo;
     }
 }

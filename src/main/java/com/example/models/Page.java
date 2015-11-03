@@ -7,6 +7,7 @@ import javax.persistence.*;
 public class Page {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "int")
     private Integer id;
     @OneToOne(mappedBy = "page")
     private Group group;

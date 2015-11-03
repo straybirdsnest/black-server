@@ -5,9 +5,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.util.Base64;
 
-/**
- * Created by yy on 11/2/15.
- */
 public class Cryptor {
     private static Cipher cipher;
     private static SecretKey secretKey;
