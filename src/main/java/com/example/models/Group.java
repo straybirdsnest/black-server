@@ -1,27 +1,23 @@
 package com.example.models;
 
 import javax.persistence.*;
-import java.sql.Blob;
 
 @Entity
-@Table(name = "tGroup")
 public class Group {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "int")
+    @GeneratedValue
     private Integer id;
-    @Column(columnDefinition = "varchar(50)")
+
     private String name;
-    @Column(columnDefinition = "varchar(200)")
+
     private String intro;
-    @Lob
+
     @Column(columnDefinition = "mediumblob")
-    private Blob logo;
+    private byte[] logo;
+
     @OneToOne
-    @JoinColumn(name = "page", referencedColumnName = "id")
+    @JoinColumn(name = "page_id")
     private Page page;
-    @OneToOne(mappedBy = "group")
-    private Activity activity;
 
     public Integer getId() {
         return id;
@@ -47,11 +43,11 @@ public class Group {
         this.intro = intro;
     }
 
-    public Blob getLogo() {
+    public byte[] getLogo() {
         return logo;
     }
 
-    public void setLogo(Blob logo) {
+    public void setLogo(byte[] logo) {
         this.logo = logo;
     }
 
@@ -61,13 +57,5 @@ public class Group {
 
     public void setPage(Page page) {
         this.page = page;
-    }
-
-    public Activity getActivity() {
-        return activity;
-    }
-
-    public void setActivity(Activity activity) {
-        this.activity = activity;
     }
 }

@@ -1,16 +1,14 @@
 package com.example.models;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 @Entity
-@Table(name = "tPage")
 public class Page {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "int")
+    @GeneratedValue
     private Integer id;
-    @OneToOne(mappedBy = "page")
-    private Group group;
 
     public Integer getId() {
         return id;

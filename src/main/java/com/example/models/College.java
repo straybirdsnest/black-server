@@ -1,30 +1,28 @@
 package com.example.models;
 
 import javax.persistence.*;
-import java.sql.Blob;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "tCollege")
 public class College {
 
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "int")
     private Integer id;
-    @Column(columnDefinition = "varchar(30)")
+
     private String name;
-    @Column(columnDefinition = "varchar(30)")
+
     private String nameExt;
 
     @Lob
     @Column(columnDefinition = "mediumblob")
-    private Blob logo;
-    @Column(columnDefinition = "varchar(200)")
+    private byte[] logo;
+
     private String location;
 
     @OneToMany(mappedBy = "college")
-    private List<Academy> academies;
+    private Set<Academy> academies = new HashSet<>();
 
     public Integer getId() {
         return id;
@@ -58,11 +56,19 @@ public class College {
         this.location = location;
     }
 
-    public Blob getLogo() {
+    public byte[] getLogo() {
         return logo;
     }
 
-    public void setLogo(Blob logo) {
+    public void setLogo(byte[] logo) {
         this.logo = logo;
+    }
+
+    public Set<Academy> getAcademies() {
+        return academies;
+    }
+
+    public void setAcademies(Set<Academy> academies) {
+        this.academies = academies;
     }
 }

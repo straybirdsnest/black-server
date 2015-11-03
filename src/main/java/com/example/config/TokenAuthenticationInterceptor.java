@@ -1,6 +1,7 @@
 package com.example.config;
 
 import com.example.services.TokenService;
+import com.example.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,15 @@ public class TokenAuthenticationInterceptor implements HandlerInterceptor {
     @Autowired
     TokenService tokenService;
 
+    @Autowired
+    UserService userService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("X-Token");
         log.debug("拦截到请求 X-Token: " + token);
-        request.setAttribute("currentUser", tokenService.getUser(token));
+        //request.setAttribute("currentUser", tokenService.getUser(token));
+        userService.addUser(tokenService.getUserId(token));
         return true;
     }
 

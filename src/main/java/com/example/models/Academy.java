@@ -1,25 +1,21 @@
 package com.example.models;
 
 import javax.persistence.*;
-import java.sql.Blob;
 
 @Entity
-@Table(name = "tAcademy")
 public class Academy {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "int")
+    @GeneratedValue
     private Integer id;
-    @Column(columnDefinition = "varchar(30)")
+
     private String name;
 
     @Lob
     @Column(columnDefinition = "mediumblob")
-    private Blob logo;
+    private byte[] logo;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST})
-    @JoinColumn(name = "college")
+    @OneToOne
+    @JoinColumn(name = "college_id")
     private College college;
 
     public Integer getId() {
@@ -46,11 +42,11 @@ public class Academy {
         this.college = college;
     }
 
-    public Blob getLogo() {
+    public byte[] getLogo() {
         return logo;
     }
 
-    public void setLogo(Blob logo) {
+    public void setLogo(byte[] logo) {
         this.logo = logo;
     }
 }

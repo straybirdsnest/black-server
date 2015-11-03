@@ -1,20 +1,16 @@
 package com.example.models;
 
 import javax.persistence.*;
-import java.sql.Blob;
 
 @Entity
-@Table(name="tNetbar")
-public class NetBar {
+public class Netbar {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "int")
+    @GeneratedValue
     private Integer id;
-    @Column(columnDefinition = "varchar(30)")
     private String name;
+    @Lob
     @Column(columnDefinition = "mediumblob")
-    private Blob logo;
-    @Column(columnDefinition = "varchar(200)")
+    private byte[] logo;
     private String location;
 
     public Integer getId() {
@@ -33,11 +29,11 @@ public class NetBar {
         this.name = name;
     }
 
-    public Blob getLogo() {
+    public byte[] getLogo() {
         return logo;
     }
 
-    public void setLogo(Blob logo) {
+    public void setLogo(byte[] logo) {
         this.logo = logo;
     }
 
