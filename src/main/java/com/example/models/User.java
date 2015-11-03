@@ -94,6 +94,9 @@ public class User {
     @ManyToMany(mappedBy = "subscriptions")
     private List<User> broadcaster;
 
+    @OneToMany(mappedBy = "promoter")
+    private List<Activity> hostActivities;
+
     protected User() {
     }
 

@@ -30,7 +30,7 @@ public class Activity {
     @Column(columnDefinition = "text")
     private String remarks;
     @OneToOne
-    @JoinColumn(name = "group", referencedColumnName = "id")
+    @JoinColumn(name = "`group`", referencedColumnName = "id")
     private Group group;
 
     public Integer getId() {
