@@ -22,10 +22,10 @@ public class Activity {
     @Column(columnDefinition = "text")
     private String content;
 
-    @Column(columnDefinition = "enum('match', 'black')")
+    @Column(columnDefinition = "enum('MATCH', 'BLACK')")
     private Type type;
 
-    @Column(columnDefinition = "enum('ready', 'running', 'stopped')")
+    @Column(columnDefinition = "enum('READY', 'RUNNING', 'STOPPED')")
     private Status status;
 
     @Column(columnDefinition = "text")

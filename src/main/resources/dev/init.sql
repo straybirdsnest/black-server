@@ -47,10 +47,13 @@ CREATE TABLE T_USER (
   `reg_ip`        VARCHAR(39),
   `reg_longitude` DOUBLE PRECISION(9, 6),
   `reg_latitude`  DOUBLE PRECISION(9, 6),
-  `group_id`      INT,
+  `username`      VARCHAR(20),
+  `signature`     VARCHAR(255),
+  `hometown`      VARCHAR(40),
+  `highschool`    VARCHAR(40),
+  `grade`         VARCHAR(20),
   FOREIGN KEY (`college_id`) REFERENCES T_COLLEGE (id),
-  FOREIGN KEY (`academy_id`) REFERENCES T_ACADEMY (id),
-  FOREIGN KEY (`group_id`) REFERENCES T_GROUP (id)
+  FOREIGN KEY (`academy_id`) REFERENCES T_ACADEMY (id)
 );
 
 CREATE TABLE T_ACTIVITY (
@@ -85,7 +88,7 @@ CREATE TABLE T_SUBSCRIPTION (
 CREATE TABLE T_MEMBERSHIP (
   `group_id`  INT,
   `member_id` INT,
-  `type`      ENUM('member', 'op', 'speaker'),
+  `type`      ENUM('MEMBER', 'OP', 'SPEAKER'),
   FOREIGN KEY (`group_id`) REFERENCES T_GROUP (id),
   FOREIGN KEY (`member_id`) REFERENCES T_USER (id)
 );
@@ -109,5 +112,8 @@ CREATE TABLE T_NETBAR (
 );
 
 # 插入数据
-
-
+#学校信息
+INSERT INTO `black_server`.`t_college` (`id`, `name`, `name_ext`, `location`) VALUES ('1', '上海大学', '宝山校区', '上海市宝山区');
+INSERT INTO `black_server`.`t_academy` (`id`, `name`, `college_id`) VALUES ('1', '计算机工程与科学学院', '1');
+#用户信息
+INSERT INTO `black_server`.`t_user` (`id`, `phone`, `email`, `username`, `nickname`, `realname`, `idcard`, `enabled`, `gender`, `college_id`, `academy_id`, `birthday`, `reg_time`, `reg_ip`, `signature`, `hometown`, `highschool`, `grade`) VALUES ('1', '123456789', 'test@test.com', '王尼玛', '王尼玛', '王尼玛', '123456789', '0', 'MALE', '1', '1', '2000-01-01', '2001-01-02:03:45:01', '127.0.0.1', '我是王尼玛，萌萌的', '上海', '暴走高中', '研究生一年级');

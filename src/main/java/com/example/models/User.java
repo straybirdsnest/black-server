@@ -1,7 +1,10 @@
 package com.example.models;
 
+import com.example.config.jsonviews.UserView;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,11 +15,15 @@ public class User {
     @Id
     @GeneratedValue
     private Integer id;
+    @JsonView(UserView.ProfileWithoutAvatar.class)
     private String phone;
+    @JsonView(UserView.ProfileWithoutAvatar.class)
     private String email;
     private boolean enabled;
     @Embedded
-    public Profile profile;
+    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonUnwrapped
+    private Profile profile;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "T_FRIENDSHIP",
@@ -71,4 +78,19 @@ public class User {
         this.friends = friends;
     }
 
+    public RegistrationInfo getRegInfo() {
+        return regInfo;
+    }
+
+    public void setRegInfo(RegistrationInfo regInfo) {
+        this.regInfo = regInfo;
+    }
+
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
+    }
 }
