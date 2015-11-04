@@ -18,7 +18,7 @@ public class UserService {
         long threadId = Thread.currentThread().getId();
         Integer userId = userMap.get(threadId);
         User user = userRepo.findOne(userId);
-        return null;
+        return user;
     }
 
     public void addUser(int userId) {

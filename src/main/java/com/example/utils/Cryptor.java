@@ -9,9 +9,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
-/**
- * Created by yy on 11/2/15.
- */
 public class Cryptor {
     static final Logger log = LoggerFactory.getLogger(Cryptor.class);
     private static Cipher cipher;

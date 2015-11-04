@@ -17,6 +17,7 @@ public class Api {
     public static final String RESULT_FILTER_NAME = "apiResultFilter";
     public static final int SUCCESS = 0;
     public static final int ERR_PHONE_EXISTED = 1;
+    public static final int ERR_DATA_NOT_FOUND = 2;
 
     public static Result result(int returnCode) {
         return new Result(returnCode);

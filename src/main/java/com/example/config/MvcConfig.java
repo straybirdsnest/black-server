@@ -2,6 +2,7 @@ package com.example.config;
 
 import com.example.Api;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -36,15 +37,13 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         /*ObjectMapper mapper = Jackson2ObjectMapperBuilder.json()
                 .filters(new SimpleFilterProvider()).addFilter("filter", new Api.Result.ResultFilter());*/
         // Cannot use above code cause spring under 4.2
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setFilters(new SimpleFilterProvider()
-                .addFilter(Api.RESULT_FILTER_NAME, new Api.Result.ResultFilter()));
-
         converters.replaceAll(f -> {
             if (f instanceof MappingJackson2HttpMessageConverter) {
-                ((MappingJackson2HttpMessageConverter) f).setObjectMapper(mapper);
+                FilterProvider provider = new SimpleFilterProvider().addFilter(Api.RESULT_FILTER_NAME, new Api.Result.ResultFilter());
+                ((MappingJackson2HttpMessageConverter) f).getObjectMapper().setFilters(provider);
             }
             return f;
         });
     }
+
 }

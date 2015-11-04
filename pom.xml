@@ -64,6 +64,10 @@
 			<version>5.1.36</version>
 			<scope>runtime</scope>
 		</dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
         <!-- NO EFFECTS! -->
         <!--<dependency>-->
         <!--<groupId>org.jadira.usertype</groupId>-->
