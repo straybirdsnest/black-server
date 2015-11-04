@@ -14,22 +14,11 @@ public class User {
     private Integer id;
     private String phone;
     private String email;
-    private String nickname;
-    @Column(name = "realname")
-    private String realName;
-    @Column(name = "idcard")
-    private String idCard;
     private boolean enabled;
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum")
-    private Gender gender;
+    @Embedded
+    public Profile profile;
 
-    @Lob
-    @Column(columnDefinition = "mediumblob")
-    private byte[] avatar;
-
-    private LocalDate birthday;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "T_FRIENDSHIP",
             joinColumns = @JoinColumn(name = "user_a"),
             inverseJoinColumns = @JoinColumn(name = "user_b"))
@@ -66,60 +55,12 @@ public class User {
         this.email = email;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getRealName() {
-        return realName;
-    }
-
-    public void setRealName(String realName) {
-        this.realName = realName;
-    }
-
-    public String getIdCard() {
-        return idCard;
-    }
-
-    public void setIdCard(String idCard) {
-        this.idCard = idCard;
-    }
-
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public byte[] getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(byte[] avatar) {
-        this.avatar = avatar;
-    }
-
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
     }
 
     public Set<User> getFriends() {
@@ -130,7 +71,4 @@ public class User {
         this.friends = friends;
     }
 
-    public enum Gender {
-        MALE, FEMALE, SECRET
-    }
 }

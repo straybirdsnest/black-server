@@ -2,6 +2,7 @@ package com.example.controllers;
 
 import com.example.Api;
 import com.example.daos.UserRepo;
+import com.example.models.Profile;
 import com.example.models.User;
 import com.example.services.TokenService;
 import org.slf4j.Logger;
@@ -37,6 +38,8 @@ public class AccountController {
         User u = userRepo.findOneByPhone(phone);
         if (u == null) {
             User user = new User(phone);
+            user.profile = new Profile();
+            user.profile.setGender(Profile.Gender.SECRET);
             userRepo.save(user);
             return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
         }
