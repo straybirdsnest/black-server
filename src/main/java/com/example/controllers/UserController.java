@@ -21,7 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import static com.example.Api.SUCCESS;
 
@@ -56,6 +59,7 @@ public class UserController {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream);
             byte[] avatar = byteArrayOutputStream.toByteArray();
+            byteArrayOutputStream.close();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setContentLength(avatar.length);
@@ -66,14 +70,19 @@ public class UserController {
     }
 
     @RequestMapping(value = "/api/profile/avatar", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    ResponseEntity<?> setAvatar(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> setAvatar(@RequestParam("file") MultipartFile file) {
+        //TODO 扩展默认使用ImageIO导致的某些格式无法转换
         User user = userService.getCurrentUser();
-        if(user!=null && !file.isEmpty()) {
+        if (user != null && !file.isEmpty()) {
             try {
                 byte[] bytes = file.getBytes();
-                user.getProfile().setAvatar(bytes);
+                InputStream inputStream = new ByteArrayInputStream(bytes);
+                BufferedImage bufferedImage = ImageIO.read(inputStream);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream);
+                byte[] avatar = byteArrayOutputStream.toByteArray();
+                byteArrayOutputStream.close();
+                user.getProfile().setAvatar(avatar);
                 userRepo.save(user);
                 return new ResponseEntity<>(HttpStatus.OK);
             } catch (Exception e) {
