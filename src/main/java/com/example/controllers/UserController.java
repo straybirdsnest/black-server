@@ -17,14 +17,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.example.Api.ERR_DATA_NOT_FOUND;
 import static com.example.Api.SUCCESS;
 
 @RestController
@@ -41,10 +42,9 @@ public class UserController {
     UserService userService;
 
     @RequestMapping(value = "/api/profile/avatar", method = RequestMethod.GET)
-    public ResponseEntity<?> getAvatar()
-    {
+    public ResponseEntity<?> getAvatar() {
         User user = userService.getCurrentUser();
-        if(user!=null && user.getProfile() != null && user.getProfile().getAvatar() != null) {
+        if (user != null && user.getProfile() != null && user.getProfile().getAvatar() != null) {
             byte[] avatar = user.getProfile().getAvatar();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
@@ -57,27 +57,40 @@ public class UserController {
             InputStream inputStream = resource.getInputStream();
             BufferedImage bufferedImage = ImageIO.read(inputStream);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage,"PNG",byteArrayOutputStream);
+            ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream);
             byte[] avatar = byteArrayOutputStream.toByteArray();
+            byteArrayOutputStream.close();
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setContentLength(avatar.length);
-            return new ResponseEntity<byte[]>(avatar,headers,HttpStatus.OK);
+            return new ResponseEntity<byte[]>(avatar, headers, HttpStatus.OK);
         } catch (IOException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
     }
 
     @RequestMapping(value = "/api/profile/avatar", method = RequestMethod.POST)
-    public @ResponseBody Api.Result setAvatar(byte[] avatar)
-    {
+    public ResponseEntity<?> setAvatar(@RequestParam("file") MultipartFile file) {
+        //TODO 扩展默认使用ImageIO导致的某些格式无法转换
         User user = userService.getCurrentUser();
-        if(user!= null && avatar!= null){
-            user.getProfile().setAvatar(avatar);
-            userRepo.save(user);
-            return Api.result(SUCCESS);
+        if (user != null && !file.isEmpty()) {
+            try {
+                byte[] bytes = file.getBytes();
+                InputStream inputStream = new ByteArrayInputStream(bytes);
+                BufferedImage bufferedImage = ImageIO.read(inputStream);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream);
+                byte[] avatar = byteArrayOutputStream.toByteArray();
+                byteArrayOutputStream.close();
+                user.getProfile().setAvatar(avatar);
+                userRepo.save(user);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return Api.result(ERR_DATA_NOT_FOUND);
     }
 
     @JsonView(UserView.ProfileWithoutAvatar.class)
@@ -86,17 +99,16 @@ public class UserController {
         User user = userService.getCurrentUser();
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);
-        }else{
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @RequestMapping(value = "/api/profile", method = RequestMethod.POST)
-    public ResponseEntity<?> setProfile(@RequestBody Profile profile)
-    {
+    public ResponseEntity<?> setProfile(@RequestBody Profile profile) {
         //TODO 分开头像与Profile的数据，使得两者不再重复获得
         User user = userService.getCurrentUser();
-        if(user!= null && profile!= null){
+        if (user != null && profile != null) {
             user.setProfile(profile);
             userRepo.save(user);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -105,10 +117,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/api/reginfo", method = RequestMethod.GET)
-    public ResponseEntity<?> getRegInfo()
-    {
+    public ResponseEntity<?> getRegInfo() {
         User user = userRepo.findOne(1);
-        if(user!= null) {
+        if (user != null) {
             RegistrationInfo registrationInfo = user.getRegInfo();
             return new ResponseEntity<>(registrationInfo, HttpStatus.OK);
         }
@@ -121,31 +132,31 @@ public class UserController {
         User user = userRepo.findOne(1);
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);
-        }else{
+        } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @RequestMapping(value = "/api/friend/num", method = RequestMethod.GET)
-    public ResponseEntity<?> getFriendNumber(){
+    public ResponseEntity<?> getFriendNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(123);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/api/follow/num", method = RequestMethod.GET)
-    public ResponseEntity<?> getFollowNumber(){
+    public ResponseEntity<?> getFollowNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(200);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/api/fan/num", method = RequestMethod.GET)
-    public ResponseEntity<?> getFanNumber(){
+    public ResponseEntity<?> getFanNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(456);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/api/likes/num", method = RequestMethod.GET)
-    public ResponseEntity<?> getLikeNumber(){
+    public ResponseEntity<?> getLikeNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(789);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
