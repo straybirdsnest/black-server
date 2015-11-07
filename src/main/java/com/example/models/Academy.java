@@ -1,6 +1,7 @@
 package com.example.models;
 
 import com.example.config.jsonviews.UserView;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
@@ -10,7 +11,7 @@ public class Academy {
     @Id
     @GeneratedValue
     private Integer id;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String name;
 
     @Lob
@@ -19,6 +20,7 @@ public class Academy {
 
     @OneToOne
     @JoinColumn(name = "college_id")
+    @JsonIgnore
     private College college;
 
     public Integer getId() {

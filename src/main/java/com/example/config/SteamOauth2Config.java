@@ -1,11 +1,5 @@
 package com.example.config;
 
-import org.mitre.oauth2.model.RegisteredClient;
-import org.mitre.openid.connect.client.NamedAdminAuthoritiesMapper;
-import org.mitre.openid.connect.client.OIDCAuthenticationFilter;
-import org.mitre.openid.connect.client.OIDCAuthenticationProvider;
-import org.mitre.openid.connect.client.SubjectIssuerGrantedAuthority;
-import org.mitre.openid.connect.client.service.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,19 +11,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
-//@Configuration
+@Configuration
 @EnableWebSecurity
-public class SteamOauth2Config extends WebSecurityConfigurerAdapter{
+public class SteamOauth2Config extends WebSecurityConfigurerAdapter {
 
     public static final String STEAM_OPENID_SERVICE_ISSUER = "http://steamcommunity.com/openid/?l=chinese";
 
-    public SteamOauth2Config() {
-
-    }
-
+    /*
     @Bean
     public OIDCAuthenticationProvider oidcAuthenticationProvider() {
         OIDCAuthenticationProvider oidcAuthenticationProvider = new OIDCAuthenticationProvider();
@@ -102,7 +90,7 @@ public class SteamOauth2Config extends WebSecurityConfigurerAdapter{
         oidcAuthenticationFilter.setAuthRequestUrlBuilder(plainAuthRequestUrlBuilder());
         return oidcAuthenticationFilter;
     }
-
+    */
 
     @Autowired
     public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
@@ -112,7 +100,7 @@ public class SteamOauth2Config extends WebSecurityConfigurerAdapter{
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/webjars/**", "/images/**", "/oauth/uncache_approvals", "/oauth/cache_approvals");
+        web.ignoring().antMatchers("/api/**");
     }
 
     @Override
@@ -126,6 +114,9 @@ public class SteamOauth2Config extends WebSecurityConfigurerAdapter{
         // @formatter:off
         http
                 .authorizeRequests()
+                .antMatchers("/requests").permitAll()
+                .antMatchers("/tokens").permitAll()
+                .antMatchers("/api/**").permitAll()
                 .antMatchers("/login.jsp").permitAll()
                 .anyRequest().hasRole("USER")
                 .and()
@@ -145,5 +136,7 @@ public class SteamOauth2Config extends WebSecurityConfigurerAdapter{
                 .failureUrl("/login.jsp?authentication_error=true")
                 .loginPage("/login.jsp");
         // @formatter:on
+        http.csrf().disable();
     }
+
 }

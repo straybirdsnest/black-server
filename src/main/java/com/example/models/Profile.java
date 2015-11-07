@@ -1,7 +1,6 @@
 package com.example.models;
 
 import com.example.config.jsonviews.UserView;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
@@ -9,39 +8,39 @@ import java.time.LocalDate;
 
 @Embeddable
 public class Profile {
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String nickname;
     @Column(name = "realname")
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.UserSummary.class)
     private String realName;
     @Column(name = "idcard")
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String idCard;
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private Gender gender;
     @Lob
     @Column(columnDefinition = "mediumblob")
     private byte[] avatar;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private LocalDate birthday;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.UserSummary.class)
     private String signature;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String hometown;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String highschool;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String username;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id",referencedColumnName = "id")
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private College college;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academy_id",referencedColumnName = "id")
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private Academy academy;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String grade;
 
     public String getNickname() {
@@ -148,7 +147,7 @@ public class Profile {
         this.grade = grade;
     }
 
-    //@JsonView(UserView.ProfileWithoutAvatar.class)
+    //@JsonView(UserView.Profile.class)
     //@JsonProperty("college")
     public String getCollegeName()
     {
@@ -160,7 +159,7 @@ public class Profile {
         }
     }
 
-    //@JsonView(UserView.ProfileWithoutAvatar.class)
+    //@JsonView(UserView.Profile.class)
     //@JsonProperty("academy")
     public String getAcademyName(){
         if(academy!= null){

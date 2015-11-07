@@ -13,7 +13,7 @@ public class College {
     @Id
     @GeneratedValue
     private Integer id;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String name;
 
     private String nameExt;
