@@ -1,7 +1,7 @@
 package com.example.models;
 
 import com.example.config.jsonviews.UserView;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
@@ -15,20 +15,20 @@ public class User {
     @Id
     @GeneratedValue
     private Integer id;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String phone;
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     private String email;
     private boolean enabled;
     @Embedded
-    @JsonView(UserView.ProfileWithoutAvatar.class)
-    @JsonUnwrapped
+    @JsonView(UserView.UserSummary.class)
     private Profile profile;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "T_FRIENDSHIP",
             joinColumns = @JoinColumn(name = "user_a"),
             inverseJoinColumns = @JoinColumn(name = "user_b"))
+    @JsonIgnore
     private Set<User> friends = new HashSet<>();
 
     public User() {

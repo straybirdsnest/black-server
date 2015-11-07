@@ -1,5 +1,6 @@
 package com.example.config.jsonviews;
 
 public class UserView {
-    public interface ProfileWithoutAvatar{};
+    public interface UserSummary{}
+    public interface Profile extends UserSummary{}
 }
