@@ -3,7 +3,6 @@ package com.example.controllers;
 import com.example.Api;
 import com.example.config.jsonviews.UserView;
 import com.example.daos.UserRepo;
-import com.example.models.Profile;
 import com.example.models.RegistrationInfo;
 import com.example.models.User;
 import com.example.services.TokenService;
@@ -31,7 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import static com.example.Api.*;
+import static com.example.Api.SUCCESS;
+import static com.example.Api.UPDATE_TOKEN_FAILED;
 
 @RestController
 public class UserController {
@@ -70,7 +70,7 @@ public class UserController {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setContentLength(avatar.length);
-            return new ResponseEntity<byte[]>(avatar, headers, HttpStatus.OK);
+            return new ResponseEntity<>(avatar, headers, HttpStatus.OK);
         }
         //TODO 使用非固定URI读取资源
         Resource resource = applicationContext.getResource("url:http://localhost:8080/images/defaultavatar.png");
@@ -84,7 +84,7 @@ public class UserController {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setContentLength(avatar.length);
-            return new ResponseEntity<byte[]>(avatar, headers, HttpStatus.OK);
+            return new ResponseEntity<>(avatar, headers, HttpStatus.OK);
         } catch (IOException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
@@ -92,6 +92,7 @@ public class UserController {
 
     @RequestMapping(value = "/api/profile/avatar", method = RequestMethod.PUT)
     public ResponseEntity<?> setAvatar(MultipartFile file) {
+        //TODO Fix使用PUT方法无法上传图片的Bug
         //TODO 扩展默认使用ImageIO导致的某些格式无法转换
         User user = userService.getCurrentUser();
         if (user != null && !file.isEmpty()) {
@@ -186,7 +187,7 @@ public class UserController {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.IMAGE_PNG);
             headers.setContentLength(avatar.length);
-            return new ResponseEntity<byte[]>(avatar, headers, HttpStatus.OK);
+            return new ResponseEntity<>(avatar, headers, HttpStatus.OK);
         } catch (IOException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
@@ -198,7 +199,7 @@ public class UserController {
         final PageRequest pageable = new PageRequest(0, 10, Sort.Direction.ASC, "id");
         //TODO 将查询朋友的功能真正实现
         Page<User> users = userRepo.findAll(pageable);
-        if (users.getTotalElements()>0) {
+        if (users.getTotalElements() > 0) {
             List<User> userList = users.getContent();
             return new ResponseEntity<>(userList, HttpStatus.OK);
         } else {
