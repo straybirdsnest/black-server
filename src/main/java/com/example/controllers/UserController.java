@@ -13,6 +13,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,9 +29,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
-import static com.example.Api.SUCCESS;
-import static com.example.Api.UPDATE_TOKEN_FAILED;
+import static com.example.Api.*;
 
 @RestController
 public class UserController {
@@ -111,9 +114,9 @@ public class UserController {
         }
     }
 
-    @JsonView(UserView.ProfileWithoutAvatar.class)
+    @JsonView(UserView.Profile.class)
     @RequestMapping(value = "/api/profile", method = RequestMethod.GET)
-    public ResponseEntity<?> getProfile() {
+    public ResponseEntity<?> getMyProfile() {
         User user = userService.getCurrentUser();
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);
@@ -122,12 +125,18 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/api/profile", method = RequestMethod.POST)
-    public ResponseEntity<?> setProfile(@RequestBody Profile profile) {
-        //TODO 分开头像与Profile的数据，使得两者不再重复获得
+    @JsonView()
+    @RequestMapping(value = "/api/profile", method = RequestMethod.PUT)
+    public ResponseEntity<?> setMyProfile(@RequestBody com.example.models.Profile profile) {
         User user = userService.getCurrentUser();
         if (user != null && profile != null) {
-            user.setProfile(profile);
+            com.example.models.Profile oldProfile = user.getProfile();
+            if (oldProfile != null && oldProfile.getAvatar() != null) {
+                profile.setAvatar(oldProfile.getAvatar());
+                user.setProfile(profile);
+            } else {
+                user.setProfile(profile);
+            }
             userRepo.save(user);
             return new ResponseEntity<>(HttpStatus.OK);
         }
@@ -135,7 +144,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/api/reginfo", method = RequestMethod.GET)
-    public ResponseEntity<?> getRegInfo() {
+    public ResponseEntity<?> getMyRegInfo() {
         User user = userRepo.findOne(1);
         if (user != null) {
             RegistrationInfo registrationInfo = user.getRegInfo();
@@ -144,10 +153,10 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @JsonView(UserView.ProfileWithoutAvatar.class)
-    @RequestMapping(value = "/api/friend/profile", method = RequestMethod.GET)
-    public ResponseEntity<?> getFriendProfile() {
-        User user = userRepo.findOne(1);
+    @JsonView(UserView.Profile.class)
+    @RequestMapping(value = "/api/users/{userId}/profile", method = RequestMethod.GET)
+    public ResponseEntity<?> getUserProfile(@PathVariable int userId) {
+        User user = userRepo.findOne(userId);
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);
         } else {
@@ -155,6 +164,49 @@ public class UserController {
         }
     }
 
+    @RequestMapping(value = "/api/users/{userId}/profile/avatar", method = RequestMethod.GET)
+    public ResponseEntity<?> getUserAvatar(@PathVariable int userId) {
+        User user = userRepo.findOne(userId);
+        if (user != null && user.getProfile() != null && user.getProfile().getAvatar() != null) {
+            byte[] avatar = user.getProfile().getAvatar();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            headers.setContentLength(avatar.length);
+            return new ResponseEntity<byte[]>(avatar, headers, HttpStatus.OK);
+        }
+        //TODO 使用非固定URI读取资源
+        Resource resource = applicationContext.getResource("url:http://localhost:8080/images/defaultavatar.png");
+        try {
+            InputStream inputStream = resource.getInputStream();
+            BufferedImage bufferedImage = ImageIO.read(inputStream);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream);
+            byte[] avatar = byteArrayOutputStream.toByteArray();
+            byteArrayOutputStream.close();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            headers.setContentLength(avatar.length);
+            return new ResponseEntity<byte[]>(avatar, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+    }
+
+    @JsonView(UserView.UserSummary.class)
+    @RequestMapping(value = "/api/profile/friends", method = RequestMethod.GET)
+    public ResponseEntity<?> getMyFriendList() {
+        final PageRequest pageable = new PageRequest(0, 10, Sort.Direction.ASC, "id");
+        //TODO 将查询朋友的功能真正实现
+        Page<User> users = userRepo.findAll(pageable);
+        if (users.getTotalElements()>0) {
+            List<User> userList = users.getContent();
+            return new ResponseEntity<>(userList, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @JsonView(UserView.Profile.class)
     @RequestMapping(value = "/api/friend/num", method = RequestMethod.GET)
     public ResponseEntity<?> getFriendNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(123);

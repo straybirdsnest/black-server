@@ -58,6 +58,7 @@ CREATE TABLE T_USER (
 
 CREATE TABLE T_ACTIVITY (
   `id`          INT PRIMARY KEY AUTO_INCREMENT,
+  `cover`       MEDIUMBLOB,
   `start_time`  DATETIME,
   `end_time`    DATETIME,
   `location`    VARCHAR(100),

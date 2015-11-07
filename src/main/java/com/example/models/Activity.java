@@ -1,5 +1,8 @@
 package com.example.models;
 
+import com.example.config.jsonviews.ActivityView;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -9,10 +12,16 @@ public class Activity {
     @GeneratedValue
     private Integer id;
 
+    @Lob
+    @Column(columnDefinition = "mediumblob")
+    @JsonView(ActivityView.AcitivitySummary.class)
+    private byte[] cover;
+
+    @JsonView(ActivityView.AcitivitySummary.class)
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
-
+    @JsonView(ActivityView.AcitivitySummary.class)
     private String location;
 
     @ManyToOne
@@ -23,6 +32,7 @@ public class Activity {
     private String content;
 
     @Column(columnDefinition = "enum('MATCH', 'BLACK')")
+    @JsonView(ActivityView.AcitivitySummary.class)
     private Type type;
 
     @Column(columnDefinition = "enum('READY', 'RUNNING', 'STOPPED')")
@@ -41,6 +51,14 @@ public class Activity {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public byte[] getCover() {
+        return cover;
+    }
+
+    public void setCover(byte[] cover) {
+        this.cover = cover;
     }
 
     public LocalDateTime getStartTime() {

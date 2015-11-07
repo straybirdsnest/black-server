@@ -1,5 +1,8 @@
 package com.example.models;
 
+import com.example.config.jsonviews.UserView;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +13,7 @@ public class College {
     @Id
     @GeneratedValue
     private Integer id;
-
+    @JsonView(UserView.Profile.class)
     private String name;
 
     private String nameExt;
