@@ -114,6 +114,7 @@ public class SteamOauth2Config extends WebSecurityConfigurerAdapter {
         // @formatter:off
         http
                 .authorizeRequests()
+                .antMatchers("/status").permitAll()
                 .antMatchers("/requests").permitAll()
                 .antMatchers("/tokens").permitAll()
                 .antMatchers("/api/**").permitAll()

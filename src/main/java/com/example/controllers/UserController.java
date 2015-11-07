@@ -73,7 +73,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/api/profile/avatar", method = RequestMethod.PUT)
-    public ResponseEntity<?> setAvatar(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> setAvatar(MultipartFile file) {
         //TODO 扩展默认使用ImageIO导致的某些格式无法转换
         User user = userService.getCurrentUser();
         if (user != null && !file.isEmpty()) {
