@@ -1,7 +1,7 @@
 package com.example.config;
 
 import com.example.Api;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.dev.DebugRequestInterceptor;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,9 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Autowired
     TokenAuthenticationInterceptor tokenAuthenticationInterceptor;
 
+    @Autowired
+    DebugRequestInterceptor debugRequestInterceptor;
+
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("index");
@@ -27,6 +30,9 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(debugRequestInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/requests");
         registry.addInterceptor(tokenAuthenticationInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns("/api/register");
