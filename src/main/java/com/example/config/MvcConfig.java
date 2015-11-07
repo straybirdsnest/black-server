@@ -35,7 +35,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
                 .excludePathPatterns("/requests");
         registry.addInterceptor(tokenAuthenticationInterceptor)
                 .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/register");
+                .excludePathPatterns("/api/register", "/api/token");
     }
 
     @Override
