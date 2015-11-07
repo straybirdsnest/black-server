@@ -25,9 +25,14 @@ public class TokenAuthenticationInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String token = request.getHeader("X-Token");
-        log.debug("拦截到请求 X-Token: " + token);
-        //request.setAttribute("currentUser", tokenService.getUser(token));
-        userService.addUser(tokenService.getUserId(token));
+        if (token == null) {
+            log.debug("拦截到无 X-Token 的请求：" + request.getRequestURI());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
+        } else {
+            log.debug("拦截到 X-Token 为 " + token + " 的请求：" + request.getRequestURI());
+            userService.addUser(tokenService.getUserId(token));
+        }
         return true;
     }
 
