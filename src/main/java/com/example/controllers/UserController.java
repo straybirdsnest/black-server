@@ -6,6 +6,7 @@ import com.example.daos.UserRepo;
 import com.example.models.Profile;
 import com.example.models.RegistrationInfo;
 import com.example.models.User;
+import com.example.services.TokenService;
 import com.example.services.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.log4j.Logger;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static com.example.Api.SUCCESS;
+import static com.example.Api.UPDATE_TOKEN_FAILED;
 
 @RestController
 public class UserController {
@@ -40,6 +42,22 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    TokenService tokenService;
+
+    /**
+     * 更新用户无效的 token
+     *
+     * @param phone
+     * @return
+     */
+    @RequestMapping(value = "/api/token", method = RequestMethod.GET)
+    public Api.Result getToken(@RequestParam String phone) {
+        User user = userRepo.findOneByPhone(phone);
+        if (user == null) return Api.result(UPDATE_TOKEN_FAILED);
+        return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
+    }
 
     @RequestMapping(value = "/api/profile/avatar", method = RequestMethod.GET)
     public ResponseEntity<?> getAvatar() {
@@ -70,7 +88,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/api/profile/avatar", method = RequestMethod.POST)
-    public ResponseEntity<?> setAvatar(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> setAvatar(@RequestParam MultipartFile file) {
         //TODO 扩展默认使用ImageIO导致的某些格式无法转换
         User user = userService.getCurrentUser();
         if (user != null && !file.isEmpty()) {
