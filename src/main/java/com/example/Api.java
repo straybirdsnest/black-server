@@ -18,6 +18,8 @@ public class Api {
     public static final int SUCCESS = 0;
     public static final int ERR_PHONE_EXISTED = 1;
     public static final int ERR_DATA_NOT_FOUND = 2;
+    public static final int STATUS_OK = 0; // 服务器运行正常
+    public static final int STATUS_MAINTENANCE = 1; // 服务器维护
 
     public static Result result(int returnCode) {
         return new Result(returnCode);
