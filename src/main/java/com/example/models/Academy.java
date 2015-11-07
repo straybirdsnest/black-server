@@ -1,5 +1,8 @@
 package com.example.models;
 
+import com.example.config.jsonviews.UserView;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import javax.persistence.*;
 
 @Entity
@@ -7,7 +10,7 @@ public class Academy {
     @Id
     @GeneratedValue
     private Integer id;
-
+    @JsonView(UserView.ProfileWithoutAvatar.class)
     private String name;
 
     @Lob

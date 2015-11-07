@@ -109,7 +109,13 @@ public class UserController {
         //TODO 分开头像与Profile的数据，使得两者不再重复获得
         User user = userService.getCurrentUser();
         if (user != null && profile != null) {
-            user.setProfile(profile);
+            Profile oldProfile = user.getProfile();
+            if(oldProfile!= null && oldProfile.getAvatar()!= null) {
+                profile.setAvatar(oldProfile.getAvatar());
+                user.setProfile(profile);
+            }else{
+                user.setProfile(profile);
+            }
             userRepo.save(user);
             return new ResponseEntity<>(HttpStatus.OK);
         }

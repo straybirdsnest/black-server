@@ -148,8 +148,8 @@ public class Profile {
         this.grade = grade;
     }
 
-    @JsonView(UserView.ProfileWithoutAvatar.class)
-    @JsonProperty("college")
+    //@JsonView(UserView.ProfileWithoutAvatar.class)
+    //@JsonProperty("college")
     public String getCollegeName()
     {
         if(college != null){
@@ -160,8 +160,8 @@ public class Profile {
         }
     }
 
-    @JsonView(UserView.ProfileWithoutAvatar.class)
-    @JsonProperty("academy")
+    //@JsonView(UserView.ProfileWithoutAvatar.class)
+    //@JsonProperty("academy")
     public String getAcademyName(){
         if(academy!= null){
             return academy.getName();
