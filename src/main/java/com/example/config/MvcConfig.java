@@ -43,6 +43,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         /*ObjectMapper mapper = Jackson2ObjectMapperBuilder.json()
                 .filters(new SimpleFilterProvider()).addFilter("filter", new Api.Result.ResultFilter());*/
         // Cannot use above code cause spring under 4.2
+
         converters.replaceAll(f -> {
             if (f instanceof MappingJackson2HttpMessageConverter) {
                 FilterProvider provider = new SimpleFilterProvider().addFilter(Api.RESULT_FILTER_NAME, new Api.Result.ResultFilter());
