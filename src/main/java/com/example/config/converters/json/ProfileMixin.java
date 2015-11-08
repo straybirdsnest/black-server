@@ -12,7 +12,7 @@ public abstract class ProfileMixin {
     abstract String getNickename();
 
     @JsonView(UserView.UserSummary.class)
-    abstract String getRealName();
+    abstract String getRealName();;
 
     @JsonView(UserView.Profile.class)
     abstract String getIdCard();
@@ -38,6 +38,9 @@ public abstract class ProfileMixin {
     @JsonView(UserView.Profile.class)
     @JsonProperty("college")
     abstract String getCollegeName();
+    @JsonView(UserView.Profile.class)
+    @JsonProperty("college")
+    abstract void setCollegeName();
 
     @JsonView(UserView.Profile.class)
     @JsonProperty("academy")

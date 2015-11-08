@@ -1,12 +1,14 @@
 package com.example.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@JsonDeserialize(using = com.example.config.converters.json.UserDeserilizer.class)
 public class User {
     @Embedded
     RegistrationInfo regInfo;

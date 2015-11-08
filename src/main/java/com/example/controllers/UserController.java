@@ -2,13 +2,16 @@ package com.example.controllers;
 
 import com.example.Api;
 import com.example.config.jsonviews.UserView;
+import com.example.daos.AcademyRepo;
+import com.example.daos.CollegeRepo;
 import com.example.daos.UserRepo;
+import com.example.models.Academy;
+import com.example.models.College;
 import com.example.models.RegistrationInfo;
 import com.example.models.User;
 import com.example.services.TokenService;
 import com.example.services.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +48,13 @@ public class UserController {
     ApplicationContext applicationContext;
 
     @Autowired
-    ObjectMapper objectMapper;
+    UserRepo userRepo;
 
     @Autowired
-    UserRepo userRepo;
+    CollegeRepo collegeRepo;
+
+    @Autowired
+    AcademyRepo academyRepo;
 
     @Autowired
     UserService userService;
@@ -160,9 +166,21 @@ public class UserController {
     @RequestMapping(value = "/api/profile", method = RequestMethod.PUT)
     public ResponseEntity<?> setMyProfile(@RequestBody User updatedUser) {
         User user = userService.getCurrentUser();
+        updatedUser.setId(user.getId());
+        updatedUser.setPhone(user.getPhone());
+        updatedUser.setEnabled(updatedUser.isEnabled());
         updatedUser.setRegInfo(user.getRegInfo());
-        userRepo.save(updatedUser);
-        return ResponseEntity.ok(user);
+        College updatedCollege = updatedUser.getProfile().getCollege();
+        College college = collegeRepo.findOneByName(updatedCollege.getName());
+        Academy updatedAcademy = updatedUser.getProfile().getAcademy();
+        Academy academy = academyRepo.findOneByName(updatedAcademy.getName());
+        if(college != null && academy != null) {
+            updatedUser.getProfile().setCollege(college);
+            updatedUser.getProfile().setAcademy(academy);
+            userRepo.save(updatedUser);
+            return ResponseEntity.ok(updatedUser);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "/api/reginfo", method = RequestMethod.GET)
