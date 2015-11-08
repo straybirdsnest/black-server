@@ -1,46 +1,43 @@
 package com.example.models;
 
-import com.example.config.jsonviews.UserView;
-import com.fasterxml.jackson.annotation.JsonView;
-
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Embeddable
 public class Profile {
-    @JsonView(UserView.Profile.class)
     private String nickname;
+
     @Column(name = "realname")
-    @JsonView(UserView.UserSummary.class)
     private String realName;
+
     @Column(name = "idcard")
-    @JsonView(UserView.Profile.class)
     private String idCard;
+
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
-    @JsonView(UserView.Profile.class)
     private Gender gender;
+
     @Lob
     @Column(columnDefinition = "mediumblob")
     private byte[] avatar;
-    @JsonView(UserView.Profile.class)
+
     private LocalDate birthday;
-    @JsonView(UserView.UserSummary.class)
+
     private String signature;
-    @JsonView(UserView.Profile.class)
+
     private String hometown;
-    @JsonView(UserView.Profile.class)
+
     private String highschool;
-    @JsonView(UserView.Profile.class)
+
     private String username;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id",referencedColumnName = "id")
-    @JsonView(UserView.Profile.class)
+
     private College college;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academy_id",referencedColumnName = "id")
-    @JsonView(UserView.Profile.class)
+
     private Academy academy;
-    @JsonView(UserView.Profile.class)
+
     private String grade;
 
     public String getNickname() {
@@ -147,8 +144,6 @@ public class Profile {
         this.grade = grade;
     }
 
-    //@JsonView(UserView.Profile.class)
-    //@JsonProperty("college")
     public String getCollegeName()
     {
         if(college != null){
@@ -159,8 +154,6 @@ public class Profile {
         }
     }
 
-    //@JsonView(UserView.Profile.class)
-    //@JsonProperty("academy")
     public String getAcademyName(){
         if(academy!= null){
             return academy.getName();

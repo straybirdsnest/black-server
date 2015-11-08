@@ -1,8 +1,6 @@
 package com.example.models;
 
-import com.example.config.jsonviews.UserView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -15,13 +13,14 @@ public class User {
     @Id
     @GeneratedValue
     private Integer id;
-    @JsonView(UserView.Profile.class)
+
     private String phone;
-    @JsonView(UserView.Profile.class)
+
     private String email;
+
     private boolean enabled;
+
     @Embedded
-    @JsonView(UserView.UserSummary.class)
     private Profile profile;
 
     @ManyToMany(fetch = FetchType.LAZY)

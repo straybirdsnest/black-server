@@ -9,7 +9,8 @@ import com.example.services.TokenService;
 import com.example.services.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -38,7 +39,7 @@ import static com.example.Api.UPDATE_TOKEN_FAILED;
 
 @RestController
 public class UserController {
-    static final Logger logger = Logger.getLogger(UserController.class);
+    static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     ApplicationContext applicationContext;
@@ -157,7 +158,7 @@ public class UserController {
      * @return HTTP状态码OK表示操作成功，BAD_REQUEST表示参数异常
      */
     @RequestMapping(value = "/api/profile", method = RequestMethod.PUT)
-    public ResponseEntity<?> setMyProfile(@RequestBody User updatedUser){
+    public ResponseEntity<?> setMyProfile(@RequestBody User updatedUser) {
         User user = userService.getCurrentUser();
         updatedUser.setRegInfo(user.getRegInfo());
         userRepo.save(updatedUser);
