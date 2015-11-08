@@ -43,6 +43,7 @@ public class AccountController {
         User u = userRepo.findOneByPhone(phone);
         if (u == null) {
             User user = new User(phone);
+            user.setEnabled(true);
             RegistrationInfo registrationInfo = new RegistrationInfo();
             String remoteAddress = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                     .getRequest().getRemoteAddr();
@@ -55,8 +56,16 @@ public class AccountController {
             user.setProfile(profile);
             userRepo.save(user);
             return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
+            /*
+            ErrorMessage error = new ErrorMessage("token", tokenService.generateToken(user));
+            return new ResponseEntity<>(error ,HttpStatus.OK);
+            */
         }
         return Api.result(ERR_PHONE_EXISTED);
+        /*
+        ErrorMessage error = new ErrorMessage("error", "phone existed");
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        */
     }
 
     @RequestMapping(value = "/api/hello", method = GET)
