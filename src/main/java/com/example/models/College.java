@@ -18,14 +18,16 @@ public class College {
 
     private String nameExt;
 
-    @Lob
-    @Column(columnDefinition = "mediumblob")
-    private byte[] logo;
+    @ManyToOne
+    @JoinColumn(name = "logo_id")
+    private Image logo;
 
     private String location;
 
     @OneToMany(mappedBy = "college")
     private Set<Academy> academies = new HashSet<>();
+
+    //<editor-fold desc="=== Getters & Setters ===">
 
     public Integer getId() {
         return id;
@@ -59,11 +61,11 @@ public class College {
         this.location = location;
     }
 
-    public byte[] getLogo() {
+    public Image getLogo() {
         return logo;
     }
 
-    public void setLogo(byte[] logo) {
+    public void setLogo(Image logo) {
         this.logo = logo;
     }
 
@@ -74,4 +76,6 @@ public class College {
     public void setAcademies(Set<Academy> academies) {
         this.academies = academies;
     }
+
+    //</editor-fold>
 }
