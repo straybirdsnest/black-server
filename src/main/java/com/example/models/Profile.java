@@ -10,38 +10,56 @@ import java.time.LocalDate;
 public class Profile {
     @JsonView(UserView.Profile.class)
     private String nickname;
+
     @Column(name = "realname")
     @JsonView(UserView.UserSummary.class)
     private String realName;
+
     @Column(name = "idcard")
     @JsonView(UserView.Profile.class)
     private String idCard;
+
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
     @JsonView(UserView.Profile.class)
     private Gender gender;
-    @Lob
-    @Column(columnDefinition = "mediumblob")
-    private byte[] avatar;
+
+    @ManyToOne
+    @JoinColumn(name = "avatar_id")
+    private Image avatar;
+
     @JsonView(UserView.Profile.class)
     private LocalDate birthday;
+
     @JsonView(UserView.UserSummary.class)
     private String signature;
+
     @JsonView(UserView.Profile.class)
     private String hometown;
+
     @JsonView(UserView.Profile.class)
     private String highschool;
+
     @JsonView(UserView.Profile.class)
     private String username;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id",referencedColumnName = "id")
     @JsonView(UserView.Profile.class)
     private College college;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academy_id",referencedColumnName = "id")
     @JsonView(UserView.Profile.class)
     private Academy academy;
+
     @JsonView(UserView.Profile.class)
     private String grade;
+
+    @ManyToOne
+    @JoinColumn(name = "background_image_id")
+    private Image backgroundImage;
+
+    //<editor-fold desc="=== Getters & Setters ===">
 
     public String getNickname() {
         return nickname;
@@ -75,11 +93,11 @@ public class Profile {
         this.gender = gender;
     }
 
-    public byte[] getAvatar() {
+    public Image getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(byte[] avatar) {
+    public void setAvatar(Image avatar) {
         this.avatar = avatar;
     }
 
@@ -146,6 +164,16 @@ public class Profile {
     public void setGrade(String grade) {
         this.grade = grade;
     }
+
+    public Image getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public void setBackgroundImage(Image backgroundImage) {
+        this.backgroundImage = backgroundImage;
+    }
+
+    //</editor-fold>
 
     //@JsonView(UserView.Profile.class)
     //@JsonProperty("college")

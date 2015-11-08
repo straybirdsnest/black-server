@@ -14,14 +14,16 @@ public class Academy {
     @JsonView(UserView.Profile.class)
     private String name;
 
-    @Lob
-    @Column(columnDefinition = "mediumblob")
-    private byte[] logo;
+    @ManyToOne
+    @JoinColumn(name = "logo_id")
+    private Image logo;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "college_id")
     @JsonIgnore
     private College college;
+
+    //<editor-fold desc="=== Getters & Setters ===">
 
     public Integer getId() {
         return id;
@@ -47,11 +49,13 @@ public class Academy {
         this.college = college;
     }
 
-    public byte[] getLogo() {
+    public Image getLogo() {
         return logo;
     }
 
-    public void setLogo(byte[] logo) {
+    public void setLogo(Image logo) {
         this.logo = logo;
     }
+
+    //</editor-fold>
 }

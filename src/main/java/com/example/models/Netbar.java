@@ -8,10 +8,12 @@ public class Netbar {
     @GeneratedValue
     private Integer id;
     private String name;
-    @Lob
-    @Column(columnDefinition = "mediumblob")
-    private byte[] logo;
+    @ManyToOne
+    @JoinColumn(name = "logo_id")
+    private Image logo;
     private String location;
+
+    //<editor-fold desc="=== Getters & Setters ===">
 
     public Integer getId() {
         return id;
@@ -29,11 +31,11 @@ public class Netbar {
         this.name = name;
     }
 
-    public byte[] getLogo() {
+    public Image getLogo() {
         return logo;
     }
 
-    public void setLogo(byte[] logo) {
+    public void setLogo(Image logo) {
         this.logo = logo;
     }
 
@@ -44,4 +46,6 @@ public class Netbar {
     public void setLocation(String location) {
         this.location = location;
     }
+
+    //</editor-fold>
 }

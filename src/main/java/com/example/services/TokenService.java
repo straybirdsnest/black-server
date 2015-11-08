@@ -17,7 +17,7 @@ public class TokenService {
     @Autowired
     UserRepo userRepo;
 
-    public String generateToken(User user){
+    public String generateToken(User user) {
         int id = user.getId();
         byte[] bytes = new byte[]{
                 (byte) (id >>> 24),
@@ -27,17 +27,13 @@ public class TokenService {
         return Cryptor.encrypt(bytes);
     }
 
-    public User getUser(String token){
-        byte[] data = Cryptor.decrypt(token);
-        int id = data[0];
-        id = (id << 8) | data[1];
-        id = (id << 8) | data[2];
-        id = (id << 8) | data[3];
-        return userRepo.findOne(id);
+    public User getUser(String token) throws IllegalTokenException{
+        return userRepo.findOne(getUserId(token));
     }
 
-    public int getUserId(String token) {
+    public int getUserId(String token) throws IllegalTokenException {
         byte[] data = Cryptor.decrypt(token);
+        if (data == null) throw new IllegalTokenException();
         int id = data[0];
         id = (id << 8) | data[1];
         id = (id << 8) | data[2];
