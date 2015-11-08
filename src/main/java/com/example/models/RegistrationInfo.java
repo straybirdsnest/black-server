@@ -16,6 +16,8 @@ public class RegistrationInfo {
     })
     private Location regLocation;
 
+    //<editor-fold desc="=== Getters & Setters ===">
+
     public LocalDateTime getRegTime() {
         return regTime;
     }
@@ -39,4 +41,6 @@ public class RegistrationInfo {
     public void setRegLocation(Location regLocation) {
         this.regLocation = regLocation;
     }
+
+    //</editor-fold>
 }

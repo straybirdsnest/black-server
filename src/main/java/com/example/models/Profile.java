@@ -16,9 +16,9 @@ public class Profile {
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
     private Gender gender;
 
-    @Lob
-    @Column(columnDefinition = "mediumblob")
-    private byte[] avatar;
+    @ManyToOne
+    @JoinColumn(name = "avatar_id")
+    private Image avatar;
 
     private LocalDate birthday;
 
@@ -29,16 +29,24 @@ public class Profile {
     private String highschool;
 
     private String username;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "college_id",referencedColumnName = "id")
+    @JoinColumn(name = "college_id", referencedColumnName = "id")
 
     private College college;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "academy_id",referencedColumnName = "id")
+    @JoinColumn(name = "academy_id", referencedColumnName = "id")
 
     private Academy academy;
 
     private String grade;
+
+    @ManyToOne
+    @JoinColumn(name = "background_image_id")
+    private Image backgroundImage;
+
+    //<editor-fold desc="=== Getters & Setters ===">
 
     public String getNickname() {
         return nickname;
@@ -72,11 +80,11 @@ public class Profile {
         this.gender = gender;
     }
 
-    public byte[] getAvatar() {
+    public Image getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(byte[] avatar) {
+    public void setAvatar(Image avatar) {
         this.avatar = avatar;
     }
 
@@ -144,20 +152,30 @@ public class Profile {
         this.grade = grade;
     }
 
-    public String getCollegeName()
-    {
-        if(college != null){
+    public Image getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public void setBackgroundImage(Image backgroundImage) {
+        this.backgroundImage = backgroundImage;
+    }
+
+    //</editor-fold>
+
+    //@JsonView(UserView.Profile.class)
+    //@JsonProperty("college")
+    public String getCollegeName() {
+        if (college != null) {
             return college.getName();
-        }else
-        {
+        } else {
             return null;
         }
     }
 
-    public String getAcademyName(){
-        if(academy!= null){
+    public String getAcademyName() {
+        if (academy != null) {
             return academy.getName();
-        }else {
+        } else {
             return null;
         }
     }

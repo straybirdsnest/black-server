@@ -12,12 +12,15 @@ public class Group {
 
     private String intro;
 
-    @Column(columnDefinition = "mediumblob")
-    private byte[] logo;
+    @ManyToOne
+    @JoinColumn(name = "logo_id")
+    private Image logo;
 
     @OneToOne
     @JoinColumn(name = "page_id")
     private Page page;
+
+    //<editor-fold desc="=== Getters & Setters ===">
 
     public Integer getId() {
         return id;
@@ -43,11 +46,11 @@ public class Group {
         this.intro = intro;
     }
 
-    public byte[] getLogo() {
+    public Image getLogo() {
         return logo;
     }
 
-    public void setLogo(byte[] logo) {
+    public void setLogo(Image logo) {
         this.logo = logo;
     }
 
@@ -58,4 +61,6 @@ public class Group {
     public void setPage(Page page) {
         this.page = page;
     }
+
+    //</editor-fold>
 }

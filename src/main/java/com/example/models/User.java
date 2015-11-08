@@ -10,8 +10,7 @@ import java.util.Set;
 @Entity
 @JsonDeserialize(using = com.example.config.converters.json.UserDeserilizer.class)
 public class User {
-    @Embedded
-    RegistrationInfo regInfo;
+
     @Id
     @GeneratedValue
     private Integer id;
@@ -24,6 +23,9 @@ public class User {
 
     @Embedded
     private Profile profile;
+
+    @Embedded
+    private RegistrationInfo regInfo;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "T_FRIENDSHIP",
@@ -38,6 +40,8 @@ public class User {
     public User(String phone) {
         this.phone = phone;
     }
+
+    //<editor-fold desc="=== Getters & Setters ===">
 
     public Integer getId() {
         return id;
@@ -94,4 +98,6 @@ public class User {
     public void setProfile(Profile profile) {
         this.profile = profile;
     }
+
+    //</editor-fold>
 }

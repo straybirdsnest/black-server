@@ -12,10 +12,10 @@ public class Activity {
     @GeneratedValue
     private Integer id;
 
-    @Lob
-    @Column(columnDefinition = "mediumblob")
+    @ManyToOne
+    @JoinColumn(name = "cover_image_id")
     @JsonView(ActivityView.AcitivitySummary.class)
-    private byte[] cover;
+    private Image coverImage;
 
     @JsonView(ActivityView.AcitivitySummary.class)
     private LocalDateTime startTime;
@@ -45,6 +45,8 @@ public class Activity {
     @JoinColumn(name = "group_id")
     private Group group;
 
+    //<editor-fold desc="=== Getters & Setters ===">
+
     public Integer getId() {
         return id;
     }
@@ -53,12 +55,12 @@ public class Activity {
         this.id = id;
     }
 
-    public byte[] getCover() {
-        return cover;
+    public Image getCoverImage() {
+        return coverImage;
     }
 
-    public void setCover(byte[] cover) {
-        this.cover = cover;
+    public void setCoverImage(Image coverImage) {
+        this.coverImage = coverImage;
     }
 
     public LocalDateTime getStartTime() {
@@ -132,6 +134,8 @@ public class Activity {
     public void setGroup(Group group) {
         this.group = group;
     }
+
+    //</editor-fold>
 
     public enum Type {
         MATCH, BLACK
