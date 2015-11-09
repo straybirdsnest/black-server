@@ -17,7 +17,8 @@ import java.time.LocalDate;
 
 public class UserDeserilizer extends JsonDeserializer<User> {
 
-    public static final Logger logger = LoggerFactory.getLogger(UserDeserilizer.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserDeserilizer.class);
+
     @Override
     public User deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
         JsonNode root = jsonParser.getCodec().readTree(jsonParser);
@@ -51,7 +52,7 @@ public class UserDeserilizer extends JsonDeserializer<User> {
         academy.setName(academyName);
         profile.setAcademy(academy);
 
-        switch (gender){
+        switch (gender) {
             case "MALE":
                 profile.setGender(Profile.Gender.MALE);
                 break;
@@ -62,7 +63,7 @@ public class UserDeserilizer extends JsonDeserializer<User> {
                 profile.setGender(Profile.Gender.SECRET);
                 break;
             default:
-                throw new IOException("unknown gender type of "+ gender);
+                throw new IOException("unknown gender type of " + gender);
         }
 
         profile.setGrade(grade);
