@@ -10,6 +10,8 @@ public class Page {
     @GeneratedValue
     private Integer id;
 
+    //<editor-fold desc="=== Getters & Setters ===">
+
     public Integer getId() {
         return id;
     }
@@ -17,4 +19,6 @@ public class Page {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    //</editor-fold>
 }

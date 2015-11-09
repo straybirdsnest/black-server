@@ -1,28 +1,31 @@
 package com.example.models;
 
-import com.example.config.jsonviews.UserView;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@JsonDeserialize(using = com.example.config.converters.json.UserDeserilizer.class)
 public class User {
-    @Embedded
-    RegistrationInfo regInfo;
+
     @Id
     @GeneratedValue
     private Integer id;
-    @JsonView(UserView.Profile.class)
+
     private String phone;
-    @JsonView(UserView.Profile.class)
+
     private String email;
+
     private boolean enabled;
+
     @Embedded
-    @JsonView(UserView.UserSummary.class)
     private Profile profile;
+
+    @Embedded
+    private RegistrationInfo regInfo;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "T_FRIENDSHIP",
@@ -37,6 +40,8 @@ public class User {
     public User(String phone) {
         this.phone = phone;
     }
+
+    //<editor-fold desc="=== Getters & Setters ===">
 
     public Integer getId() {
         return id;
@@ -93,4 +98,6 @@ public class User {
     public void setProfile(Profile profile) {
         this.profile = profile;
     }
+
+    //</editor-fold>
 }

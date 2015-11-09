@@ -1,10 +1,13 @@
 package com.example.config;
 
 import com.example.Api;
+import com.example.config.converters.json.BlackServerDataJacksonModule;
 import com.example.dev.DebugRequestInterceptor;
+import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -51,6 +54,12 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
             }
             return f;
         });
+    }
+
+    @Bean
+    Module module(){
+        BlackServerDataJacksonModule blackServerDataJacksonModule = new BlackServerDataJacksonModule();
+        return blackServerDataJacksonModule;
     }
 
 }

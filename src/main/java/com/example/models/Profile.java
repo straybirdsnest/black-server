@@ -1,47 +1,52 @@
 package com.example.models;
 
-import com.example.config.jsonviews.UserView;
-import com.fasterxml.jackson.annotation.JsonView;
-
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Embeddable
 public class Profile {
-    @JsonView(UserView.Profile.class)
     private String nickname;
+
     @Column(name = "realname")
-    @JsonView(UserView.UserSummary.class)
     private String realName;
+
     @Column(name = "idcard")
-    @JsonView(UserView.Profile.class)
     private String idCard;
+
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
-    @JsonView(UserView.Profile.class)
     private Gender gender;
-    @Lob
-    @Column(columnDefinition = "mediumblob")
-    private byte[] avatar;
-    @JsonView(UserView.Profile.class)
+
+    @ManyToOne
+    @JoinColumn(name = "avatar_id")
+    private Image avatar;
+
     private LocalDate birthday;
-    @JsonView(UserView.UserSummary.class)
+
     private String signature;
-    @JsonView(UserView.Profile.class)
+
     private String hometown;
-    @JsonView(UserView.Profile.class)
+
     private String highschool;
-    @JsonView(UserView.Profile.class)
+
     private String username;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "college_id",referencedColumnName = "id")
-    @JsonView(UserView.Profile.class)
+    @JoinColumn(name = "college_id", referencedColumnName = "id")
+
     private College college;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "academy_id",referencedColumnName = "id")
-    @JsonView(UserView.Profile.class)
+    @JoinColumn(name = "academy_id", referencedColumnName = "id")
+
     private Academy academy;
-    @JsonView(UserView.Profile.class)
+
     private String grade;
+
+    @ManyToOne
+    @JoinColumn(name = "background_image_id")
+    private Image backgroundImage;
+
+    //<editor-fold desc="=== Getters & Setters ===">
 
     public String getNickname() {
         return nickname;
@@ -75,11 +80,11 @@ public class Profile {
         this.gender = gender;
     }
 
-    public byte[] getAvatar() {
+    public Image getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(byte[] avatar) {
+    public void setAvatar(Image avatar) {
         this.avatar = avatar;
     }
 
@@ -147,24 +152,28 @@ public class Profile {
         this.grade = grade;
     }
 
-    //@JsonView(UserView.Profile.class)
-    //@JsonProperty("college")
-    public String getCollegeName()
-    {
-        if(college != null){
+    public Image getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public void setBackgroundImage(Image backgroundImage) {
+        this.backgroundImage = backgroundImage;
+    }
+
+    //</editor-fold>
+
+    public String getCollegeName() {
+        if (college != null) {
             return college.getName();
-        }else
-        {
+        } else {
             return null;
         }
     }
 
-    //@JsonView(UserView.Profile.class)
-    //@JsonProperty("academy")
-    public String getAcademyName(){
-        if(academy!= null){
+    public String getAcademyName() {
+        if (academy != null) {
             return academy.getName();
-        }else {
+        } else {
             return null;
         }
     }
