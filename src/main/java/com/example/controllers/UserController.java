@@ -15,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -32,9 +31,6 @@ import static com.example.Api.UPDATE_TOKEN_FAILED;
 @RestController
 public class UserController {
     static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
-    @Autowired
-    ApplicationContext applicationContext;
 
     @Autowired
     UserRepo userRepo;
@@ -154,6 +150,7 @@ public class UserController {
      */
     @RequestMapping(value = "/api/profile", method = RequestMethod.PUT)
     public ResponseEntity<?> setMyProfile(@RequestBody User updatedUser) {
+        //TODO 进行数据验证
         User user = userService.getCurrentUser();
         updatedUser.setId(user.getId());
         updatedUser.setPhone(user.getPhone());
@@ -163,7 +160,7 @@ public class UserController {
         College college = collegeRepo.findOneByName(updatedCollege.getName());
         Academy updatedAcademy = updatedUser.getProfile().getAcademy();
         Academy academy = academyRepo.findOneByName(updatedAcademy.getName());
-        if(college != null && academy != null) {
+        if (college != null && academy != null) {
             updatedUser.getProfile().setCollege(college);
             updatedUser.getProfile().setAcademy(academy);
             userRepo.save(updatedUser);

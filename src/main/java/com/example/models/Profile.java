@@ -162,8 +162,6 @@ public class Profile {
 
     //</editor-fold>
 
-    //@JsonView(UserView.Profile.class)
-    //@JsonProperty("college")
     public String getCollegeName() {
         if (college != null) {
             return college.getName();

@@ -9,11 +9,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
 
 public class UserDeserilizer extends JsonDeserializer<User> {
+
+    public static final Logger logger = LoggerFactory.getLogger(UserDeserilizer.class);
     @Override
     public User deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
         JsonNode root = jsonParser.getCodec().readTree(jsonParser);
@@ -56,6 +60,7 @@ public class UserDeserilizer extends JsonDeserializer<User> {
                 break;
             case "SECRET":
                 profile.setGender(Profile.Gender.SECRET);
+                break;
             default:
                 throw new IOException("unknown gender type of "+ gender);
         }
