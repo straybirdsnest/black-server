@@ -62,12 +62,10 @@ public class ImageController {
                 image.setData(imageService.convertToPNGImageData(file.getBytes()));
                 imageRepo.save(image);
                 String token = imageService.generateAccessToken(image);
-                image.setAccessToken(token);
-                imageRepo.save(image);
                 return new ResponseEntity<>(token, headers, CREATED);
             }
         }catch (IOException e){
-            logger.debug("上传图片出错", e);
+            logger.warn("上传图片出错", e);
         }
         return new ResponseEntity<>(null, headers, BAD_REQUEST);
     }
