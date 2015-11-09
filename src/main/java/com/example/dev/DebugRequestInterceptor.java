@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class DebugRequestInterceptor implements HandlerInterceptor {
-    static final Logger log = LoggerFactory.getLogger(DebugRequestInterceptor.class);
+    static final Logger logger = LoggerFactory.getLogger(DebugRequestInterceptor.class);
 
     @Autowired
     DebugManager debugManager;
@@ -34,7 +34,11 @@ public class DebugRequestInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
-        log.debug("a request hit");
+        logger.debug(String.format("调试拦截器截获来自 %s 的 %s 请求：%s",
+                        httpServletRequest.getRemoteHost() + ":" + httpServletRequest.getRemotePort(),
+                        httpServletRequest.getMethod(),
+                        httpServletRequest.getRequestURI())
+        );
         DebugController.Request request = new DebugController.Request();
         request.setHost(httpServletRequest.getRemoteAddr() + ":" + httpServletRequest.getRemotePort());
         request.setMethod(httpServletRequest.getMethod());
