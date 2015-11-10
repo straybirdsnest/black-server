@@ -39,7 +39,9 @@ public class AccountController {
      * @return
      */
     @RequestMapping(value = "/api/register", method = POST)
-    public @ResponseBody Api.Result register(@RequestParam String phone){
+    public
+    @ResponseBody
+    Api.Result register(@RequestParam String phone) {
         User u = userRepo.findOneByPhone(phone);
         if (u == null) {
             User user = new User(phone);
@@ -56,16 +58,8 @@ public class AccountController {
             user.setProfile(profile);
             userRepo.save(user);
             return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
-            /*
-            ErrorMessage error = new ErrorMessage("token", tokenService.generateToken(user));
-            return new ResponseEntity<>(error ,HttpStatus.OK);
-            */
         }
         return Api.result(ERR_PHONE_EXISTED);
-        /*
-        ErrorMessage error = new ErrorMessage("error", "phone existed");
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-        */
     }
 
     @RequestMapping(value = "/api/hello", method = GET)

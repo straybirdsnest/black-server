@@ -27,6 +27,7 @@ public class App implements ApplicationListener<ApplicationEvent>, ApplicationCo
     public static final String CFG_CHAT_PORT = "blackserver.chat.port";
     private static final Logger log = LoggerFactory.getLogger(App.class);
     public static int tokenLifetime;
+
     @Autowired
     private SocketIOServer chatServer;
 

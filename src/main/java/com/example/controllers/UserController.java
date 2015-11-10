@@ -2,26 +2,26 @@ package com.example.controllers;
 
 import com.example.Api;
 import com.example.config.jsonviews.UserView;
+import com.example.daos.AcademyRepo;
+import com.example.daos.CollegeRepo;
 import com.example.daos.UserRepo;
-import com.example.models.RegistrationInfo;
-import com.example.models.User;
+import com.example.models.*;
+import com.example.services.ImageService;
 import com.example.services.TokenService;
 import com.example.services.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Iterator;
 import java.util.List;
 
 import static com.example.Api.SUCCESS;
@@ -32,19 +32,22 @@ public class UserController {
     static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
-    ApplicationContext applicationContext;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    CollegeRepo collegeRepo;
+
+    @Autowired
+    AcademyRepo academyRepo;
 
     @Autowired
     UserService userService;
 
     @Autowired
     TokenService tokenService;
+
+    @Autowired
+    ImageService imageService;
 
     /**
      * 更新用户无效的 token
@@ -60,99 +63,60 @@ public class UserController {
     }
 
     /**
-     * 获取当前用户的头像，返回数据为PNG格式的图片，如果当前用户未设置头像
-     * 则返回默认的头像
+     * 获取当前用户的个人信息
      *
-     * @return 若成功则返回HTTP状态码OK并返回byte数组数据
+     * @return 用户的个人信息
      */
-//    @RequestMapping(value = "/api/profile/avatar", method = RequestMethod.GET)
-//    public ResponseEntity<?> getAvatar(Model model) {
-//        User user = userService.getCurrentUser();
-//        if (user != null && user.getProfile() != null && user.getProfile().getAvatar() != null) {
-//            model.addAttribute("user", user);
-//            byte[] avatar = user.getProfile().getAvatar();
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.IMAGE_PNG);
-//            headers.setContentLength(avatar.length);
-//            return new ResponseEntity<>(avatar, headers, HttpStatus.OK);
-//        }
-//        //TODO 使用非固定URI读取资源
-//        Resource resource = applicationContext.getResource("url:http://localhost:8080/images/defaultavatar.png");
-//        try {
-//            InputStream inputStream = resource.getInputStream();
-//            BufferedImage bufferedImage = ImageIO.read(inputStream);
-//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//            ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream);
-//            byte[] avatar = byteArrayOutputStream.toByteArray();
-//            byteArrayOutputStream.close();
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.IMAGE_PNG);
-//            headers.setContentLength(avatar.length);
-//            return new ResponseEntity<>(avatar, headers, HttpStatus.OK);
-//        } catch (IOException e) {
-//            throw new IllegalStateException(e.getMessage(), e);
-//        }
-//    }
-
-    /**
-     * 更新当前用户的头像，将用户上传的头像转换为PNG格式并储存
-     *
-     * @param file 图片文件
-     * @return HTTP状态码OK、INTERNAL_SERVER_ERROR、BAD_REQUEST分别表示操作成功、
-     * 服务器转换图片失败或上传的图像出错
-     */
-//    @RequestMapping(value = "/api/profile/avatar", method = RequestMethod.POST)
-//    public ResponseEntity<?> setAvatar(MultipartFile file) {
-//        //TODO 扩展默认使用ImageIO导致的某些格式无法转换并调整图片尺寸
-//        User user = userService.getCurrentUser();
-//        if (user != null && !file.isEmpty()) {
-//            try {
-//                byte[] bytes = file.getBytes();
-//                InputStream inputStream = new ByteArrayInputStream(bytes);
-//                BufferedImage bufferedImage = ImageIO.read(inputStream);
-//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream);
-//                byte[] avatar = byteArrayOutputStream.toByteArray();
-//                byteArrayOutputStream.close();
-//                user.getProfile().setAvatar(avatar);
-//                userRepo.save(user);
-//                return new ResponseEntity<>(HttpStatus.OK);
-//            } catch (Exception e) {
-//                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
-    /**
-     * 获取当前用户的个人信息，不包含头像
-     *
-     * @return 用户的个人信息，不包含头像
-     */
-    @JsonView(UserView.Profile.class)
     @RequestMapping(value = "/api/profile", method = RequestMethod.GET)
+    @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getMyProfile() {
         User user = userService.getCurrentUser();
         if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
+            Profile profile = user.getProfile();
+            if (profile == null) {
+                logger.warn("用户" + user.getId() + "的[Profile]为Null。");
+            } else {
+                Image avatar = profile.getAvatar();
+                if (avatar != null) {
+                    profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
+                }
+                Image background = profile.getBackgroundImage();
+                if (background != null) {
+                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
+                }
+                return new ResponseEntity<>(user, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     /**
-     * 更新用户的个人信息，不包含头像
+     * 更新用户的个人信息
      *
      * @param updatedUser 新的用户个人信息，不含头像
      * @return HTTP状态码OK表示操作成功，BAD_REQUEST表示参数异常
      */
     @RequestMapping(value = "/api/profile", method = RequestMethod.PUT)
-    public ResponseEntity<?> setMyProfile(@RequestBody User updatedUser){
+    public ResponseEntity<?> setMyProfile(@RequestBody User updatedUser) {
+        //TODO 进行数据验证
         User user = userService.getCurrentUser();
+        updatedUser.setId(user.getId());
+        updatedUser.setPhone(user.getPhone());
+        updatedUser.setEnabled(updatedUser.isEnabled());
         updatedUser.setRegInfo(user.getRegInfo());
-        userRepo.save(updatedUser);
-        return ResponseEntity.ok(user);
+        College updatedCollege = updatedUser.getProfile().getCollege();
+        College college = collegeRepo.findOneByName(updatedCollege.getName());
+        Academy updatedAcademy = updatedUser.getProfile().getAcademy();
+        Academy academy = academyRepo.findOneByName(updatedAcademy.getName());
+        if (college != null && academy != null) {
+            updatedUser.getProfile().setCollege(college);
+            updatedUser.getProfile().setAcademy(academy);
+            userRepo.save(updatedUser);
+            return ResponseEntity.ok(updatedUser);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "/api/reginfo", method = RequestMethod.GET)
@@ -166,42 +130,29 @@ public class UserController {
     }
 
     @RequestMapping(value = "/api/users/{userId}/profile", method = RequestMethod.GET)
+    @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getUserProfile(@PathVariable int userId) {
         User user = userRepo.findOne(userId);
         if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
+            Profile profile = user.getProfile();
+            if (profile == null) {
+                logger.warn("用户" + user.getId() + "的[Profile]为Null。");
+            } else {
+                Image avatar = profile.getAvatar();
+                if (avatar != null) {
+                    profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
+                }
+                Image background = profile.getBackgroundImage();
+                if (background != null) {
+                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
+                }
+                return new ResponseEntity<>(user, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-//    @RequestMapping(value = "/api/users/{userId}/profile/avatar", method = RequestMethod.GET)
-//    public ResponseEntity<?> getUserAvatar(@PathVariable int userId) {
-//        User user = userRepo.findOne(userId);
-//        if (user != null && user.getProfile() != null && user.getProfile().getAvatar() != null) {
-//            byte[] avatar = user.getProfile().getAvatar();
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.IMAGE_PNG);
-//            headers.setContentLength(avatar.length);
-//            return new ResponseEntity<>(avatar, headers, HttpStatus.OK);
-//        }
-//        //TODO 使用非固定URI读取资源
-//        Resource resource = applicationContext.getResource("url:http://localhost:8080/images/defaultavatar.png");
-//        try {
-//            InputStream inputStream = resource.getInputStream();
-//            BufferedImage bufferedImage = ImageIO.read(inputStream);
-//            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//            ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream);
-//            byte[] avatar = byteArrayOutputStream.toByteArray();
-//            byteArrayOutputStream.close();
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.IMAGE_PNG);
-//            headers.setContentLength(avatar.length);
-//            return new ResponseEntity<>(avatar, headers, HttpStatus.OK);
-//        } catch (IOException e) {
-//            throw new IllegalStateException(e.getMessage(), e);
-//        }
-//    }
 
     @RequestMapping(value = "/api/profile/friends", method = RequestMethod.GET)
     @JsonView(UserView.UserSummary.class)
@@ -211,6 +162,28 @@ public class UserController {
         Page<User> users = userRepo.findAll(pageable);
         if (users.getTotalElements() > 0) {
             List<User> userList = users.getContent();
+            Iterator<User> iterator = userList.iterator();
+            User user = null;
+            Image avatar = null;
+            Image background = null;
+            Profile profile = null;
+            while (iterator.hasNext()) {
+                user = iterator.next();
+                if (user != null) {
+                    profile = user.getProfile();
+                    if (profile == null) {
+                        logger.warn("用户" + user.getId() + "的[Profile]为Null。");
+                    } else {
+                        if (avatar != null) {
+                            profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
+                        }
+                        if (background != null) {
+                            profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
+                        }
+                    }
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+            }
             return new ResponseEntity<>(userList, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -247,6 +220,5 @@ public class UserController {
     public void handle(HttpMessageNotReadableException e) {
         logger.warn("Returning HTTP 400 Bad Request", e);
     }
-
 
 }
