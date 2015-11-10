@@ -102,6 +102,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- ======================================== -->
+        <!--~ JsonPath for test -->
+        <!-- ======================================== -->
+        <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+        </dependency>
 	</dependencies>
 	
 	<build>
