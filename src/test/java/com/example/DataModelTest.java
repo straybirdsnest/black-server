@@ -53,7 +53,7 @@ public class DataModelTest {
 //        session.save(s);
 //
 //    }
-
+/*
     @Test
     @Transactional
     @Rollback(false)
@@ -74,4 +74,5 @@ public class DataModelTest {
     public void resetDatabase() {
 
     }
+*/
 }

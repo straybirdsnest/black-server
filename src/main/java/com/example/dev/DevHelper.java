@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 public class DevHelper {
+
     public static void initDb(String[] args) {
         initDbWithScript(args, "/dev/init.sql");
     }
@@ -25,11 +26,30 @@ public class DevHelper {
             InputStream is = DevHelper.class.getResourceAsStream("/application.properties");
             Properties props = new Properties();
             props.load(is);
+
             // find from application.properties
             username = props.getProperty("spring.datasource.username");
             password = props.getProperty("spring.datasource.password");
             url = props.getProperty("spring.datasource.url");
             driver = props.getProperty("spring.datasource.driverClassName");
+
+            // find form system env
+            String usernameEnv = System.getenv("spring.datasource.username");
+            String passwordEnv = System.getenv("spring.datasource.password");
+            String urlEnv = System.getenv("spring.datasource.url");
+            String driverEnv = System.getenv("spring.datasource.driverClassName");
+            if (usernameEnv != null) {
+                username = usernameEnv;
+            }
+            if (passwordEnv != null) {
+                password = passwordEnv;
+            }
+            if(urlEnv != null){
+                url = urlEnv;
+            }
+            if(driverEnv != null){
+                driver = driverEnv;
+            }
 
             // find from command line arguments
             Optional<String> _username = Arrays.stream(args)
