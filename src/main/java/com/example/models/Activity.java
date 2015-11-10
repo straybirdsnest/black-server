@@ -1,6 +1,5 @@
 package com.example.models;
 
-import com.example.models.proxies.ImageProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +47,10 @@ public class Activity {
     private Group group;
 
     @Transient
-    private ImageProxy imageProxy;
+    private String coverImageAccessToken;
 
-    public Activity(){
-        imageProxy = new ImageProxy();
+    public Activity() {
+
     }
 
     //<editor-fold desc="=== Getters & Setters ===">
@@ -145,9 +144,11 @@ public class Activity {
     }
 
     public String getCoverImageAccessToken() {
-        Image image = getCoverImage();
-        logger.debug("image"+image);
-        return imageProxy.getAccessToken(image);
+        return coverImageAccessToken;
+    }
+
+    public void setCoverImageAccessToken(String accessToken) {
+        this.coverImageAccessToken = accessToken;
     }
 
     //</editor-fold>

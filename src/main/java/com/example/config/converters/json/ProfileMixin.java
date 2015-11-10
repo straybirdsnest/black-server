@@ -8,11 +8,24 @@ import com.fasterxml.jackson.annotation.JsonView;
 import java.time.LocalDate;
 
 public abstract class ProfileMixin {
+
+    public ProfileMixin(){
+
+    }
+
     @JsonView(UserView.Profile.class)
     abstract String getNickename();
 
     @JsonView(UserView.UserSummary.class)
-    abstract String getRealName();;
+    abstract String getRealName();
+
+    @JsonProperty("avatar")
+    @JsonView(UserView.UserSummary.class)
+    abstract String getAvatarAccessToken();
+
+    @JsonProperty("background")
+    @JsonView(UserView.Profile.class)
+    abstract String getBackgroundImageAccessToken();
 
     @JsonView(UserView.Profile.class)
     abstract String getIdCard();

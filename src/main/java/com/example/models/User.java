@@ -99,5 +99,6 @@ public class User {
         this.profile = profile;
     }
 
-    //</editor-fold>
+//</editor-fold>
+
 }

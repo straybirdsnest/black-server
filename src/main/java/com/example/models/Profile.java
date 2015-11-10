@@ -46,6 +46,12 @@ public class Profile {
     @JoinColumn(name = "background_image_id")
     private Image backgroundImage;
 
+    @Transient
+    private String avatarAccessToken;
+
+    @Transient
+    private String backgroundImageAccessToken;
+
     //<editor-fold desc="=== Getters & Setters ===">
 
     public String getNickname() {
@@ -160,7 +166,22 @@ public class Profile {
         this.backgroundImage = backgroundImage;
     }
 
-    //</editor-fold>
+    public String getAvatarAccessToken() {
+        return avatarAccessToken;
+    }
+
+    public void setAvatarAccessToken(String avatarAccessToken) {
+        this.avatarAccessToken = avatarAccessToken;
+    }
+
+    public String getBackgroundImageAccessToken() {
+        return backgroundImageAccessToken;
+    }
+
+    public void setBackgroundImageAccessToken(String backgroundImageAccessToken) {
+        this.backgroundImageAccessToken = backgroundImageAccessToken;
+    }
+//</editor-fold>
 
     public String getCollegeName() {
         if (college != null) {
