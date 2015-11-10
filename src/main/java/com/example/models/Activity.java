@@ -1,27 +1,29 @@
 package com.example.models;
 
-import com.example.config.jsonviews.ActivityView;
-import com.fasterxml.jackson.annotation.JsonView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 public class Activity {
+
+    @Transient
+    private final static Logger logger = LoggerFactory.getLogger(Activity.class);
+
     @Id
     @GeneratedValue
     private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "cover_image_id")
-    @JsonView(ActivityView.AcitivitySummary.class)
     private Image coverImage;
 
-    @JsonView(ActivityView.AcitivitySummary.class)
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
-    @JsonView(ActivityView.AcitivitySummary.class)
+
     private String location;
 
     @ManyToOne
@@ -32,7 +34,6 @@ public class Activity {
     private String content;
 
     @Column(columnDefinition = "enum('MATCH', 'BLACK')")
-    @JsonView(ActivityView.AcitivitySummary.class)
     private Type type;
 
     @Column(columnDefinition = "enum('READY', 'RUNNING', 'STOPPED')")
@@ -44,6 +45,13 @@ public class Activity {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
+
+    @Transient
+    private String coverImageAccessToken;
+
+    public Activity() {
+
+    }
 
     //<editor-fold desc="=== Getters & Setters ===">
 
@@ -133,6 +141,14 @@ public class Activity {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    public String getCoverImageAccessToken() {
+        return coverImageAccessToken;
+    }
+
+    public void setCoverImageAccessToken(String accessToken) {
+        this.coverImageAccessToken = accessToken;
     }
 
     //</editor-fold>
