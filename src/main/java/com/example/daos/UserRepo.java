@@ -10,5 +10,4 @@ import org.springframework.transaction.annotation.Transactional;
 public interface UserRepo extends PagingAndSortingRepository<User, Integer> {
 
     User findOneByPhone(String phone);
-
 }
