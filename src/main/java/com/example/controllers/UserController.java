@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static com.example.Api.SUCCESS;
 import static com.example.Api.UPDATE_TOKEN_FAILED;
@@ -96,12 +97,16 @@ public class UserController {
      * 更新用户的个人信息
      *
      * @param updatedUser 新的用户个人信息，不含头像
-     * @return HTTP状态码OK表示操作成功，BAD_REQUEST表示参数异常
+     * @return HTTP状态码NO_CONTENT表示操作成功，BAD_REQUEST表示参数异常，未登录则返回UNAUTHORIZED
      */
     @RequestMapping(value = "/api/profile", method = RequestMethod.PUT)
+    @JsonView(UserView.Profile.class)
     public ResponseEntity<?> setMyProfile(@RequestBody User updatedUser) {
         //TODO 进行数据验证
         User user = userService.getCurrentUser();
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         updatedUser.setId(user.getId());
         updatedUser.setPhone(user.getPhone());
         updatedUser.setEnabled(updatedUser.isEnabled());
@@ -114,7 +119,7 @@ public class UserController {
             updatedUser.getProfile().setCollege(college);
             updatedUser.getProfile().setAcademy(academy);
             userRepo.save(updatedUser);
-            return ResponseEntity.ok(updatedUser);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -190,6 +195,122 @@ public class UserController {
         }
     }
 
+    /**
+     * 检查目标用户是否已经被关注了
+     *
+     * @param id 目标id
+     * @return 已经关注过则返回NO_CONTENT，未关注则返回NOT_FOUND，未登录则返回UNAUTHORIZED
+     */
+    @RequestMapping(value = "/api/following/{id}", method = RequestMethod.GET)
+    public ResponseEntity<?> checkHasFollowed(@PathVariable Integer id) {
+        if (id != null) {
+            User currentUser = userService.getCurrentUser();
+            if (currentUser == null) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            Set<User> following = currentUser.getFollowing();
+            for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
+                User checkUser = iterator.next();
+                if (checkUser.getId().equals(id)) {
+                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                }
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @RequestMapping(value = "/api/following", method = RequestMethod.GET)
+    @JsonView(UserView.UserSummary.class)
+    public ResponseEntity<?> getFollowList() {
+        User currentUser = userService.getCurrentUser();
+        if (currentUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Set<User> following = currentUser.getFollowing();
+        for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
+            User checkUser = iterator.next();
+            Profile profile = checkUser.getProfile();
+            if (profile != null) {
+                if (profile.getAvatar() != null) {
+                    profile.setAvatarAccessToken(imageService.generateAccessToken(profile.getAvatar()));
+                }
+                if (profile.getBackgroundImage() != null) {
+                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(profile.getBackgroundImage()));
+                }
+            }
+        }
+        return new ResponseEntity<>(following, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 关注一个用户
+     *
+     * @param id 要关注的对象的id
+     * @return 操作成功返回NO_CONTENT，参数错误返回BAD_REQUEST，未登陆则返回UNAUTHORIZED
+     */
+    @RequestMapping(value = "/api/following/{id}", method = RequestMethod.PUT)
+    public ResponseEntity<?> doFollow(@PathVariable Integer id) {
+        if (id == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            User user = userService.getCurrentUser();
+            if (user == null) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            User followedUser = userRepo.findOne(id);
+            if (followedUser != null) {
+                Set<User> following = user.getFollowing();
+                boolean hasFollowed = false;
+                for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
+                    User checkUser = iterator.next();
+                    if (checkUser.getId().equals(id)) {
+                        hasFollowed = true;
+                        break;
+                    }
+                }
+                if (!hasFollowed) {
+                    following.add(followedUser);
+                    userRepo.save(user);
+                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                }
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 取消关注用户
+     *
+     * @param id 要取消关注的用户的id
+     * @return 操作成功返回NO_CONTENT，参数错误返回BAD_REQUEST，未登陆则返回UNAUTHORIZED
+     */
+    @RequestMapping(value = "/api/following/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> unFollow(@PathVariable Integer id) {
+        if (id == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } else {
+            User user = userService.getCurrentUser();
+            if (user == null) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            User followedUser = userRepo.findOne(id);
+            if (followedUser != null) {
+                Set<User> following = user.getFollowing();
+                for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
+                    User checkUser = iterator.next();
+                    if (checkUser.getId().equals(id)) {
+                        iterator.remove();
+                        break;
+                    }
+                }
+                userRepo.save(user);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     @RequestMapping(value = "/api/friend/num", method = RequestMethod.GET)
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getFriendNumber() {
@@ -197,7 +318,7 @@ public class UserController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/api/follow/num", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/followed/num", method = RequestMethod.GET)
     public ResponseEntity<?> getFollowNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(200);
         return new ResponseEntity<>(result, HttpStatus.OK);
