@@ -1,6 +1,5 @@
 package com.example.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.persistence.*;
@@ -31,8 +30,10 @@ public class User {
     @JoinTable(name = "T_FRIENDSHIP",
             joinColumns = @JoinColumn(name = "user_a"),
             inverseJoinColumns = @JoinColumn(name = "user_b"))
-    @JsonIgnore
-    private Set<User> friends = new HashSet<>();
+    private Set<User> following = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "following")
+    private Set<User> followed = new HashSet<>();
 
     public User() {
     }
@@ -75,12 +76,20 @@ public class User {
         this.enabled = enabled;
     }
 
-    public Set<User> getFriends() {
-        return friends;
+    public Set<User> getFollowing() {
+        return following;
     }
 
-    public void setFriends(Set<User> friends) {
-        this.friends = friends;
+    public void setFollowing(Set<User> following) {
+        this.following = following;
+    }
+
+    public Set<User> getFollowed() {
+        return followed;
+    }
+
+    public void setFollowed(Set<User> followed) {
+        this.followed = followed;
     }
 
     public RegistrationInfo getRegInfo() {
