@@ -222,6 +222,7 @@ public class UserController {
 
     /**
      * 获取当前用户的关注列表
+     *
      * @return 如果未登录则返回UNAUTHORIZED，没有则返回NOT_FOUND，否则返回关注用户基本信息列表
      */
     @RequestMapping(value = "/api/following", method = RequestMethod.GET)
@@ -232,7 +233,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         Set<User> following = currentUser.getFollowing();
-        if(following.isEmpty()){
+        if (following.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
@@ -260,30 +261,29 @@ public class UserController {
     public ResponseEntity<?> doFollow(@PathVariable Integer id) {
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else {
-            User user = userService.getCurrentUser();
-            if (user == null) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-            if(user.getId().equals(id)){
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-            User followedUser = userRepo.findOne(id);
-            if (followedUser != null) {
-                Set<User> following = user.getFollowing();
-                boolean hasFollowed = false;
-                for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
-                    User checkUser = iterator.next();
-                    if (checkUser.getId().equals(id)) {
-                        hasFollowed = true;
-                        break;
-                    }
+        }
+        User user = userService.getCurrentUser();
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        if (user.getId().equals(id)) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        User followedUser = userRepo.findOne(id);
+        if (followedUser != null) {
+            Set<User> following = user.getFollowing();
+            boolean hasFollowed = false;
+            for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
+                User checkUser = iterator.next();
+                if (checkUser.getId().equals(id)) {
+                    hasFollowed = true;
+                    break;
                 }
-                if (!hasFollowed) {
-                    following.add(followedUser);
-                    userRepo.save(user);
-                    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-                }
+            }
+            if (!hasFollowed) {
+                following.add(followedUser);
+                userRepo.save(user);
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -299,41 +299,41 @@ public class UserController {
     public ResponseEntity<?> unFollow(@PathVariable Integer id) {
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } else {
-            User user = userService.getCurrentUser();
-            if (user == null) {
-                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-            }
-            User followedUser = userRepo.findOne(id);
-            if (followedUser != null) {
-                Set<User> following = user.getFollowing();
-                for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
-                    User checkUser = iterator.next();
-                    if (checkUser.getId().equals(id)) {
-                        iterator.remove();
-                        break;
-                    }
+        }
+        User user = userService.getCurrentUser();
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        User followedUser = userRepo.findOne(id);
+        if (followedUser != null) {
+            Set<User> following = user.getFollowing();
+            for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
+                User checkUser = iterator.next();
+                if (checkUser.getId().equals(id)) {
+                    iterator.remove();
+                    break;
                 }
-                userRepo.save(user);
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
+            userRepo.save(user);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     /**
      * 获取关注当前用户的用户列表
+     *
      * @return 未登录则返回UNAUTHORIZED，如果列表为空则返回NOT_FOUND，否则返回用户列表
      */
     @RequestMapping(value = "/api/followed", method = RequestMethod.GET)
     @JsonView(UserView.UserSummary.class)
-    public ResponseEntity<?> getFollowedList(){
+    public ResponseEntity<?> getFollowedList() {
         User currentUser = userService.getCurrentUser();
-        if(currentUser == null){
+        if (currentUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         Set<User> followed = currentUser.getFollowed();
-        if(followed.isEmpty()){
+        if (followed.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         for (Iterator<User> iterator = followed.iterator(); iterator.hasNext(); ) {
