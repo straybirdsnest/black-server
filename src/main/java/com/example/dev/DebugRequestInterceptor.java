@@ -9,9 +9,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,25 +54,15 @@ public class DebugRequestInterceptor implements HandlerInterceptor {
             request.getHeaders().put(headerName, headerValues);
         }
         // cannot use get reader -> IllegalStateException: STREAMED
-        InputStream is = httpServletRequest.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        String content = null;
-        String line;
-        while ((line = br.readLine()) != null) {
-            if (content == null) {
-                content = line;
-            } else {
-                content += "<br>" + line;
-            }
+        String content = "";
+        Map<String, String[]> params = httpServletRequest.getParameterMap();
+        boolean first = true;
+        for (Map.Entry<String, String[]> entry : params.entrySet()) {
+            if (!first) content += "<br>";
+            content += entry.getKey() + ": " + Arrays.stream(entry.getValue()).collect(Collectors.joining(", "));
         }
-        if (content == null) {
-            Map<String, String[]> params = httpServletRequest.getParameterMap();
-            content = "";
-            boolean first = true;
-            for (Map.Entry<String, String[]> entry : params.entrySet()) {
-                if (!first) content += "<br>";
-                content += entry.getKey() + ": " + Arrays.stream(entry.getValue()).collect(Collectors.joining(", "));
-            }
+        if (content.isEmpty() && request.getContentLength() > 0){
+            content = "暂且只能读取表单数据";
         }
         request.setContent(content);
         debugManager.requests.add(0, request);

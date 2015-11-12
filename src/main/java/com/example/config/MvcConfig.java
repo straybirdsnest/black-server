@@ -35,7 +35,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(debugRequestInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/requests");
+                .excludePathPatterns("/requests", "/tokens", "/", "/error");
         registry.addInterceptor(tokenAuthenticationInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns("/api/register", "/api/token");
