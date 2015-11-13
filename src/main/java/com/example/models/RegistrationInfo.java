@@ -1,11 +1,14 @@
 package com.example.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Embeddable
 public class RegistrationInfo {
-    private LocalDateTime regTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date regTime;
 
     private String regIp;
 
@@ -18,11 +21,11 @@ public class RegistrationInfo {
 
     //<editor-fold desc="=== Getters & Setters ===">
 
-    public LocalDateTime getRegTime() {
+    public Date getRegTime() {
         return regTime;
     }
 
-    public void setRegTime(LocalDateTime regTime) {
+    public void setRegTime(Date regTime) {
         this.regTime = regTime;
     }
 
