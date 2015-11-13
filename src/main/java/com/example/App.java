@@ -19,6 +19,8 @@ import org.springframework.context.event.ContextStoppedEvent;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.util.TimeZone;
+
 @SpringBootApplication
 @Component
 public class App implements ApplicationListener<ApplicationEvent>, ApplicationContextAware {
@@ -32,6 +34,7 @@ public class App implements ApplicationListener<ApplicationEvent>, ApplicationCo
     private SocketIOServer chatServer;
 
     public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
         DevHelper.initDb(args);
         SpringApplication.run(App.class, args);
     }

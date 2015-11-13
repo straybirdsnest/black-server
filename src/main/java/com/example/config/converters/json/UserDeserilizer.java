@@ -27,8 +27,8 @@ public class UserDeserilizer extends JsonDeserializer<User> {
         String username = root.get("username").asText();
         String email = root.get("email").asText();
         JsonNode birthdayNode = root.get("birthday");
-        LocalDate birthday = LocalDate.of(birthdayNode.get(0).asInt(),
-                birthdayNode.get(1).asInt(), birthdayNode.get(2).asInt());
+//        LocalDate birthday = LocalDate.of(birthdayNode.get(0).asInt(),
+//                birthdayNode.get(1).asInt(), birthdayNode.get(2).asInt());
         String collegeName = root.get("college").asText();
         String academyName = root.get("academy").asText();
         String grade = root.get("grade").asText();
@@ -43,7 +43,7 @@ public class UserDeserilizer extends JsonDeserializer<User> {
 
         Profile profile = new Profile();
         profile.setUsername(username);
-        profile.setBirthday(birthday);
+//        profile.setBirthday(birthday);
         profile.setRealName(realName);
 
         College college = new College();

@@ -1,7 +1,9 @@
 package com.example.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.util.Date;
 
 @Embeddable
 public class Profile {
@@ -20,7 +22,7 @@ public class Profile {
     @JoinColumn(name = "avatar_id")
     private Image avatar;
 
-    private LocalDate birthday;
+    private Date birthday;
 
     private String signature;
 
@@ -94,11 +96,11 @@ public class Profile {
         this.avatar = avatar;
     }
 
-    public LocalDate getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(LocalDate birthday) {
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
 
