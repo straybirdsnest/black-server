@@ -126,25 +126,24 @@ public class UserController {
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getMyProfile() {
         User user = userService.getCurrentUser();
-        if (user != null) {
-            Profile profile = user.getProfile();
-            if (profile == null) {
-                logger.warn("用户" + user.getId() + "的[Profile]为Null。");
-            } else {
-                Image avatar = profile.getAvatar();
-                if (avatar != null) {
-                    profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
-                }
-                Image background = profile.getBackgroundImage();
-                if (background != null) {
-                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
-                }
-                return new ResponseEntity<>(user, HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        Profile profile = user.getProfile();
+        if (profile == null) {
+            logger.warn("用户" + user.getId() + "的[Profile]为Null。");
+        } else {
+            Image avatar = profile.getAvatar();
+            if (avatar != null) {
+                profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
+            }
+            Image background = profile.getBackgroundImage();
+            if (background != null) {
+                profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
+            }
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -219,34 +218,34 @@ public class UserController {
         final PageRequest pageable = new PageRequest(0, 10, Sort.Direction.ASC, "id");
         //TODO 将查询朋友的功能真正实现
         Page<User> users = userRepo.findAll(pageable);
-        if (users.getTotalElements() > 0) {
-            List<User> userList = users.getContent();
-            Iterator<User> iterator = userList.iterator();
-            User user = null;
-            Image avatar = null;
-            Image background = null;
-            Profile profile = null;
-            while (iterator.hasNext()) {
-                user = iterator.next();
-                if (user != null) {
-                    profile = user.getProfile();
-                    if (profile == null) {
-                        logger.warn("用户" + user.getId() + "的[Profile]为Null。");
-                    } else {
-                        if (avatar != null) {
-                            profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
-                        }
-                        if (background != null) {
-                            profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
-                        }
-                    }
-                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-                }
-            }
-            return new ResponseEntity<>(userList, HttpStatus.OK);
-        } else {
+        if (users.getTotalElements() <= 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        List<User> userList = users.getContent();
+        User user = null;
+        Image avatar = null;
+        Image background = null;
+        Profile profile = null;
+        for (Iterator<User> iterator = userList.iterator(); iterator.hasNext(); ) {
+            user = iterator.next();
+            if (user != null) {
+                profile = user.getProfile();
+                if (profile == null) {
+                    logger.warn("用户" + user.getId() + "的[Profile]为Null。");
+                } else {
+                    avatar = profile.getAvatar();
+                    background = profile.getBackgroundImage();
+                    if (avatar != null) {
+                        profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
+                    }
+                    if (background != null) {
+                        profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
+                    }
+                }
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        }
+        return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
     /**
