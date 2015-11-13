@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 public class UserDeserilizer extends JsonDeserializer<User> {
 
@@ -22,6 +23,7 @@ public class UserDeserilizer extends JsonDeserializer<User> {
     public User deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
         JsonNode root = jsonParser.getCodec().readTree(jsonParser);
         String phone = root.get("phone").asText();
+        String realName = root.get("realName").asText();
         String username = root.get("username").asText();
         String email = root.get("email").asText();
         JsonNode birthdayNode = root.get("birthday");
@@ -42,6 +44,7 @@ public class UserDeserilizer extends JsonDeserializer<User> {
         Profile profile = new Profile();
         profile.setUsername(username);
 //        profile.setBirthday(birthday);
+        profile.setRealName(realName);
 
         College college = new College();
         college.setName(collegeName);

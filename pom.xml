@@ -60,11 +60,12 @@
 		</dependency>
 		<!-- Jackson jsr310 support 这个依赖 spring 已经包含 -->
         <!-- 但是如果不显示声明，jsr310 数据类型就无法装换-->
+        <!--
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
-
+        -->
         <!-- ======================================== -->
         <!-- ~ Chat -->
         <!-- ======================================== -->
