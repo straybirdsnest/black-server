@@ -2,10 +2,11 @@ package com.example.config.converters.json;
 
 import com.example.config.jsonviews.UserView;
 import com.example.models.Profile;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 public abstract class ProfileMixin {
 
@@ -34,7 +35,8 @@ public abstract class ProfileMixin {
     abstract Profile.Gender getGender();
 
     @JsonView(UserView.Profile.class)
-    abstract LocalDate getBirthday();
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    abstract Date getBirthday();
 
     @JsonView(UserView.UserSummary.class)
     abstract String getSignature();

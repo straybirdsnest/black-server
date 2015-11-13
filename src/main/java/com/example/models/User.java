@@ -27,9 +27,9 @@ public class User {
     private RegistrationInfo regInfo;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "T_FRIENDSHIP",
-            joinColumns = @JoinColumn(name = "user_a"),
-            inverseJoinColumns = @JoinColumn(name = "user_b"))
+    @JoinTable(name = "T_SUBSCRIPTION",
+            joinColumns = @JoinColumn(name = "subscriber_id"),
+            inverseJoinColumns = @JoinColumn(name = "broadcaster_id"))
     private Set<User> following = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "following")

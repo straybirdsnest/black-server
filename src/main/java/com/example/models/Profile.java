@@ -22,7 +22,6 @@ public class Profile {
     @JoinColumn(name = "avatar_id")
     private Image avatar;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date birthday;
 
     private String signature;
