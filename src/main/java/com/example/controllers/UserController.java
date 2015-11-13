@@ -58,6 +58,16 @@ public class UserController {
     @Autowired
     VcodeService vcodeService;
 
+    /////////////////////////////////////////////////////////////////
+    //                                                             //
+    //                    ~~~~~~~~~~~~~~~~~                        //
+    //                         ACCOUNT                             //
+    //                    =================                        //
+    //                                                             //
+    /////////////////////////////////////////////////////////////////
+
+    //<editor-fold desc="=== Account ===">
+
     /**
      * 更新用户无效的 token，需要先向 Mob 验证手机，然后再给用户刷新 token
      *
@@ -188,6 +198,23 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    //</editor-fold>
+
+    /////////////////////////////////////////////////////////////////
+    //                                                             //
+    //                    ~~~~~~~~~~~~~~~~~                        //
+    //                     OTHERS' PROFILE                         //
+    //                    =================                        //
+    //                                                             //
+    /////////////////////////////////////////////////////////////////
+
+    //<editor-fold desc="=== Others' Profile ===">
+
+    /**
+     * 查看其他用户的 Profile
+     * @param userId
+     * @return
+     */
     @RequestMapping(value = "/api/users/{userId}/profile", method = GET)
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getUserProfile(@PathVariable int userId) {
@@ -213,6 +240,10 @@ public class UserController {
         }
     }
 
+    /**
+     * 朋友的 profile
+     * @return
+     */
     @RequestMapping(value = "/api/profile/friends", method = GET)
     @JsonView(UserView.UserSummary.class)
     public ResponseEntity<?> getMyFriendList() {
@@ -249,6 +280,17 @@ public class UserController {
         }
     }
 
+    //</editor-fold>
+
+    /////////////////////////////////////////////////////////////////
+    //                                                             //
+    //                    ~~~~~~~~~~~~~~~~~                        //
+    //                       SUBCRIPTION                           //
+    //                    =================                        //
+    //                                                             //
+    /////////////////////////////////////////////////////////////////
+
+    //<editor-fold desc="=== Subscription ===">
     /**
      * 检查目标用户是否已经被关注了
      *
@@ -407,26 +449,57 @@ public class UserController {
         return new ResponseEntity<>(followed, HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/api/friend/num", method = GET)
+    /**
+     * 获取关注对象的数据
+     * @return
+     */
+    @RequestMapping(value = "/api/followings/count", method = GET)
+    public ResponseEntity<?> getFollowNumber() {
+        Api.Result result = Api.result(SUCCESS).param("num").value(200);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    /**
+     * 获取粉丝的数目
+     * @return
+     */
+    @RequestMapping(value = "/api/fans/count", method = GET)
+    public ResponseEntity<?> getFanNumber() {
+        Api.Result result = Api.result(SUCCESS).param("num").value(456);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    //</editor-fold>
+
+    /////////////////////////////////////////////////////////////////
+    //                                                             //
+    //                    ~~~~~~~~~~~~~~~~~                        //
+    //                        FRIENDSHIP                           // 
+    //                    =================                        //
+    //                                                             //
+    /////////////////////////////////////////////////////////////////
+
+    //<editor-fold desc="=== Friendship ===">
+
+    /**
+     * 获取朋友的数目
+     * @return
+     */
+    @RequestMapping(value = "/api/friends/count", method = GET)
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getFriendNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(123);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/api/followed/num", method = GET)
-    public ResponseEntity<?> getFollowNumber() {
-        Api.Result result = Api.result(SUCCESS).param("num").value(200);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
+    //</editor-fold>
 
-    @RequestMapping(value = "/api/fan/num", method = GET)
-    public ResponseEntity<?> getFanNumber() {
-        Api.Result result = Api.result(SUCCESS).param("num").value(456);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
 
-    @RequestMapping(value = "/api/likes/num", method = GET)
+    /**
+     * 获取赞的数目
+     * @return
+     */
+    @RequestMapping(value = "/api/likes/count", method = GET)
     public ResponseEntity<?> getLikeNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(789);
         return new ResponseEntity<>(result, HttpStatus.OK);
