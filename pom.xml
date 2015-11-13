@@ -58,18 +58,12 @@
 			<version>5.1.36</version>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- Jackson jsr310 support -->
+		<!-- Jackson jsr310 support 这个依赖 spring 已经包含 -->
+        <!-- 但是如果不显示声明，jsr310 数据类型就无法装换-->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
-        <!-- NO EFFECTS! -->
-        <!--<dependency>-->
-        <!--<groupId>org.jadira.usertype</groupId>-->
-        <!--<artifactId>usertype.core</artifactId>-->
-        <!--<version>4.0.0.GA</version>-->
-        <!--</dependency>-->
-
 
         <!-- ======================================== -->
         <!-- ~ Chat -->

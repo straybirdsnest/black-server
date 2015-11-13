@@ -106,7 +106,7 @@ public class UserController {
                     .getRequest().getRemoteAddr();
             LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("UTC"));
             registrationInfo.setRegIp(remoteAddress);
-            registrationInfo.setRegTime(localDateTime);
+//            registrationInfo.setRegTime(localDateTime);
             Profile profile = new Profile();
             profile.setGender(Profile.Gender.SECRET);
             user.setRegInfo(registrationInfo);
