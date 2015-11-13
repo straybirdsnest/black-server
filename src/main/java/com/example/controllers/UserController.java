@@ -9,6 +9,7 @@ import com.example.models.*;
 import com.example.services.ImageService;
 import com.example.services.TokenService;
 import com.example.services.UserService;
+import com.example.services.VcodeService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +21,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import static com.example.Api.SUCCESS;
-import static com.example.Api.UPDATE_TOKEN_FAILED;
+import static com.example.Api.*;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
 public class UserController {
@@ -50,17 +55,66 @@ public class UserController {
     @Autowired
     ImageService imageService;
 
+    @Autowired
+    VcodeService vcodeService;
+
     /**
-     * 更新用户无效的 token
+     * 更新用户无效的 token，需要先向 Mob 验证手机，然后再给用户刷新 token
      *
      * @param phone
      * @return
      */
-    @RequestMapping(value = "/api/token", method = RequestMethod.GET)
-    public Api.Result getToken(@RequestParam String phone) {
-        User user = userRepo.findOneByPhone(phone);
-        if (user == null) return Api.result(UPDATE_TOKEN_FAILED);
-        return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
+    @RequestMapping(value = "/api/token", method = GET)
+    public Api.Result getToken(@RequestParam String phone, @RequestParam String vcode, @RequestParam String zone) {
+        if (!vcodeService.verify(zone, phone, vcode)) return Api.result(VCODE_VERIFICATION_FAILED);
+        boolean existed = userRepo.existsByPhone(phone);
+        if (!existed) return Api.result(UPDATE_TOKEN_FAILED);
+        return Api.result(SUCCESS).param("token").value(tokenService.generateTokenByPhone(phone));
+    }
+
+    /**
+     * 检查可用性
+     * type = phone|token
+     */
+    @RequestMapping(value = "/api/availability/{type}", method = GET)
+    public boolean isAvailable(@PathVariable String type, @RequestParam(value = "q") String content) {
+        switch (type) {
+            case "phone":
+                return !userRepo.existsByPhone(content);
+            case "token":
+                return tokenService.isAvailable(content);
+        }
+        return false;
+    }
+
+    /**
+     * 注册新用户，通过向 Mob 发送手机验证码，来验证用户的身份，从而注册新用户
+     *
+     * @param phone
+     * @return
+     */
+    @RequestMapping(value = "/api/register", method = POST)
+    @ResponseBody
+    public Api.Result register(@RequestParam String phone, @RequestParam String vcode, @RequestParam String zone) {
+        if (!vcodeService.verify(zone, phone, vcode)) return Api.result(VCODE_VERIFICATION_FAILED);
+        boolean existed = userRepo.existsByPhone(phone);
+        if (!existed) {
+            User user = new User(phone);
+            user.setEnabled(true);
+            RegistrationInfo registrationInfo = new RegistrationInfo();
+            String remoteAddress = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                    .getRequest().getRemoteAddr();
+            LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("UTC"));
+            registrationInfo.setRegIp(remoteAddress);
+            registrationInfo.setRegTime(localDateTime);
+            Profile profile = new Profile();
+            profile.setGender(Profile.Gender.SECRET);
+            user.setRegInfo(registrationInfo);
+            user.setProfile(profile);
+            userRepo.save(user);
+            return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
+        }
+        return Api.result(ERR_PHONE_EXISTED);
     }
 
     /**
@@ -68,7 +122,7 @@ public class UserController {
      *
      * @return 用户的个人信息
      */
-    @RequestMapping(value = "/api/profile", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/profile", method = GET)
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getMyProfile() {
         User user = userService.getCurrentUser();
@@ -99,7 +153,7 @@ public class UserController {
      * @param updatedUser 新的用户个人信息，不含头像
      * @return HTTP状态码NO_CONTENT表示操作成功，BAD_REQUEST表示参数异常，未登录则返回UNAUTHORIZED
      */
-    @RequestMapping(value = "/api/profile", method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/profile", method = PUT)
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> setMyProfile(@RequestBody User updatedUser) {
         //TODO 进行数据验证
@@ -124,7 +178,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/api/reginfo", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/reginfo", method = GET)
     public ResponseEntity<?> getMyRegInfo() {
         User user = userService.getCurrentUser();
         if (user != null) {
@@ -134,7 +188,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/api/users/{userId}/profile", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/users/{userId}/profile", method = GET)
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getUserProfile(@PathVariable int userId) {
         User user = userRepo.findOne(userId);
@@ -159,7 +213,7 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value = "/api/profile/friends", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/profile/friends", method = GET)
     @JsonView(UserView.UserSummary.class)
     public ResponseEntity<?> getMyFriendList() {
         final PageRequest pageable = new PageRequest(0, 10, Sort.Direction.ASC, "id");
@@ -201,7 +255,7 @@ public class UserController {
      * @param id 目标id
      * @return 已经关注过则返回NO_CONTENT，未关注则返回NOT_FOUND，未登录则返回UNAUTHORIZED
      */
-    @RequestMapping(value = "/api/following/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/following/{id}", method = GET)
     public ResponseEntity<?> checkHasFollowed(@PathVariable Integer id) {
         if (id != null) {
             User currentUser = userService.getCurrentUser();
@@ -225,7 +279,7 @@ public class UserController {
      *
      * @return 如果未登录则返回UNAUTHORIZED，没有则返回NOT_FOUND，否则返回关注用户基本信息列表
      */
-    @RequestMapping(value = "/api/following", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/following", method = GET)
     @JsonView(UserView.UserSummary.class)
     public ResponseEntity<?> getFollowList() {
         User currentUser = userService.getCurrentUser();
@@ -257,7 +311,7 @@ public class UserController {
      * @param id 要关注的对象的id
      * @return 操作成功返回NO_CONTENT，参数错误返回BAD_REQUEST，未登陆则返回UNAUTHORIZED
      */
-    @RequestMapping(value = "/api/following/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/api/following/{id}", method = PUT)
     public ResponseEntity<?> doFollow(@PathVariable Integer id) {
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -295,7 +349,7 @@ public class UserController {
      * @param id 要取消关注的用户的id
      * @return 操作成功返回NO_CONTENT，参数错误返回BAD_REQUEST，未登陆则返回UNAUTHORIZED
      */
-    @RequestMapping(value = "/api/following/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/api/following/{id}", method = DELETE)
     public ResponseEntity<?> unFollow(@PathVariable Integer id) {
         if (id == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -325,7 +379,7 @@ public class UserController {
      *
      * @return 未登录则返回UNAUTHORIZED，如果列表为空则返回NOT_FOUND，否则返回用户列表
      */
-    @RequestMapping(value = "/api/followed", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/followed", method = GET)
     @JsonView(UserView.UserSummary.class)
     public ResponseEntity<?> getFollowedList() {
         User currentUser = userService.getCurrentUser();
@@ -351,26 +405,26 @@ public class UserController {
         return new ResponseEntity<>(followed, HttpStatus.BAD_REQUEST);
     }
 
-    @RequestMapping(value = "/api/friend/num", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/friend/num", method = GET)
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getFriendNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(123);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/api/followed/num", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/followed/num", method = GET)
     public ResponseEntity<?> getFollowNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(200);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/api/fan/num", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/fan/num", method = GET)
     public ResponseEntity<?> getFanNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(456);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/api/likes/num", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/likes/num", method = GET)
     public ResponseEntity<?> getLikeNumber() {
         Api.Result result = Api.result(SUCCESS).param("num").value(789);
         return new ResponseEntity<>(result, HttpStatus.OK);
