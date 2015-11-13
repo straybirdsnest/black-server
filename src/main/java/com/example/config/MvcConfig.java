@@ -28,17 +28,16 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("index");
-        registry.addViewController("/console").setViewName("console");
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(debugRequestInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/requests");
+                .excludePathPatterns("/requests", "/tokens", "/", "/error");
         registry.addInterceptor(tokenAuthenticationInterceptor)
                 .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/register", "/api/token");
+                .excludePathPatterns("/api/register/**", "/api/token/**", "/api/availability/**");
     }
 
     @Override
