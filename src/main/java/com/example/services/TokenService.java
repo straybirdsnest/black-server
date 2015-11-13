@@ -27,7 +27,17 @@ public class TokenService {
         return Cryptor.encrypt(bytes);
     }
 
-    public User getUser(String token) throws IllegalTokenException{
+    public String generateTokenByPhone(String phone){
+        int id = userRepo.findUserIdByphone(phone);
+        byte[] bytes = new byte[]{
+                (byte) (id >>> 24),
+                (byte) (id >>> 16),
+                (byte) (id >>> 8),
+                (byte) id};
+        return Cryptor.encrypt(bytes);
+    }
+
+    public User getUser(String token) throws IllegalTokenException {
         return userRepo.findOne(getUserId(token));
     }
 
@@ -39,6 +49,15 @@ public class TokenService {
         id = (id << 8) | data[2];
         id = (id << 8) | data[3];
         return id;
+    }
+
+    public boolean isAvailable(String token) {
+        try {
+            getUserId(token);
+        } catch (IllegalTokenException e) {
+            return false;
+        }
+        return true;
     }
 
 }
