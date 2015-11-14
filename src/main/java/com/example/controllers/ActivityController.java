@@ -3,6 +3,7 @@ package com.example.controllers;
 import com.example.config.jsonviews.ActivityView;
 import com.example.daos.ActivityRepo;
 import com.example.models.Activity;
+import com.example.models.Game;
 import com.example.models.Image;
 import com.example.models.User;
 import com.example.services.ImageService;
@@ -14,13 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class ActivityController {
@@ -34,9 +33,14 @@ public class ActivityController {
     @Autowired
     ImageService imageService;
 
-    @RequestMapping(value = "/api/activities", method = RequestMethod.GET)
+    /**
+     * @param page
+     * @param size
+     * @return
+     */
+    @RequestMapping(value = "/api/activities/{type}", method = RequestMethod.GET)
     @JsonView(ActivityView.ActivitySummary.class)
-    public ResponseEntity<?> getRecentActivities(@RequestParam("page") Integer page, @RequestParam("size") Integer size) {
+    public ResponseEntity<?> getRecentActivities(@PathVariable String type, @RequestParam("page") Integer page, @RequestParam("size") Integer size) {
         User currentUser = userService.getCurrentUser();
         if (currentUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -56,6 +60,8 @@ public class ActivityController {
         Iterator<Activity> iterator = activityList.iterator();
         Activity activity = null;
         Image coverImage = null;
+        Game game = null;
+        Image gameLogo = null;
         while (iterator.hasNext()) {
             activity = iterator.next();
             coverImage = activity.getCoverImage();
@@ -64,6 +70,25 @@ public class ActivityController {
             }
         }
         return new ResponseEntity<>(activityList, HttpStatus.OK);
+    }
+
+    /**
+     * 获取当前用户所举办的活动
+     *
+     * @return
+     */
+    @RequestMapping(value = "/api/user/activities", method = RequestMethod.GET)
+    @JsonView(ActivityView.ActivitySummary.class)
+    public ResponseEntity<?> getUserActivity(@RequestParam("page") Integer page, @RequestParam("size") Integer size) {
+        User currentUser = userService.getCurrentUser();
+        if (currentUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Set<Activity> activities = activityRepo.findByPromoter(currentUser);
+        if (activities.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(activities, HttpStatus.OK);
     }
 
 }

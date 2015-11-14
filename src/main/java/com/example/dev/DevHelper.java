@@ -94,6 +94,33 @@ public class DevHelper {
             stat.execute(sql2);
             String sql3 = "UPDATE T_USER SET background_image_id=2 WHERE id=1";
             stat.execute(sql3);
+
+            String gameCS = DevHelper.class.getResource("/dev/game_cs.png").getPath();
+            stat.execute(String.format(sql, gameCS));
+            String gameDota2 = DevHelper.class.getResource("/dev/game_dota2.png").getPath();
+            stat.execute(String.format(sql, gameDota2));
+            String gameHeartStone = DevHelper.class.getResource("/dev/game_hearthstone.png").getPath();
+            stat.execute(String.format(sql, gameHeartStone));
+            String gameLOL = DevHelper.class.getResource("/dev/game_lol.png").getPath();
+            stat.execute(String.format(sql, gameLOL));
+            String gameMineCraft = DevHelper.class.getResource("/dev/game_minecraft.png").getPath();
+            stat.execute(String.format(sql, gameMineCraft));
+            String gameStarCraft = DevHelper.class.getResource("/dev/game_starcraft.png").getPath();
+            stat.execute(String.format(sql, gameStarCraft));
+            String gameWarCraft = DevHelper.class.getResource("/dev/game_warcraft.png").getPath();
+            stat.execute(String.format(sql, gameWarCraft));
+
+            int imageid;
+            for(int id=1;id<8;id++){
+                imageid = id+2;
+                String sql4 = "UPDATE T_GAME SET logo_id="+imageid+" WHERE id="+id;
+                stat.execute(sql4);
+            }
+
+            for(int id=1;id<11;id++){
+                String sql4 = "UPDATE T_ACTIVITY SET cover_image_id=2, game_id="+(id%6+1)+" WHERE id="+id;
+                stat.execute(sql4);
+            }
             stat.close();
             conn.close();
 
