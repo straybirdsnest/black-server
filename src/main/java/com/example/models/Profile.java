@@ -1,7 +1,5 @@
 package com.example.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import javax.persistence.*;
 import java.util.Date;
 
@@ -16,7 +14,7 @@ public class Profile {
     private String idCard;
 
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
-    private Gender gender;
+    private Gender gender = Gender.SECRET;
 
     @ManyToOne
     @JoinColumn(name = "avatar_id")
@@ -183,7 +181,7 @@ public class Profile {
     public void setBackgroundImageAccessToken(String backgroundImageAccessToken) {
         this.backgroundImageAccessToken = backgroundImageAccessToken;
     }
-//</editor-fold>
+    //</editor-fold>
 
     public String getCollegeName() {
         if (college != null) {

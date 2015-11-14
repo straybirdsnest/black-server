@@ -18,13 +18,13 @@ public class User {
 
     private String email;
 
-    private boolean enabled;
+    private boolean enabled = true;
 
     @Embedded
-    private Profile profile;
+    private Profile profile = new Profile();
 
     @Embedded
-    private RegistrationInfo regInfo;
+    private RegistrationInfo regInfo = new RegistrationInfo();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "T_SUBSCRIPTION",
