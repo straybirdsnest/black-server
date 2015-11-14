@@ -16,7 +16,7 @@ public class Profile {
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
     private Gender gender = Gender.SECRET;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "avatar_id")
     private Image avatar;
 
@@ -42,7 +42,7 @@ public class Profile {
 
     private String grade;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "background_image_id")
     private Image backgroundImage;
 
