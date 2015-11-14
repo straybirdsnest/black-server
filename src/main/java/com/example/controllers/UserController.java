@@ -21,11 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -105,22 +102,14 @@ public class UserController {
      */
     @RequestMapping(value = "/api/register", method = POST)
     @ResponseBody
-    public Api.Result register(@RequestParam String phone, @RequestParam String vcode, @RequestParam String zone) {
+    public Api.Result register(@RequestParam String phone, @RequestParam String vcode, @RequestParam String zone,
+                               HttpServletRequest request) {
         if (!vcodeService.verify(zone, phone, vcode)) return Api.result(VCODE_VERIFICATION_FAILED);
         boolean existed = userRepo.existsByPhone(phone);
         if (!existed) {
             User user = new User(phone);
-            user.setEnabled(true);
-            RegistrationInfo registrationInfo = new RegistrationInfo();
-            String remoteAddress = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                    .getRequest().getRemoteAddr();
-            LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("UTC"));
-            registrationInfo.setRegIp(remoteAddress);
-//            registrationInfo.setRegTime(localDateTime);
-            Profile profile = new Profile();
-            profile.setGender(Profile.Gender.SECRET);
-            user.setRegInfo(registrationInfo);
-            user.setProfile(profile);
+            user.getRegInfo().setRegIp(request.getRemoteAddr());
+            user.getProfile().setUsername(phone);
             userRepo.save(user);
             return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
         }
@@ -211,6 +200,7 @@ public class UserController {
 
     /**
      * 查看其他用户的 Profile
+     *
      * @param userId
      * @return
      */
@@ -241,6 +231,7 @@ public class UserController {
 
     /**
      * 朋友的 profile
+     *
      * @return
      */
     @RequestMapping(value = "/api/profile/friends", method = GET)
@@ -290,6 +281,7 @@ public class UserController {
     /////////////////////////////////////////////////////////////////
 
     //<editor-fold desc="=== Subscription ===">
+
     /**
      * 检查目标用户是否已经被关注了
      *
@@ -448,6 +440,7 @@ public class UserController {
 
     /**
      * 获取关注对象的数据
+     *
      * @return
      */
     @RequestMapping(value = "/api/followings/count", method = GET)
@@ -458,6 +451,7 @@ public class UserController {
 
     /**
      * 获取粉丝的数目
+     *
      * @return
      */
     @RequestMapping(value = "/api/fans/count", method = GET)
@@ -480,6 +474,7 @@ public class UserController {
 
     /**
      * 获取朋友的数目
+     *
      * @return
      */
     @RequestMapping(value = "/api/friends/count", method = GET)
@@ -494,6 +489,7 @@ public class UserController {
 
     /**
      * 获取赞的数目
+     *
      * @return
      */
     @RequestMapping(value = "/api/likes/count", method = GET)

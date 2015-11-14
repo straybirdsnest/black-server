@@ -8,7 +8,7 @@ import java.util.Date;
 @Embeddable
 public class RegistrationInfo {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date regTime;
+    private Date regTime = new Date();
 
     private String regIp;
 
