@@ -76,13 +76,29 @@ public class DevHelper {
             // connect to datebase
             Class.forName(driver);
             Connection conn = DriverManager.getConnection(url, username, password);
-            Statement stat = conn.createStatement();
+
 
             // run init.sql
             ScriptRunner runner = new ScriptRunner(conn, false, true);
             runner.runScript(new BufferedReader(new InputStreamReader(
                     DevHelper.class.getResourceAsStream(script)
             )));
+
+            Statement stat = conn.createStatement();
+            String sql = "INSERT INTO T_IMAGE(data) VALUES (LOAD_FILE('%s'))";
+            String wnmAvatar = DevHelper.class.getResource("/dev/wnm_avatar.png").getPath();
+            String wnmBg = DevHelper.class.getResource("/dev/wnm_bg.png").getPath();
+            stat.execute(String.format(sql, wnmAvatar));
+            stat.execute(String.format(sql, wnmBg));
+            String sql2 = "UPDATE T_USER SET avatar_id=1 WHERE id=1";
+            stat.execute(sql2);
+            String sql3 = "UPDATE T_USER SET background_image_id=2 WHERE id=1";
+            stat.execute(sql3);
+            stat.close();
+            conn.close();
+
+            System.out.println("已经插入王尼玛的头像和背景");
+
             System.out.println("=== 测试数据库初始化完毕 ===\n");
 
         } catch (Exception e) {
