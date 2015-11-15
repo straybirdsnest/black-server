@@ -78,18 +78,26 @@ CREATE TABLE T_ACTIVITY (
   `cover_image_id` BIGINT,
   `start_time`  DATETIME,
   `end_time`    DATETIME,
+  `registration_deadline` DATETIME,
   `location`    VARCHAR(100),
   `promoter_id` INT,
+  `title`     TEXT,
   `content`     TEXT,
   `game_id`     INT,
   `type`    ENUM('MATCH', 'BLACK'),
   `status`      ENUM('READY', 'RUNNING', 'STOPPED'),
-  `remarks`     TEXT,
   `group_id`    INT,
   FOREIGN KEY (`promoter_id`) REFERENCES T_USER (id),
   FOREIGN KEY (`group_id`) REFERENCES T_GROUP (id),
   FOREIGN KEY (`cover_image_id`) REFERENCES T_IMAGE (id),
   FOREIGN KEY (`game_id`) REFERENCES T_GAME (id)
+);
+
+CREATE TABLE T_ACTIVITY_IMAGE (
+  `activity_id` INT,
+  `image_id`    BIGINT,
+  FOREIGN KEY (`activity_id`) REFERENCES T_ACTIVITY (id),
+  FOREIGN KEY (`image_id`) REFERENCES T_IMAGE (id)
 );
 
 CREATE TABLE T_FRIENDSHIP (
@@ -161,13 +169,23 @@ INSERT INTO `black_server`.`t_game`(`id`, `name`) VALUES ('6', 'StarCraft II');
 INSERT INTO `black_server`.`t_game`(`id`, `name`) VALUES ('7', 'Warcraft III');
 
 #活动信息
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('1', '2001-02-03:01:02:03', '，埃及', 'MATCH', 'RUNNING');
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('2', '2001-02-03:01:03:04', '，埃及', 'MATCH', 'RUNNING');
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('3', '2001-02-03:01:04:05', '，埃及', 'MATCH', 'RUNNING');
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('4', '2001-02-03:01:05:06', '，埃及', 'MATCH', 'RUNNING');
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('5', '2001-02-03:01:06:07', '，埃及', 'MATCH', 'RUNNING');
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('6', '2001-02-03:01:07:08', '，埃及', 'MATCH', 'RUNNING');
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('7', '2001-02-03:01:08:09', '，埃及', 'MATCH', 'RUNNING');
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('8', '2001-02-03:01:09:10', '，埃及', 'MATCH', 'RUNNING');
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('9', '2001-02-03:01:10:11', '，埃及', 'MATCH', 'RUNNING');
-INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`) VALUES ('10', '2001-02-03:01:11:12', '，埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `title`, `start_time`, `end_time`, `registration_deadline`, `promoter_id`, `location`, `type`, `status`)
+VALUES ('1', '起来嗨', '2001-02-03 01:02:03', '2099-11-11 11:11:11', '2099-01-01 11:11:11', '1', '埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)
+VALUES ('2', '2001-02-03 01:03:04', '埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)
+VALUES ('3', '2001-02-03 01:04:05', '埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)
+VALUES ('4', '2001-02-03 01:05:06', '埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `promoter_id`, `type`, `status`)
+VALUES ('5', '2001-02-03 01:06:07', '埃及', '1', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)
+VALUES ('6', '2001-02-03 01:07:08', '埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)
+VALUES ('7', '2001-02-03 01:08:09', '埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)
+VALUES ('8', '2001-02-03 01:09:10', '埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)
+VALUES ('9', '2001-02-03 01:10:11', '埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)
+VALUES ('10', '2001-02-03 01:11:12', '埃及', 'MATCH', 'RUNNING');
