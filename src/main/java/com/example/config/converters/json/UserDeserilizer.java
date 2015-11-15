@@ -13,7 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class UserDeserilizer extends JsonDeserializer<User> {
 
@@ -26,9 +30,14 @@ public class UserDeserilizer extends JsonDeserializer<User> {
         String realName = root.get("realName").asText();
         String username = root.get("username").asText();
         String email = root.get("email").asText();
-        JsonNode birthdayNode = root.get("birthday");
-//        LocalDate birthday = LocalDate.of(birthdayNode.get(0).asInt(),
-//                birthdayNode.get(1).asInt(), birthdayNode.get(2).asInt());
+        String birthday = root.get("birthday").asText();
+        Date date = null;
+        try {
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            date = format.parse(birthday);
+        } catch (ParseException e) {
+            logger.warn("parse from [birthday] error");
+        }
         String collegeName = root.get("college").asText();
         String academyName = root.get("academy").asText();
         String grade = root.get("grade").asText();
@@ -43,7 +52,7 @@ public class UserDeserilizer extends JsonDeserializer<User> {
 
         Profile profile = new Profile();
         profile.setUsername(username);
-//        profile.setBirthday(birthday);
+        profile.setBirthday(date);
         profile.setRealName(realName);
 
         College college = new College();

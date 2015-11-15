@@ -1,13 +1,10 @@
 package com.example.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import javax.persistence.*;
 import java.util.Date;
 
 @Embeddable
 public class Profile {
-    private String nickname;
 
     @Column(name = "realname")
     private String realName;
@@ -16,9 +13,9 @@ public class Profile {
     private String idCard;
 
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
-    private Gender gender;
+    private Gender gender = Gender.SECRET;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "avatar_id")
     private Image avatar;
 
@@ -44,7 +41,7 @@ public class Profile {
 
     private String grade;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "background_image_id")
     private Image backgroundImage;
 
@@ -55,14 +52,6 @@ public class Profile {
     private String backgroundImageAccessToken;
 
     //<editor-fold desc="=== Getters & Setters ===">
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
 
     public String getRealName() {
         return realName;
@@ -183,7 +172,7 @@ public class Profile {
     public void setBackgroundImageAccessToken(String backgroundImageAccessToken) {
         this.backgroundImageAccessToken = backgroundImageAccessToken;
     }
-//</editor-fold>
+    //</editor-fold>
 
     public String getCollegeName() {
         if (college != null) {

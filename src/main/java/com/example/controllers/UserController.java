@@ -19,13 +19,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -105,22 +101,15 @@ public class UserController {
      */
     @RequestMapping(value = "/api/register", method = POST)
     @ResponseBody
-    public Api.Result register(@RequestParam String phone, @RequestParam String vcode, @RequestParam String zone) {
+    public Api.Result register(@RequestParam String phone, @RequestParam String vcode, @RequestParam String zone,
+                               HttpServletRequest request) {
         if (!vcodeService.verify(zone, phone, vcode)) return Api.result(VCODE_VERIFICATION_FAILED);
         boolean existed = userRepo.existsByPhone(phone);
         if (!existed) {
             User user = new User(phone);
-            user.setEnabled(true);
-            RegistrationInfo registrationInfo = new RegistrationInfo();
-            String remoteAddress = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                    .getRequest().getRemoteAddr();
-            LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("UTC"));
-            registrationInfo.setRegIp(remoteAddress);
-//            registrationInfo.setRegTime(localDateTime);
-            Profile profile = new Profile();
-            profile.setGender(Profile.Gender.SECRET);
-            user.setRegInfo(registrationInfo);
-            user.setProfile(profile);
+            user.getRegInfo().setRegIp(request.getRemoteAddr());
+            user.getProfile().setUsername(phone);
+            user.getProfile().setRealName(phone);
             userRepo.save(user);
             return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
         }
@@ -139,21 +128,8 @@ public class UserController {
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Profile profile = user.getProfile();
-        if (profile == null) {
-            logger.warn("用户" + user.getId() + "的[Profile]为Null。");
-        } else {
-            Image avatar = profile.getAvatar();
-            if (avatar != null) {
-                profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
-            }
-            Image background = profile.getBackgroundImage();
-            if (background != null) {
-                profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
-            }
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        updateAccesToken(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     /**
@@ -211,6 +187,7 @@ public class UserController {
 
     /**
      * 查看其他用户的 Profile
+     *
      * @param userId
      * @return
      */
@@ -218,29 +195,16 @@ public class UserController {
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getUserProfile(@PathVariable int userId) {
         User user = userRepo.findOne(userId);
-        if (user != null) {
-            Profile profile = user.getProfile();
-            if (profile == null) {
-                logger.warn("用户" + user.getId() + "的[Profile]为Null。");
-            } else {
-                Image avatar = profile.getAvatar();
-                if (avatar != null) {
-                    profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
-                }
-                Image background = profile.getBackgroundImage();
-                if (background != null) {
-                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
-                }
-                return new ResponseEntity<>(user, HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
+        if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        updateAccesToken(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     /**
      * 朋友的 profile
+     *
      * @return
      */
     @RequestMapping(value = "/api/profile/friends", method = GET)
@@ -254,26 +218,10 @@ public class UserController {
         }
         List<User> userList = users.getContent();
         User user = null;
-        Image avatar = null;
-        Image background = null;
-        Profile profile = null;
         for (Iterator<User> iterator = userList.iterator(); iterator.hasNext(); ) {
             user = iterator.next();
             if (user != null) {
-                profile = user.getProfile();
-                if (profile == null) {
-                    logger.warn("用户" + user.getId() + "的[Profile]为Null。");
-                } else {
-                    avatar = profile.getAvatar();
-                    background = profile.getBackgroundImage();
-                    if (avatar != null) {
-                        profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
-                    }
-                    if (background != null) {
-                        profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
-                    }
-                }
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                updateAccesToken(user);
             }
         }
         return new ResponseEntity<>(userList, HttpStatus.OK);
@@ -290,6 +238,7 @@ public class UserController {
     /////////////////////////////////////////////////////////////////
 
     //<editor-fold desc="=== Subscription ===">
+
     /**
      * 检查目标用户是否已经被关注了
      *
@@ -333,15 +282,7 @@ public class UserController {
         }
         for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
             User checkUser = iterator.next();
-            Profile profile = checkUser.getProfile();
-            if (profile != null) {
-                if (profile.getAvatar() != null) {
-                    profile.setAvatarAccessToken(imageService.generateAccessToken(profile.getAvatar()));
-                }
-                if (profile.getBackgroundImage() != null) {
-                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(profile.getBackgroundImage()));
-                }
-            }
+            updateAccesToken(checkUser);
         }
         return new ResponseEntity<>(following, HttpStatus.BAD_REQUEST);
     }
@@ -433,21 +374,14 @@ public class UserController {
         }
         for (Iterator<User> iterator = followed.iterator(); iterator.hasNext(); ) {
             User checkUser = iterator.next();
-            Profile profile = checkUser.getProfile();
-            if (profile != null) {
-                if (profile.getAvatar() != null) {
-                    profile.setAvatarAccessToken(imageService.generateAccessToken(profile.getAvatar()));
-                }
-                if (profile.getBackgroundImage() != null) {
-                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(profile.getBackgroundImage()));
-                }
-            }
+            updateAccesToken(checkUser);
         }
         return new ResponseEntity<>(followed, HttpStatus.BAD_REQUEST);
     }
 
     /**
      * 获取关注对象的数据
+     *
      * @return
      */
     @RequestMapping(value = "/api/followings/count", method = GET)
@@ -458,6 +392,7 @@ public class UserController {
 
     /**
      * 获取粉丝的数目
+     *
      * @return
      */
     @RequestMapping(value = "/api/fans/count", method = GET)
@@ -480,6 +415,7 @@ public class UserController {
 
     /**
      * 获取朋友的数目
+     *
      * @return
      */
     @RequestMapping(value = "/api/friends/count", method = GET)
@@ -494,6 +430,7 @@ public class UserController {
 
     /**
      * 获取赞的数目
+     *
      * @return
      */
     @RequestMapping(value = "/api/likes/count", method = GET)
@@ -502,10 +439,16 @@ public class UserController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public void handle(HttpMessageNotReadableException e) {
-        logger.warn("Returning HTTP 400 Bad Request", e);
+    private void updateAccesToken(User user) {
+        Profile profile = user.getProfile();
+        if (profile != null) {
+            if (profile.getAvatar() != null) {
+                profile.setAvatarAccessToken(imageService.generateAccessToken(profile.getAvatar()));
+            }
+            if (profile.getBackgroundImage() != null) {
+                profile.setBackgroundImageAccessToken(imageService.generateAccessToken(profile.getBackgroundImage()));
+            }
+        }
     }
 
 }
