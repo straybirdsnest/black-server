@@ -3,7 +3,6 @@ package com.example.controllers;
 import com.example.config.jsonviews.ActivityView;
 import com.example.daos.ActivityRepo;
 import com.example.models.Activity;
-import com.example.models.Game;
 import com.example.models.Image;
 import com.example.models.User;
 import com.example.services.ImageService;
@@ -40,7 +39,7 @@ public class ActivityController {
      */
     @RequestMapping(value = "/api/activities/{type}", method = RequestMethod.GET)
     @JsonView(ActivityView.ActivitySummary.class)
-    public ResponseEntity<?> getRecentActivities(@PathVariable String type, @RequestParam("page") Integer page, @RequestParam("size") Integer size) {
+    public ResponseEntity<?> getRecentActivities(@PathVariable String type, @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size", required = false) Integer size) {
         User currentUser = userService.getCurrentUser();
         if (currentUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -49,7 +48,7 @@ public class ActivityController {
             page = 0;
         }
         if (size == null) {
-            size = 20;
+            size = 5;
         }
         final PageRequest pageRequest = new PageRequest(page, size, Sort.Direction.DESC, "startTime");
         Page<Activity> activities = activityRepo.findAll(pageRequest);
@@ -60,8 +59,6 @@ public class ActivityController {
         Iterator<Activity> iterator = activityList.iterator();
         Activity activity = null;
         Image coverImage = null;
-        Game game = null;
-        Image gameLogo = null;
         while (iterator.hasNext()) {
             activity = iterator.next();
             coverImage = activity.getCoverImage();
@@ -70,6 +67,11 @@ public class ActivityController {
             }
         }
         return new ResponseEntity<>(activityList, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/api/activity", method = RequestMethod.PATCH)
+    public ResponseEntity<?> updateParticleActivity(@RequestParam(value = "hh", required = false) String hh) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     /**

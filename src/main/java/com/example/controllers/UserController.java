@@ -110,6 +110,7 @@ public class UserController {
             User user = new User(phone);
             user.getRegInfo().setRegIp(request.getRemoteAddr());
             user.getProfile().setUsername(phone);
+            user.getProfile().setRealName(phone);
             userRepo.save(user);
             return Api.result(SUCCESS).param("token").value(tokenService.generateToken(user));
         }
