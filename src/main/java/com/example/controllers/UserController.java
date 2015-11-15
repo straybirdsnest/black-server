@@ -19,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -129,21 +128,8 @@ public class UserController {
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        Profile profile = user.getProfile();
-        if (profile == null) {
-            logger.warn("用户" + user.getId() + "的[Profile]为Null。");
-        } else {
-            Image avatar = profile.getAvatar();
-            if (avatar != null) {
-                profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
-            }
-            Image background = profile.getBackgroundImage();
-            if (background != null) {
-                profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
-            }
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        updateAccesToken(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     /**
@@ -209,25 +195,11 @@ public class UserController {
     @JsonView(UserView.Profile.class)
     public ResponseEntity<?> getUserProfile(@PathVariable int userId) {
         User user = userRepo.findOne(userId);
-        if (user != null) {
-            Profile profile = user.getProfile();
-            if (profile == null) {
-                logger.warn("用户" + user.getId() + "的[Profile]为Null。");
-            } else {
-                Image avatar = profile.getAvatar();
-                if (avatar != null) {
-                    profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
-                }
-                Image background = profile.getBackgroundImage();
-                if (background != null) {
-                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
-                }
-                return new ResponseEntity<>(user, HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } else {
+        if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        updateAccesToken(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     /**
@@ -246,26 +218,10 @@ public class UserController {
         }
         List<User> userList = users.getContent();
         User user = null;
-        Image avatar = null;
-        Image background = null;
-        Profile profile = null;
         for (Iterator<User> iterator = userList.iterator(); iterator.hasNext(); ) {
             user = iterator.next();
             if (user != null) {
-                profile = user.getProfile();
-                if (profile == null) {
-                    logger.warn("用户" + user.getId() + "的[Profile]为Null。");
-                } else {
-                    avatar = profile.getAvatar();
-                    background = profile.getBackgroundImage();
-                    if (avatar != null) {
-                        profile.setAvatarAccessToken(imageService.generateAccessToken(avatar));
-                    }
-                    if (background != null) {
-                        profile.setBackgroundImageAccessToken(imageService.generateAccessToken(background));
-                    }
-                }
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                updateAccesToken(user);
             }
         }
         return new ResponseEntity<>(userList, HttpStatus.OK);
@@ -326,15 +282,7 @@ public class UserController {
         }
         for (Iterator<User> iterator = following.iterator(); iterator.hasNext(); ) {
             User checkUser = iterator.next();
-            Profile profile = checkUser.getProfile();
-            if (profile != null) {
-                if (profile.getAvatar() != null) {
-                    profile.setAvatarAccessToken(imageService.generateAccessToken(profile.getAvatar()));
-                }
-                if (profile.getBackgroundImage() != null) {
-                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(profile.getBackgroundImage()));
-                }
-            }
+            updateAccesToken(checkUser);
         }
         return new ResponseEntity<>(following, HttpStatus.BAD_REQUEST);
     }
@@ -426,15 +374,7 @@ public class UserController {
         }
         for (Iterator<User> iterator = followed.iterator(); iterator.hasNext(); ) {
             User checkUser = iterator.next();
-            Profile profile = checkUser.getProfile();
-            if (profile != null) {
-                if (profile.getAvatar() != null) {
-                    profile.setAvatarAccessToken(imageService.generateAccessToken(profile.getAvatar()));
-                }
-                if (profile.getBackgroundImage() != null) {
-                    profile.setBackgroundImageAccessToken(imageService.generateAccessToken(profile.getBackgroundImage()));
-                }
-            }
+            updateAccesToken(checkUser);
         }
         return new ResponseEntity<>(followed, HttpStatus.BAD_REQUEST);
     }
@@ -499,10 +439,16 @@ public class UserController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public void handle(HttpMessageNotReadableException e) {
-        logger.warn("Returning HTTP 400 Bad Request", e);
+    private void updateAccesToken(User user) {
+        Profile profile = user.getProfile();
+        if (profile != null) {
+            if (profile.getAvatar() != null) {
+                profile.setAvatarAccessToken(imageService.generateAccessToken(profile.getAvatar()));
+            }
+            if (profile.getBackgroundImage() != null) {
+                profile.setBackgroundImageAccessToken(imageService.generateAccessToken(profile.getBackgroundImage()));
+            }
+        }
     }
 
 }

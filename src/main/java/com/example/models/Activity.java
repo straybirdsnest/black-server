@@ -1,12 +1,17 @@
 package com.example.models;
 
+import com.example.config.converters.json.ActivityDeserillizer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
+@JsonDeserialize(using = ActivityDeserillizer.class)
 public class Activity {
 
     @Transient
@@ -23,6 +28,8 @@ public class Activity {
     private Date startTime;
 
     private Date endTime;
+
+    private Date registrationDeadline;
 
     private String location;
 
@@ -44,14 +51,23 @@ public class Activity {
     private Status status;
 
     @Column(columnDefinition = "text")
-    private String remarks;
+    private String title;
 
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
 
+    @OneToMany
+    @JoinTable(name = "T_ACTIVITY_IMAGE",
+            joinColumns = @JoinColumn(name = "activity_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "image_id", referencedColumnName = "id", unique = true))
+    private Set<Image> photos = new HashSet<>();
+
     @Transient
     private String coverImageAccessToken;
+
+    @Transient
+    private Set<String> photosAccessToken;
 
     public Activity() {
 
@@ -89,6 +105,14 @@ public class Activity {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public Date getRegistrationDeadline() {
+        return registrationDeadline;
+    }
+
+    public void setRegistrationDeadline(Date registrationDeadline) {
+        this.registrationDeadline = registrationDeadline;
     }
 
     public String getLocation() {
@@ -139,12 +163,12 @@ public class Activity {
         this.status = status;
     }
 
-    public String getRemarks() {
-        return remarks;
+    public String getTitle() {
+        return title;
     }
 
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Group getGroup() {
@@ -155,6 +179,14 @@ public class Activity {
         this.group = group;
     }
 
+    public Set<Image> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(Set<Image> photos) {
+        this.photos = photos;
+    }
+
     public String getCoverImageAccessToken() {
         return coverImageAccessToken;
     }
@@ -163,9 +195,24 @@ public class Activity {
         this.coverImageAccessToken = accessToken;
     }
 
+    public Set<String> getPhotosAccessToken() {
+        return photosAccessToken;
+    }
+
+    public void setPhotosAccessToken(Set<String> photosAccessToken) {
+        this.photosAccessToken = photosAccessToken;
+    }
+
     public String getGameName() {
-        if (game != null){
+        if (game != null) {
             return game.getName();
+        }
+        return null;
+    }
+
+    public Integer getGroupId() {
+        if (group != null) {
+            return group.getId();
         }
         return null;
     }

@@ -1,6 +1,7 @@
 package com.example.config.converters.json;
 
 import com.example.models.Activity;
+import com.example.models.Group;
 import com.example.models.Profile;
 import com.example.models.User;
 import com.fasterxml.jackson.core.Version;
@@ -21,6 +22,7 @@ public class BlackServerDataJacksonModule extends SimpleModule {
         context.setMixInAnnotations(User.class, UserMixin.class);
         context.setMixInAnnotations(Profile.class, ProfileMixin.class);
         context.setMixInAnnotations(Activity.class, ActivityMixin.class);
+        context.setMixInAnnotations(Group.class, GroupMixin.class);
     }
 
 }

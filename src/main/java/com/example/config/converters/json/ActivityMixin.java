@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import java.util.Date;
+import java.util.Set;
 
 public abstract class ActivityMixin {
     @JsonView(ActivityView.ActivitySummary.class)
@@ -17,6 +18,9 @@ public abstract class ActivityMixin {
     abstract String getCoverImageAccessToken();
 
     @JsonView(ActivityView.ActivitySummary.class)
+    abstract String getTitle();
+
+    @JsonView(ActivityView.ActivityDetails.class)
     abstract String getContent();
 
     @JsonView(ActivityView.ActivitySummary.class)
@@ -34,6 +38,22 @@ public abstract class ActivityMixin {
     abstract Activity.Type getType();
 
     @JsonView(ActivityView.ActivityDetails.class)
+    abstract String getStatus();
+
+    @JsonView(ActivityView.ActivityDetails.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    abstract Date getRegistrationDeadline();
+
+    @JsonView(ActivityView.ActivityDetails.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     abstract Date getEndTime();
+
+    @JsonView(ActivityView.ActivityDetails.class)
+    @JsonProperty("photos")
+    abstract Set<String> getPhotosAccessToken();
+
+    @JsonView(ActivityView.ActivityDetails.class)
+    @JsonProperty("group")
+    abstract Integer getGroupId();
+
 }
