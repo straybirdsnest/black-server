@@ -1,6 +1,5 @@
 package com.example.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +20,8 @@ public class Activity {
     @JoinColumn(name = "cover_image_id")
     private Image coverImage;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private Date startTime;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private Date endTime;
 
     private String location;
@@ -35,6 +32,10 @@ public class Activity {
 
     @Column(columnDefinition = "text")
     private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "game_id")
+    private Game game;
 
     @Column(columnDefinition = "enum('MATCH', 'BLACK')")
     private Type type;
@@ -114,6 +115,14 @@ public class Activity {
         this.content = content;
     }
 
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
     public Type getType() {
         return type;
     }
@@ -154,7 +163,14 @@ public class Activity {
         this.coverImageAccessToken = accessToken;
     }
 
-    //</editor-fold>
+    public String getGameName() {
+        if (game != null){
+            return game.getName();
+        }
+        return null;
+    }
+
+//</editor-fold>
 
     public enum Type {
         MATCH, BLACK

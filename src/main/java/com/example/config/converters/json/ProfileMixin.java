@@ -14,9 +14,6 @@ public abstract class ProfileMixin {
 
     }
 
-    @JsonView(UserView.Profile.class)
-    abstract String getNickename();
-
     @JsonView(UserView.UserSummary.class)
     abstract String getRealName();
 
