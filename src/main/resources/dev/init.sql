@@ -168,9 +168,15 @@ INSERT INTO `black_server`.`t_game`(`id`, `name`) VALUES ('5', 'Minecraft');
 INSERT INTO `black_server`.`t_game`(`id`, `name`) VALUES ('6', 'StarCraft II');
 INSERT INTO `black_server`.`t_game`(`id`, `name`) VALUES ('7', 'Warcraft III');
 
+#群组页面信息
+INSERT INTO `black_server`.`t_page` (`id`) VALUES ('1');
+
+#群组信息
+INSERT INTO `black_server`.`t_group` (`id`, `name`, `intro`, `page_id`) VALUES ('1', '起来嗨', '睡你麻痹起来嗨', '1');
+
 #活动信息
-INSERT INTO `black_server`.`t_activity` (`id`, `title`, `start_time`, `end_time`, `registration_deadline`, `promoter_id`, `location`, `type`, `status`)
-VALUES ('1', '起来嗨', '2001-02-03 01:02:03', '2099-11-11 11:11:11', '2099-01-01 11:11:11', '1', '埃及', 'MATCH', 'RUNNING');
+INSERT INTO `black_server`.`t_activity` (`id`, `title`, `content`, `start_time`, `end_time`, `registration_deadline`, `promoter_id`, `location`, `type`, `status`, `group_id`)
+VALUES ('1', '起来嗨', '睡你麻痹起来嗨', '2001-02-03 01:02:03', '2099-11-11 11:11:11', '2099-01-01 11:11:11', '1', '埃及', 'MATCH', 'RUNNING', '1');
 INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)
 VALUES ('2', '2001-02-03 01:03:04', '埃及', 'MATCH', 'RUNNING');
 INSERT INTO `black_server`.`t_activity` (`id`, `start_time`, `location`, `type`, `status`)

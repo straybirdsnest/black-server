@@ -2,7 +2,6 @@ package com.example.config.converters.json;
 
 import com.example.config.jsonviews.ActivityView;
 import com.example.models.Activity;
-import com.example.models.Image;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;

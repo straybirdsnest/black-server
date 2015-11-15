@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.controllers.UserController;
 import com.example.models.User;
 import com.example.services.TokenService;
 import org.junit.Before;
@@ -29,8 +28,6 @@ public class UserControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(UserControllerTest.class);
     @Autowired
     WebApplicationContext webApplicationContext;
-    @Autowired
-    UserController userController;
     @Autowired
     TokenService tokenService;
     private MockMvc mockMvc;
@@ -63,9 +60,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.academy").value("计算机工程与科学学院"))
                 .andExpect(jsonPath("$.grade").value("研究生一年级"))
                 .andExpect(jsonPath("$.email").value("test@test.com"))
-                .andExpect(jsonPath("$.birthday[0]").value(2000))
-                .andExpect(jsonPath("$.birthday[1]").value(1))
-                .andExpect(jsonPath("$.birthday[2]").value(1))
+                .andExpect(jsonPath("$.birthday").value("2000-01-01"))
                 .andDo(MockMvcResultHandlers.print());
         // @formatter:on
     }
@@ -88,9 +83,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.academy").value("计算机工程与科学学院"))
                 .andExpect(jsonPath("$.grade").value("研究生一年级"))
                 .andExpect(jsonPath("$.email").value("test@test.com"))
-                .andExpect(jsonPath("$.birthday[0]").value(2000))
-                .andExpect(jsonPath("$.birthday[1]").value(1))
-                .andExpect(jsonPath("$.birthday[2]").value(1))
+                .andExpect(jsonPath("$.birthday").value("2000-01-01"))
                 .andDo(MockMvcResultHandlers.print());
         // @formatter:on
     }
