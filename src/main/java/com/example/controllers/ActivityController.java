@@ -2,10 +2,10 @@ package com.example.controllers;
 
 import com.example.config.jsonviews.ActivityView;
 import com.example.daos.ActivityRepo;
+import com.example.daos.GameRepo;
+import com.example.daos.GroupRepo;
 import com.example.daos.UserRepo;
-import com.example.models.Activity;
-import com.example.models.Image;
-import com.example.models.User;
+import com.example.models.*;
 import com.example.services.ImageService;
 import com.example.services.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -33,6 +33,12 @@ public class ActivityController {
 
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    GameRepo gameRepo;
+
+    @Autowired
+    GroupRepo groupRepo;
 
     @Autowired
     ActivityRepo activityRepo;
@@ -99,11 +105,11 @@ public class ActivityController {
         }
         Set<Image> photos = activity.getPhotos();
         Image photo = null;
-        if(!photos.isEmpty()){
+        if (!photos.isEmpty()) {
             Set<String> accessTokens = new HashSet<>();
-            for(Iterator<Image> iterator = photos.iterator(); iterator.hasNext();){
+            for (Iterator<Image> iterator = photos.iterator(); iterator.hasNext(); ) {
                 photo = iterator.next();
-                if(photo!= null) {
+                if (photo != null) {
                     accessTokens.add(imageService.generateAccessToken(photo));
                 }
             }
@@ -117,12 +123,26 @@ public class ActivityController {
      * @return
      */
     @RequestMapping(value = "/api/activities", method = RequestMethod.POST)
-    public ResponseEntity<?> createActivity(@RequestParam Activity activity) {
+    @JsonView(ActivityView.ActivityDetails.class)
+    public ResponseEntity<?> createActivity(@RequestBody Activity activity) {
         User currentUser = userService.getCurrentUser();
-        if(currentUser == null){
+        if (currentUser == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        // TODO 实现插入数据
+        activity.setPromoter(currentUser);
+        Game game = activity.getGame();
+        Game targetGame = gameRepo.findOneByName(game.getName());
+        if (targetGame == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        activity.setGame(targetGame);
+        Group group = activity.getGroup();
+        Group targetGroup = groupRepo.findOne(group.getId());
+        if(targetGroup == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        activity.setGroup(targetGroup);
+        activityRepo.save(activity);
         return new ResponseEntity<>(activity, HttpStatus.CREATED);
     }
 
