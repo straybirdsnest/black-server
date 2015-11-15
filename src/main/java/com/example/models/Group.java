@@ -20,6 +20,9 @@ public class Group {
     @JoinColumn(name = "page_id")
     private Page page;
 
+    @Transient
+    private String logoAccessToken;
+
     //<editor-fold desc="=== Getters & Setters ===">
 
     public Integer getId() {
@@ -62,5 +65,19 @@ public class Group {
         this.page = page;
     }
 
-    //</editor-fold>
+    public Integer getPageId(){
+        if(page != null){
+            return page.getId();
+        }
+        return null;
+    }
+
+    public String getLogoAccessToken() {
+        return logoAccessToken;
+    }
+
+    public void setLogoAccessToken(String logoAccessToken) {
+        this.logoAccessToken = logoAccessToken;
+    }
+//</editor-fold>
 }

@@ -5,7 +5,6 @@ import java.util.Date;
 
 @Embeddable
 public class Profile {
-    private String nickname;
 
     @Column(name = "realname")
     private String realName;
@@ -53,14 +52,6 @@ public class Profile {
     private String backgroundImageAccessToken;
 
     //<editor-fold desc="=== Getters & Setters ===">
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
 
     public String getRealName() {
         return realName;

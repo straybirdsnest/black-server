@@ -41,7 +41,9 @@ public class AccountControllerTest {
     @Test
     public void registration() throws Exception {
         mockMvc.perform(post("/api/register")
-                .param("phone", "987654321"))
+                .param("phone", "987654321")
+                .param("vcode","1234")
+                .param("zone","86"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json;charset=UTF-8"));
     }
