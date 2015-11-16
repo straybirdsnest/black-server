@@ -22,6 +22,9 @@ import java.util.Properties;
  * modify to use AbstractStandardBasicType instead.
  * @author Chun ping Wang.
  *
+ *
+ * https://developer.jboss.org/wiki/Java5EnumUserType
+ *
  */
 public class GenericEnumUserType  implements UserType, ParameterizedType {
     private static final String DEFAULT_IDENTIFIER_METHOD_NAME = "name";

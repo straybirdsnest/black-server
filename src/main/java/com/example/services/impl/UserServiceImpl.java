@@ -3,6 +3,7 @@ package com.example.services.impl;
 import com.example.daos.UserRepo;
 import com.example.models.User;
 import com.example.services.UserService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +16,11 @@ public class UserServiceImpl implements UserService {
 
     private ConcurrentHashMap<Long, Integer> userMap = new ConcurrentHashMap<>();
 
+    @NotNull
     public User getCurrentUser() {
         long threadId = Thread.currentThread().getId();
         Integer userId = userMap.get(threadId);
-        User user = userRepo.findOne(userId);
-        return user;
+        return userRepo.findOne(userId);
     }
 
     public void addUser(int userId) {
