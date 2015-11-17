@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -14,82 +15,87 @@ import java.util.Optional;
 import java.util.Properties;
 
 public class DevHelper {
+    public static final String INIT_SCRIPT = "/dev/init.sql";
+    public static final String CONFIGURATION_FILE = "/application.properties";
+    public static final String JDBC_USERNAME = "spring.datasource.username";
+    public static final String JDBC_PASSWORD = "spring.datasource.password";
+    public static final String JDBC_URL = "spring.datasource.url";
+    public static final String JDBC_DRIVER = "spring.datasource.driverClassName";
     private static final Logger logger = LoggerFactory.getLogger(DevHelper.class);
+    private static String username;
+    private static String password;
+    private static String url;
+    private static String driver;
+
+    private static void loadPropertiesFromConfigurationFile() throws IOException {
+        InputStream is = DevHelper.class.getResourceAsStream(CONFIGURATION_FILE);
+        Properties props = new Properties();
+        props.load(is);
+
+        // find from application.properties
+        username = props.getProperty(JDBC_USERNAME);
+        password = props.getProperty(JDBC_PASSWORD);
+        url = props.getProperty(JDBC_URL);
+        driver = props.getProperty(JDBC_DRIVER);
+    }
+
+    private static void loadPropertiesFromSystemEnvironment() {
+        String usernameEnv = System.getenv(JDBC_USERNAME);
+        String passwordEnv = System.getenv(JDBC_PASSWORD);
+        String urlEnv = System.getenv(JDBC_URL);
+        String driverEnv = System.getenv(JDBC_DRIVER);
+        if (usernameEnv != null) {
+            username = usernameEnv;
+        }
+        if (passwordEnv != null) {
+            password = passwordEnv;
+        }
+        if (urlEnv != null) {
+            url = urlEnv;
+        }
+        if (driverEnv != null) {
+            driver = driverEnv;
+        }
+    }
+
+    private static void loadPropertiesFromCommandLineArguments(String[] args){
+        Optional<String> _username = Arrays.stream(args)
+                .filter(e -> e.contains(JDBC_USERNAME)).findFirst();
+        if (_username.isPresent()) {
+            username = _username.get().split("=")[1];
+        }
+        Optional<String> _password = Arrays.stream(args)
+                .filter(e -> e.contains(JDBC_PASSWORD)).findFirst();
+        if (_password.isPresent()) {
+            password = _password.get().split("=")[1];
+        }
+        Optional<String> _url = Arrays.stream(args)
+                .filter(e -> e.contains(JDBC_URL)).findFirst();
+        if (_url.isPresent()) {
+            url = _url.get().split("=")[1];
+        }
+        Optional<String> _driver = Arrays.stream(args)
+                .filter(e -> e.contains(JDBC_DRIVER)).findFirst();
+        if (_driver.isPresent()) {
+            driver = _driver.get().split("=")[1];
+        }
+    }
 
     public static void initDb(String[] args) {
-        initDbWithScript(args, "/dev/init.sql");
-    }
-
-    public static void initDbWithoutTables(String[] args) {
-        initDbWithScript(args, "/dev/recreate_database.sql");
-    }
-
-    private static void initDbWithScript(String[] args, String script) {
         try {
-            String username, password, url, driver;
-            InputStream is = DevHelper.class.getResourceAsStream("/application.properties");
-            Properties props = new Properties();
-            props.load(is);
-
-            // find from application.properties
-            username = props.getProperty("spring.datasource.username");
-            password = props.getProperty("spring.datasource.password");
-            url = props.getProperty("spring.datasource.url");
-            driver = props.getProperty("spring.datasource.driverClassName");
-
-            // find form system env
-            String usernameEnv = System.getenv("spring.datasource.username");
-            String passwordEnv = System.getenv("spring.datasource.password");
-            String urlEnv = System.getenv("spring.datasource.url");
-            String driverEnv = System.getenv("spring.datasource.driverClassName");
-            if (usernameEnv != null) {
-                username = usernameEnv;
-            }
-            if (passwordEnv != null) {
-                password = passwordEnv;
-            }
-            if (urlEnv != null) {
-                url = urlEnv;
-            }
-            if (driverEnv != null) {
-                driver = driverEnv;
-            }
-
-            // find from command line arguments
-            Optional<String> _username = Arrays.stream(args)
-                    .filter(e -> e.contains("spring.datasource.username")).findFirst();
-            if (_username.isPresent()) {
-                username = _username.get().split("=")[1];
-            }
-            Optional<String> _password = Arrays.stream(args)
-                    .filter(e -> e.contains("spring.datasource.password")).findFirst();
-            if (_password.isPresent()) {
-                password = _password.get().split("=")[1];
-            }
-            Optional<String> _url = Arrays.stream(args)
-                    .filter(e -> e.contains("spring.datasource.url")).findFirst();
-            if (_url.isPresent()) {
-                url = _url.get().split("=")[1];
-            }
-            Optional<String> _driver = Arrays.stream(args)
-                    .filter(e -> e.contains("spring.datasource.driverClassName")).findFirst();
-            if (_driver.isPresent()) {
-                driver = _driver.get().split("=")[1];
-            }
+            loadPropertiesFromConfigurationFile();
+            loadPropertiesFromSystemEnvironment();
+            loadPropertiesFromCommandLineArguments(args);
 
             // connect to datebase
             Class.forName(driver);
             Connection conn = DriverManager.getConnection(url, username, password);
 
-
-            // run init.sql
             ScriptRunner runner = new ScriptRunner(conn, false, true);
             //runner.setLogWriter(new LogPrintWriter(logger));
-            runner.setLogWriter(null); // 不现实建表语句
+            runner.setLogWriter(null); // 不显示建表语句
             runner.setErrorLogWriter(new ErrorLogPrintWriter(logger));
-            runner.runScript(new BufferedReader(new InputStreamReader(
-                    DevHelper.class.getResourceAsStream(script)
-            )));
+            runner.runScript(new BufferedReader(new InputStreamReader(DevHelper.class.getResourceAsStream(INIT_SCRIPT))));
 
             //检查系统是否windows，若是则去掉盘符前面的反斜杠
             boolean isWindows;
@@ -113,43 +119,21 @@ public class DevHelper {
             String sql3 = "UPDATE T_USER SET background_image_id=2 WHERE id=1";
             stat.execute(sql3);
 
-            System.out.println("=~> 已经插入王尼玛的头像和背景");
-
-            String gameCS = DevHelper.class.getResource("/dev/game_cs.png").getPath();
-            if (isWindows) {
-                gameCS = gameCS.substring(1);
+            String[] gameImages = new String[]{
+                    "/dev/game_cs.png",
+                    "/dev/game_dota2.png",
+                    "/dev/game_hearthstone.png",
+                    "/dev/game_lol.png",
+                    "/dev/game_minecraft.png",
+                    "/dev/game_starcraft.png",
+                    "/dev/game_warcraft.png",
+            };
+            for (String image: gameImages){
+                String path = DevHelper.class.getResource(image).getPath();
+                if (isWindows)
+                    path = path.substring(1);
+                stat.execute(String.format(sql, path));
             }
-            stat.execute(String.format(sql, gameCS));
-            String gameDota2 = DevHelper.class.getResource("/dev/game_dota2.png").getPath();
-            if (isWindows) {
-                gameDota2 = gameDota2.substring(1);
-            }
-            stat.execute(String.format(sql, gameDota2));
-            String gameHeartStone = DevHelper.class.getResource("/dev/game_hearthstone.png").getPath();
-            if (isWindows) {
-                gameHeartStone = gameHeartStone.substring(1);
-            }
-            stat.execute(String.format(sql, gameDota2));
-            String gameLOL = DevHelper.class.getResource("/dev/game_lol.png").getPath();
-            if (isWindows) {
-                gameLOL = gameLOL.substring(1);
-            }
-            stat.execute(String.format(sql, gameLOL));
-            String gameMineCraft = DevHelper.class.getResource("/dev/game_minecraft.png").getPath();
-            if (isWindows) {
-                gameMineCraft = gameMineCraft.substring(1);
-            }
-            stat.execute(String.format(sql, gameMineCraft));
-            String gameStarCraft = DevHelper.class.getResource("/dev/game_starcraft.png").getPath();
-            if (isWindows) {
-                gameStarCraft = gameStarCraft.substring(1);
-            }
-            stat.execute(String.format(sql, gameStarCraft));
-            String gameWarCraft = DevHelper.class.getResource("/dev/game_warcraft.png").getPath();
-            if (isWindows) {
-                gameWarCraft = gameWarCraft.substring(1);
-            }
-            stat.execute(String.format(sql, gameWarCraft));
 
             int imageid;
             for (int id = 1; id < 8; id++) {
@@ -166,7 +150,7 @@ public class DevHelper {
             stat.close();
             conn.close();
 
-            System.out.println("=~> 测试数据库初始化完毕 \n");
+            logger.debug("测试数据库初始化完毕");
 
         } catch (Exception e) {
             logger.debug("数据库初始化出错，服务器被迫终止", e);
