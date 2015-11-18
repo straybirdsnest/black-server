@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.config.ApplicationLifecycleManager;
 import com.example.config.ApplicationProperties;
 import com.example.dev.DevHelper;
 import org.springframework.boot.SpringApplication;
@@ -19,6 +20,8 @@ public class App {
         // 初始化数据库
         DevHelper.initDb(args);
         // 启动服务器
-        SpringApplication.run(App.class, args);
+        SpringApplication app = new SpringApplication(App.class);
+        app.addListeners(new ApplicationLifecycleManager());
+        app.run(args);
     }
 }

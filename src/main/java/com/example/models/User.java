@@ -1,30 +1,32 @@
 package com.example.models;
 
+import com.example.config.converters.json.UserDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@JsonDeserialize(using = com.example.config.converters.json.UserDeserilizer.class)
+@JsonDeserialize(using = UserDeserializer.class)
 public class User {
 
     @Id
     @GeneratedValue
     private Integer id;
 
-    private String phone;
+    private String username;
 
     private String email;
 
-    private boolean enabled = true;
+    private Boolean enabled;
 
     @Embedded
     private Profile profile = new Profile();
 
     @Embedded
-    private RegistrationInfo regInfo = new RegistrationInfo();
+    private RegInfo regInfo = new RegInfo();
 
     @ManyToMany
     @JoinTable(
@@ -43,14 +45,6 @@ public class User {
     @OneToMany(mappedBy = "user")
     private Set<Membership> membershipSet = new HashSet<>();
 
-    public User() {
-    }
-
-
-    public User(String phone) {
-        this.phone = phone;
-    }
-
     //<editor-fold desc="=== Getters & Setters ===">
 
     public Integer getId() {
@@ -61,12 +55,12 @@ public class User {
         this.id = id;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getUsername() {
+        return username;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -77,28 +71,13 @@ public class User {
         this.email = email;
     }
 
-    public boolean isEnabled() {
+    @NotNull
+    public Boolean getEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public Set<User> getFocuses() {
-        return focuses;
-    }
-
-    public void setFocuses(Set<User> focuses) {
-        this.focuses = focuses;
-    }
-
-    public RegistrationInfo getRegInfo() {
-        return regInfo;
-    }
-
-    public void setRegInfo(RegistrationInfo regInfo) {
-        this.regInfo = regInfo;
     }
 
     public Profile getProfile() {
@@ -107,6 +86,22 @@ public class User {
 
     public void setProfile(Profile profile) {
         this.profile = profile;
+    }
+
+    public RegInfo getRegInfo() {
+        return regInfo;
+    }
+
+    public void setRegInfo(RegInfo regInfo) {
+        this.regInfo = regInfo;
+    }
+
+    public Set<User> getFocuses() {
+        return focuses;
+    }
+
+    public void setFocuses(Set<User> focuses) {
+        this.focuses = focuses;
     }
 
     public Set<User> getFans() {

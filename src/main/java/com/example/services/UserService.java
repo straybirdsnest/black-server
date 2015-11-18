@@ -3,6 +3,8 @@ package com.example.services;
 import com.example.models.User;
 import org.jetbrains.annotations.NotNull;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface UserService {
 
     @NotNull
@@ -10,11 +12,22 @@ public interface UserService {
 
     int getCurrentUserId();
 
-    void addUser(int userId);
+    boolean currentUserIsHisFriend(int userId);
 
-    boolean currentUserIsHisFriend(int UserId);
+    boolean currentUserIsHisFan(int userId);
 
-    boolean currentUserIsHisFan(int UserId);
+    boolean currentUserIsHisFocus(int userId);
 
-    boolean currentUserIsHisFollwing(int UserId);
+    @NotNull
+    User createAndSaveUser(String phone, HttpServletRequest request);
+
+    @NotNull
+    User updateUser(User newUser);
+
+    void deleteCurrentUser();
+
+    @NotNull
+    User getUserById(int id);
+
+    boolean isPhoneExisted(String phone);
 }

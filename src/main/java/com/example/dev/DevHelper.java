@@ -58,7 +58,8 @@ public class DevHelper {
         }
     }
 
-    private static void loadPropertiesFromCommandLineArguments(String[] args){
+    private static void loadPropertiesFromCommandLineArguments(String[] args) {
+        if (args == null) return;
         Optional<String> _username = Arrays.stream(args)
                 .filter(e -> e.contains(JDBC_USERNAME)).findFirst();
         if (_username.isPresent()) {
@@ -128,7 +129,7 @@ public class DevHelper {
                     "/dev/game_starcraft.png",
                     "/dev/game_warcraft.png",
             };
-            for (String image: gameImages){
+            for (String image : gameImages) {
                 String path = DevHelper.class.getResource(image).getPath();
                 if (isWindows)
                     path = path.substring(1);

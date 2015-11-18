@@ -1,8 +1,8 @@
 package com.example.config;
 
 import com.example.exceptions.IllegalTokenException;
+import com.example.services.CurrentThreadUserService;
 import com.example.services.TokenService;
-import com.example.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class TokenAuthenticationInterceptor implements HandlerInterceptor {
 
     @Autowired TokenService tokenService;
 
-    @Autowired UserService userService;
+    @Autowired CurrentThreadUserService currentThreadUserService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -31,9 +31,8 @@ public class TokenAuthenticationInterceptor implements HandlerInterceptor {
         } else {
             log.debug("拦截到 X-Token 为 " + token + " 的请求：" + request.getRequestURI());
             try {
-
-                userService.addUser(tokenService.getUserId(token));
-            }catch (IllegalTokenException e){
+                currentThreadUserService.addUserIdToThreadMap(tokenService.getUserId(token));
+            } catch (IllegalTokenException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;
             }

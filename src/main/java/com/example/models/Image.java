@@ -26,6 +26,10 @@ public class Image {
 
     private String hash; // 选择速度最快的信息摘要算法 md5
 
+    private Integer used;
+
+    private String tags;
+
     //<editor-fold desc="=== Getters & Setters ===">
 
     public Long getId() {
@@ -74,6 +78,22 @@ public class Image {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public Integer getUsed() {
+        return used;
+    }
+
+    public void setUsed(Integer used) {
+        this.used = used;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
     //</editor-fold>
