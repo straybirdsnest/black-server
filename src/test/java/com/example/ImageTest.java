@@ -59,7 +59,7 @@ public class ImageTest{
         headers.add("X-Token", token);
         MockMultipartFile image =
                 new MockMultipartFile("file", "picture.png", "image/png",
-                        getClass().getResourceAsStream("/dev/wnm_avatar.png"));
+                        getClass().getResourceAsStream("/dev/data/wnm_avatar.png"));
 
         MvcResult result = mockMvc
                 .perform(MockMvcRequestBuilders.fileUpload("/api/image")

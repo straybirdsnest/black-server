@@ -104,8 +104,8 @@ public class DevHelper {
 
             Statement stat = conn.createStatement();
             String sql = "INSERT INTO T_IMAGE(data) VALUES (LOAD_FILE('%s'))";
-            String wnmAvatar = DevHelper.class.getResource("/dev/wnm_avatar.png").getPath();
-            String wnmBg = DevHelper.class.getResource("/dev/wnm_bg.png").getPath();
+            String wnmAvatar = DevHelper.class.getResource("/dev/data/wnm_avatar.png").getPath();
+            String wnmBg = DevHelper.class.getResource("/dev/data/wnm_bg.png").getPath();
             if (isWindows) {
                 wnmAvatar = wnmAvatar.substring(1);
             }
