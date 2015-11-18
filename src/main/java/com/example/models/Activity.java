@@ -1,6 +1,6 @@
 package com.example.models;
 
-import com.example.config.converters.json.ActivityDeserillizer;
+import com.example.config.converters.json.ActivityDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@JsonDeserialize(using = ActivityDeserillizer.class)
+@JsonDeserialize(using = ActivityDeserializer.class)
 public class Activity {
 
     @Transient

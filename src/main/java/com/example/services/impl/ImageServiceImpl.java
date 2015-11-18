@@ -2,33 +2,42 @@ package com.example.services.impl;
 
 import com.example.daos.ImageRepo;
 import com.example.exceptions.IllegalTokenException;
+import com.example.exceptions.PersistEntityException;
 import com.example.exceptions.TokenExpiredException;
 import com.example.models.Image;
 import com.example.models.UserGroup;
+import com.example.services.DefaultImageService;
 import com.example.services.GroupService;
 import com.example.services.ImageService;
 import com.example.services.UserService;
 import com.example.utils.Cryptor;
+import org.hibernate.Session;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Date;
 
 @Service
 public class ImageServiceImpl implements ImageService {
     public static final int ACCESS_TOKEN_EXPIRE = 1000 * 60 * 5; // 有效时间 5 分钟，单位毫秒
     static final Logger logger = LoggerFactory.getLogger(ImageServiceImpl.class);
-    @Autowired
-    ImageRepo imageRepo;
+    @Autowired ImageRepo imageRepo;
 
-    @Autowired
-    UserService userService;
+    @Autowired UserService userService;
 
-    @Autowired
-    GroupService groupService;
+    @Autowired GroupService groupService;
+
+    @Autowired EntityManager em;
+
+    @Autowired DefaultImageService defaultImageService;
 
     /**
      * 判断当前用户是否有足够的权限来访问这张图片
@@ -62,7 +71,7 @@ public class ImageServiceImpl implements ImageService {
                         break;
                     case UserGroup.GID_FANS:
                         // 检查当前用户是否是图片 uid 关注的人
-                        if (userService.currentUserIsHisFollwing(imageUid)) return true;
+                        if (userService.currentUserIsHisFocus(imageUid)) return true;
                         break;
                 }
             }
@@ -72,9 +81,6 @@ public class ImageServiceImpl implements ImageService {
 
     /**
      * 获得这一张图片的访问 token 字符串
-     *
-     * @param image
-     * @return
      */
     public String generateAccessToken(Image image) {
         return encrypt(image);
@@ -82,11 +88,8 @@ public class ImageServiceImpl implements ImageService {
 
     /**
      * 转换用户提交的图片数据
-     *
-     * @param bytes
-     * @return
      */
-    public byte[] convertToPNGImageData(byte[] bytes) {
+    private byte[] convertToPNGImageData(byte[] bytes) {
         // TODO convert to png image data
         return bytes;
     }
@@ -101,7 +104,7 @@ public class ImageServiceImpl implements ImageService {
      * 总共 40 个字节
      */
     private String encrypt(Image image) {
-        byte[] data = new byte[16];
+        byte[] data = new byte[40];
         int flags = image.getFlags();
         int uid = image.getUid();
         long gid = image.getGid();
@@ -134,9 +137,8 @@ public class ImageServiceImpl implements ImageService {
         String[] parts = accessToken.split("~");
         if (parts.length < 2) throw new IllegalTokenException();
         String token = parts[0];
-        String hash = parts[1];
 
-        byte[] data = Cryptor.decrypt(accessToken);
+        byte[] data = Cryptor.decrypt(token);
         if (data == null) throw new IllegalTokenException();
         int flags = 0, uid = 0;
         long gid = 0, expire = 0, id = 0;
@@ -181,4 +183,48 @@ public class ImageServiceImpl implements ImageService {
         return null;
     }
 
+    public Image getLazyImageFromAccessToken(String accessToken) {
+        Session session = em.unwrap(Session.class);
+        Long id = getImageIdFromAccessToken(accessToken);
+        if (id == null) return null;
+        // 获取一个 Image 的动态代理，实现延迟加载数据
+        return (Image)session.load(Image.class, id);
+    }
+
+    public DefaultImageService getDefault() {
+        return defaultImageService;
+    }
+
+    @NotNull
+    public Image createAndSaveImage(byte[] data, String tags) {
+        try {
+            int uid = userService.getCurrentUserId();
+            MessageDigest m = MessageDigest.getInstance("MD5");
+            m.reset();
+            m.update(data);
+            m.update("salt".getBytes());
+            byte[] digest = m.digest();
+            Base64.Encoder encoder = Base64.getEncoder();
+            String hash = encoder.encodeToString(digest);
+
+            Image image = new Image();
+            image.setData(convertToPNGImageData(data));
+            image.setFlags(Image.FLAG_PRIVATE);
+            image.setUid(uid);
+            image.setGid((long)UserGroup.GID_EMPTY);
+            image.setHash(hash);
+            image.setUsed(0);
+            image.setTags(tags);
+
+            Image savedImage = imageRepo.save(image);
+
+            if (savedImage == null) {
+                throw new PersistEntityException(Image.class);
+            }
+            return savedImage;
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("系统没有 MD5 摘要算法", e);
+            throw new RuntimeException(e);
+        }
+    }
 }

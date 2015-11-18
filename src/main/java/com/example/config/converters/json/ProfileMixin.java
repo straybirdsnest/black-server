@@ -1,7 +1,7 @@
 package com.example.config.converters.json;
 
 import com.example.config.jsonviews.UserView;
-import com.example.models.Profile;
+import com.example.models.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -29,7 +29,7 @@ public abstract class ProfileMixin {
     abstract String getIdCard();
 
     @JsonView(UserView.Profile.class)
-    abstract Profile.Gender getGender();
+    abstract Gender getGender();
 
     @JsonView(UserView.Profile.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

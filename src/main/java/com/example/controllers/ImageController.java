@@ -3,6 +3,7 @@ package com.example.controllers;
 import com.example.daos.ImageRepo;
 import com.example.models.Image;
 import com.example.services.ImageService;
+import com.example.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class ImageController {
     static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
-    @Autowired
-    ImageRepo imageRepo;
+    @Autowired ImageRepo imageRepo;
 
-    @Autowired
-    ImageService imageService;
+    @Autowired ImageService imageService;
+
+    @Autowired UserService userService;
 
     /**
      * 获取图片
@@ -59,15 +60,14 @@ public class ImageController {
         headers.setContentType(MediaType.TEXT_PLAIN);
         try {
             if (!file.isEmpty()) {
-                Image image = new Image();
-                image.setData(imageService.convertToPNGImageData(file.getBytes()));
-                imageRepo.save(image);
+                Image image = imageService.createAndSaveImage(file.getBytes(), null);
                 String token = imageService.generateAccessToken(image);
                 return new ResponseEntity<>(token, headers, CREATED);
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             logger.warn("上传图片出错", e);
         }
         return new ResponseEntity<>(null, headers, BAD_REQUEST);
     }
+
 }

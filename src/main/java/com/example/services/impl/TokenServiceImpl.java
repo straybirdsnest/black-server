@@ -5,6 +5,7 @@ import com.example.exceptions.IllegalTokenException;
 import com.example.models.User;
 import com.example.services.TokenService;
 import com.example.utils.Cryptor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,8 +40,11 @@ public class TokenServiceImpl implements TokenService {
         return Cryptor.encrypt(bytes);
     }
 
+    @NotNull
     public User getUser(String token) throws IllegalTokenException {
-        return userRepo.findOne(getUserId(token));
+        User u = userRepo.findOne(getUserId(token));
+        if (u == null) throw new IllegalTokenException();
+        return u;
     }
 
     public int getUserId(String token) throws IllegalTokenException {

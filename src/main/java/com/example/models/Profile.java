@@ -6,6 +6,8 @@ import java.util.Date;
 @Embeddable
 public class Profile {
 
+    private String nickname;
+
     @Column(name = "realname")
     private String realName;
 
@@ -13,11 +15,15 @@ public class Profile {
     private String idCard;
 
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
-    private Gender gender = Gender.SECRET;
+    private Gender gender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "avatar_id")
     private Image avatar;
+
+    @ManyToOne
+    @JoinColumn(name = "background_image_id")
+    private Image backgroundImage;
 
     private Date birthday;
 
@@ -25,33 +31,31 @@ public class Profile {
 
     private String hometown;
 
+    private String phone;
+
     private String highschool;
 
-    private String username;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "college_id", referencedColumnName = "id")
 
     private College college;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "academy_id", referencedColumnName = "id")
 
     private Academy academy;
 
     private String grade;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "background_image_id")
-    private Image backgroundImage;
-
-    @Transient
-    private String avatarAccessToken;
-
-    @Transient
-    private String backgroundImageAccessToken;
-
     //<editor-fold desc="=== Getters & Setters ===">
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
     public String getRealName() {
         return realName;
@@ -85,6 +89,14 @@ public class Profile {
         this.avatar = avatar;
     }
 
+    public Image getBackgroundImage() {
+        return backgroundImage;
+    }
+
+    public void setBackgroundImage(Image backgroundImage) {
+        this.backgroundImage = backgroundImage;
+    }
+
     public Date getBirthday() {
         return birthday;
     }
@@ -109,20 +121,20 @@ public class Profile {
         this.hometown = hometown;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public String getHighschool() {
         return highschool;
     }
 
     public void setHighschool(String highschool) {
         this.highschool = highschool;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public College getCollege() {
@@ -149,29 +161,7 @@ public class Profile {
         this.grade = grade;
     }
 
-    public Image getBackgroundImage() {
-        return backgroundImage;
-    }
 
-    public void setBackgroundImage(Image backgroundImage) {
-        this.backgroundImage = backgroundImage;
-    }
-
-    public String getAvatarAccessToken() {
-        return avatarAccessToken;
-    }
-
-    public void setAvatarAccessToken(String avatarAccessToken) {
-        this.avatarAccessToken = avatarAccessToken;
-    }
-
-    public String getBackgroundImageAccessToken() {
-        return backgroundImageAccessToken;
-    }
-
-    public void setBackgroundImageAccessToken(String backgroundImageAccessToken) {
-        this.backgroundImageAccessToken = backgroundImageAccessToken;
-    }
     //</editor-fold>
 
     public String getCollegeName() {
@@ -188,9 +178,5 @@ public class Profile {
         } else {
             return null;
         }
-    }
-
-    public enum Gender {
-        MALE, FEMALE, SECRET
     }
 }

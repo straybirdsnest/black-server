@@ -1,9 +1,13 @@
 package com.example.dev;
 
 import com.example.daos.UserRepo;
+import com.example.models.RegInfo;
 import com.example.models.User;
 import com.example.services.TokenService;
+import com.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,16 +17,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 @Controller
 public class DebugController {
-    @Autowired
-    DebugManager debugManager;
+    @Autowired DebugManager debugManager;
 
-    @Autowired
-    UserRepo userRepo;
+    @Autowired UserRepo userRepo;
 
-    @Autowired
-    TokenService tokenService;
+    @Autowired TokenService tokenService;
+
+    @Autowired UserService userService;
 
     @RequestMapping("/requests")
     public String getAllRequests(Model model) {
@@ -36,12 +41,22 @@ public class DebugController {
         List<UserWithToken> tokens = new ArrayList<>();
         for (User user : users) {
             UserWithToken u = new UserWithToken();
-            u.setPhone(user.getPhone());
+            u.setPhone(user.getProfile().getPhone());
             u.setToken(tokenService.generateToken(user));
             tokens.add(u);
         }
         model.addAttribute("tokens", tokens);
         return "tokens";
+    }
+
+    @RequestMapping(value = "/api/reginfo", method = GET)
+    public ResponseEntity<?> getMyRegInfo() {
+        User user = userService.getCurrentUser();
+        if (user != null) {
+            RegInfo regInfo = user.getRegInfo();
+            return new ResponseEntity<>(regInfo, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     public static class Request {

@@ -18,9 +18,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class ActivityDeserillizer extends JsonDeserializer<Activity> {
+public class ActivityDeserializer extends JsonDeserializer<Activity> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ActivityDeserillizer.class);
+    private static final Logger logger = LoggerFactory.getLogger(ActivityDeserializer.class);
 
     @Override
     public Activity deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {

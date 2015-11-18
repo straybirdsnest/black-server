@@ -1,15 +1,15 @@
 package com.example.config.converters.jpa;
 
-import com.example.models.Profile;
+import com.example.models.Gender;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 @Converter(autoApply = true)
-public class ProfileGenderConverter implements AttributeConverter<Profile.Gender, String>{
+public class ProfileGenderConverter implements AttributeConverter<Gender, String> {
     @Override
-    public String convertToDatabaseColumn(Profile.Gender gender) {
-        switch (gender){
+    public String convertToDatabaseColumn(Gender gender) {
+        switch (gender) {
             case MALE:
                 return "MALE";
             case FEMALE:
@@ -17,21 +17,21 @@ public class ProfileGenderConverter implements AttributeConverter<Profile.Gender
             case SECRET:
                 return "SECRET";
             default:
-                throw new IllegalArgumentException("unknown gender "+ gender);
+                throw new IllegalArgumentException("unknown gender " + gender);
         }
     }
 
     @Override
-    public Profile.Gender convertToEntityAttribute(String dbData) {
-        switch (dbData){
+    public Gender convertToEntityAttribute(String dbData) {
+        switch (dbData) {
             case "MALE":
-                return Profile.Gender.MALE;
+                return Gender.MALE;
             case "FEMALE":
-                return Profile.Gender.FEMALE;
+                return Gender.FEMALE;
             case "SECRET":
-                return Profile.Gender.SECRET;
+                return Gender.SECRET;
             default:
-                throw new IllegalArgumentException("unknown value for gender "+dbData);
+                throw new IllegalArgumentException("unknown value for gender " + dbData);
         }
     }
 }

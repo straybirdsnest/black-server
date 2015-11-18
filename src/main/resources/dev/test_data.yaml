@@ -1,16 +1,16 @@
 users:
   - name:         王尼玛
     username:     wnm
-    signature:    请不要给我生猴子
-    gender:
+    signature:    今天没吃药感觉自己萌萌哒
+    gender:       male
 
   - name:         东仙队长
     username:     kela_af
-    signature:    我要金坷垃，非洲农业不发达，必须要有金坷垃
+    signature:    我要金坷垃，非洲农业不发达，必须要有金坷垃！
 
   - name:         小鬼子
     username:     kela_jp
-    signature:    我要金坷垃，日本资源太缺乏，必须要有金坷垃
+    signature:    我要金坷垃，日本资源太缺乏，必须要有金坷垃！
 
   - name:         美国佬
     username:     kela_us
@@ -26,7 +26,7 @@ users:
 
   - name:         司徒
     username:     situ
-    signature:    来者可是诸葛孔明
+    signature:    来者可是诸葛孔明？
 
   - name:         丞相
     username:     chengxiang

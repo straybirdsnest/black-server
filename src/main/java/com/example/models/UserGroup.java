@@ -14,9 +14,10 @@ import java.util.Set;
 @Entity
 @Table(name = "T_GROUP")
 public class UserGroup {
-    public static final int GID_FRIENDS = 0;
-    public static final int GID_FOLLOWINGS = 1;
-    public static final int GID_FANS = 2;
+    public static final int GID_EMPTY = 0;
+    public static final int GID_FRIENDS = 1;
+    public static final int GID_FOLLOWINGS = 2;
+    public static final int GID_FANS = 3;
     public static final int GID_BASE = 100;
 
     @Id

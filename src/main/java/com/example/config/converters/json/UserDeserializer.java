@@ -1,9 +1,6 @@
 package com.example.config.converters.json;
 
-import com.example.models.Academy;
-import com.example.models.College;
-import com.example.models.Profile;
-import com.example.models.User;
+import com.example.models.*;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -19,9 +16,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class UserDeserilizer extends JsonDeserializer<User> {
+public class UserDeserializer extends JsonDeserializer<User> {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserDeserilizer.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserDeserializer.class);
 
     @Override
     public User deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
@@ -47,11 +44,11 @@ public class UserDeserilizer extends JsonDeserializer<User> {
         String gender = root.get("gender").asText();
 
         User user = new User();
-        user.setPhone(phone);
+        user.setUsername(phone);
         user.setEmail(email);
 
         Profile profile = new Profile();
-        profile.setUsername(username);
+        profile.setPhone(username);
         profile.setBirthday(date);
         profile.setRealName(realName);
 
@@ -65,13 +62,13 @@ public class UserDeserilizer extends JsonDeserializer<User> {
 
         switch (gender) {
             case "MALE":
-                profile.setGender(Profile.Gender.MALE);
+                profile.setGender(Gender.MALE);
                 break;
             case "FEMALE":
-                profile.setGender(Profile.Gender.FEMALE);
+                profile.setGender(Gender.FEMALE);
                 break;
             case "SECRET":
-                profile.setGender(Profile.Gender.SECRET);
+                profile.setGender(Gender.SECRET);
                 break;
             default:
                 throw new IOException("unknown gender type of " + gender);

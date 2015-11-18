@@ -1,8 +1,10 @@
 package com.example;
 
 import com.example.daos.UserRepo;
+import com.example.dev.DevHelper;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,11 @@ public class AccountControllerTest {
     @Autowired WebApplicationContext context;
 
     private MockMvc mockMvc;
+
+    @BeforeClass
+    public static void setUpAll() {
+        DevHelper.initDb(null);
+    }
 
     @Before
     public void setUp() {

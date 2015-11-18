@@ -1,20 +1,25 @@
 package com.example.config.converters.json;
 
-import com.example.models.Activity;
-import com.example.models.Profile;
-import com.example.models.User;
-import com.example.models.UserGroup;
+import com.example.models.*;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class BlackServerDataJacksonModule extends SimpleModule {
 
     public static final int MAJOR_VERSION = 0;
     public static final int MINOR_VERSION = 0;
     public static final int PATCH_VERSION = 1;
 
-    public BlackServerDataJacksonModule() {
+    @Autowired
+    public BlackServerDataJacksonModule(ImageDeserializer imageDeserializer, ImageSerializer imageSerializer) {
         super("BlackServerData", new Version(MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION, null, null, null));
+        assert imageDeserializer != null;
+        addDeserializer(Image.class, imageDeserializer);
+        assert imageSerializer != null;
+        addSerializer(Image.class, imageSerializer);
     }
 
     @Override
