@@ -2,7 +2,6 @@ package com.example;
 
 import com.example.config.ApplicationLifecycleManager;
 import com.example.config.ApplicationProperties;
-import com.example.dev.DevHelper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -22,7 +21,7 @@ public class App {
         // 服务器使用 UTC 时间
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
         // 初始化数据库
-        DevHelper.initDb(args);
+        // DevHelper.initDb(args);
         // 启动服务器
         handle = new SpringApplication(App.class);
         handle.addListeners(new ApplicationLifecycleManager());
