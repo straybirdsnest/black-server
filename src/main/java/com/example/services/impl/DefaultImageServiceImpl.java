@@ -1,5 +1,6 @@
 package com.example.services.impl;
 
+import com.example.App;
 import com.example.daos.ImageRepo;
 import com.example.models.Image;
 import com.example.services.DefaultImageService;
@@ -15,22 +16,27 @@ public class DefaultImageServiceImpl implements DefaultImageService {
 
     @Autowired
     public DefaultImageServiceImpl(ImageRepo imageRepo){
-
+        //loadDefaultImages(imageRepo);
     }
 
+    public void loadDefaultImages(ImageRepo imageRepo){
+        avatar = imageRepo.findOneByTags(App.DEFAULT_AVATAR_TAG);
+        background = imageRepo.findOneByTags(App.DEFAULT_BACKGROUND_TAG);
+        cover = imageRepo.findOneByTags(App.DEFAULT_COVER_TAG);
+    }
 
     @NotNull
     public Image avatar() {
-        return null;
+        return avatar;
     }
 
     @NotNull
     public Image background() {
-        return null;
+        return background;
     }
 
     @NotNull
     public Image cover() {
-        return null;
+        return cover;
     }
 }

@@ -1,17 +1,19 @@
 package com.example.services.impl;
 
+import com.example.config.security.ImageToken;
+import com.example.daos.ImageAccessPermissionRepo;
 import com.example.daos.ImageRepo;
 import com.example.exceptions.IllegalTokenException;
 import com.example.exceptions.PersistEntityException;
-import com.example.exceptions.TokenExpiredException;
+import com.example.exceptions.SystemError;
 import com.example.models.Image;
+import com.example.models.ImageAccessPermission;
 import com.example.models.UserGroup;
 import com.example.services.DefaultImageService;
 import com.example.services.GroupService;
 import com.example.services.ImageService;
 import com.example.services.UserService;
 import com.example.utils.Cryptor;
-import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -20,16 +22,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.io.*;
 import java.util.Date;
+import java.util.List;
+
+import static com.example.models.ImageAccessPermission.FLAG_PRIVATE;
+import static com.example.models.ImageAccessPermission.FLAG_USER;
 
 @Service
 public class ImageServiceImpl implements ImageService {
-    public static final int ACCESS_TOKEN_EXPIRE = 1000 * 60 * 5; // 有效时间 5 分钟，单位毫秒
     static final Logger logger = LoggerFactory.getLogger(ImageServiceImpl.class);
     @Autowired ImageRepo imageRepo;
+
+    @Autowired ImageAccessPermissionRepo imageAccessPermissionRepo;
 
     @Autowired UserService userService;
 
@@ -40,58 +45,26 @@ public class ImageServiceImpl implements ImageService {
     @Autowired DefaultImageService defaultImageService;
 
     /**
-     * 判断当前用户是否有足够的权限来访问这张图片
+     * 为当前用户生成一张图片的访问 token
      */
-    public boolean canAccessImage(Image image) {
-        int flags = image.getFlags();
-        if ((flags & Image.FLAG_PRIVATE) == 0) return true; // 公共图片
-        int uid = userService.getCurrentUserId();
-        if ((flags & Image.FLAG_USER) > 0) {
-            if (uid == image.getUid()) {
-                // 就是用户自己的图片
-                return true;
-            }
-        }
-        if ((flags & Image.FLAG_USER_GROUP) > 0) {
-            long gid = image.getGid();
-            if (gid >= UserGroup.GID_BASE) {
-                // 检查当前用户知否是这个组的成员
-                if (groupService.isUserInGroup(uid, gid)) return true;
-            } else {
-                int id = (int) gid;
-                int imageUid = image.getUid();
-                switch (id) {
-                    case UserGroup.GID_FRIENDS:
-                        // 检查当前用户是否是图片 uid 的朋友
-                        if (userService.currentUserIsHisFriend(imageUid)) return true;
-                        break;
-                    case UserGroup.GID_FOLLOWINGS:
-                        // 检查当前用户是否是图片 uid 的粉丝
-                        if (userService.currentUserIsHisFan(imageUid)) return true;
-                        break;
-                    case UserGroup.GID_FANS:
-                        // 检查当前用户是否是图片 uid 关注的人
-                        if (userService.currentUserIsHisFocus(imageUid)) return true;
-                        break;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 获得这一张图片的访问 token 字符串
-     */
+    @NotNull
     public String generateAccessToken(Image image) {
-        return encrypt(image);
-    }
-
-    /**
-     * 转换用户提交的图片数据
-     */
-    private byte[] convertToPNGImageData(byte[] bytes) {
-        // TODO convert to png image data
-        return bytes;
+        int uid = userService.getCurrentUserId();
+        List<ImageAccessPermission> permissions = imageAccessPermissionRepo.findByImage(image);
+        ImageAccessPermission permission = null;
+        for (ImageAccessPermission p : permissions) {
+            if (canAccessImage(uid, p)) {
+                permission = p;
+                break;
+            }
+        }
+        if (permission == null) {
+            // 在图片的所有访问权限中找不到满足当前用户的权限
+            // 这种情况在系统正常运行的情况下是不会发生的
+            throw new SystemError(
+                    String.format("系统中保存这一张用户 (id = %d) 无权访问的图片 (id = %d)", uid, image.getId()), null);
+        }
+        return encrypt(image, permission);
     }
 
     /**
@@ -103,79 +76,35 @@ public class ImageServiceImpl implements ImageService {
      * - id     int64
      * 总共 40 个字节
      */
-    private String encrypt(Image image) {
-        byte[] data = new byte[40];
-        int flags = image.getFlags();
-        int uid = image.getUid();
-        long gid = image.getGid();
-        long expire = new Date().getTime() + ACCESS_TOKEN_EXPIRE;
-        long id = image.getId();
-        for (int i = 0; i < 4; i++) {
-            data[i] = (byte) flags;
-            flags >>= 8;
-        }
-        for (int i = 4; i < 8; i++) {
-            data[i] = (byte) uid;
-            uid >>= 8;
-        }
-        for (int i = 8; i < 16; i++) {
-            data[i] = (byte) gid;
-            gid >>= 8;
-        }
-        for (int i = 16; i < 32; i++) {
-            data[i] = (byte) expire;
-            expire >>= 8;
-        }
-        for (int i = 32; i < 40; i++) {
-            data[i] = (byte) id;
-            id >>= 8;
-        }
-        return Cryptor.encrypt(data) + "~" + image.getHash();
-    }
+    private String encrypt(Image image, ImageAccessPermission permission) {
+        ImageToken token = new ImageToken();
+        token.setFlags(permission.getFlags());
+        token.setUid(permission.getUid());
+        token.setGid(permission.getGid());
+        token.setGid(new Date().getTime() + ImageToken.EXPIRE);
+        token.setId(image.getId());
 
-    private Image decrypt(String accessToken) throws IllegalTokenException {
-        String[] parts = accessToken.split("~");
-        if (parts.length < 2) throw new IllegalTokenException();
-        String token = parts[0];
-
-        byte[] data = Cryptor.decrypt(token);
-        if (data == null) throw new IllegalTokenException();
-        int flags = 0, uid = 0;
-        long gid = 0, expire = 0, id = 0;
-        for (int i = 39; i >= 32; i--) {
-            id = id << 8 | data[i];
+        try (ByteArrayOutputStream arrOut = new ByteArrayOutputStream(ImageToken.SIZE);
+             ObjectOutputStream out = new ObjectOutputStream(arrOut)
+        ) {
+            out.writeObject(token);
+            return Cryptor.encrypt(arrOut.toByteArray()) + "~" + image.getHash();
+        } catch (IOException e) {
+            logger.error("无法序列化 ImageToken", e);
+            throw new SystemError("无法序列化 ImageToken", e);
         }
-        for (int i = 31; i >= 16; i--) {
-            expire = expire << 8 | data[i];
-        }
-        if (expire > new Date().getTime()) throw new TokenExpiredException();
-
-        for (int i = 15; i >= 8; i--) {
-            gid = gid << 8 | data[i];
-        }
-        for (int i = 7; i >= 4; i--) {
-            uid = uid << 8 | data[i];
-        }
-        for (int i = 3; i >= 0; i--) {
-            flags = flags << 8 | data[i];
-        }
-        Image image = new Image();
-        image.setId(id);
-        image.setFlags(flags);
-        image.setUid(uid);
-        image.setGid(gid);
-        return image;
     }
 
     /**
-     * 本函数用户更新数据的时候关联图片
-     * 如果 accessToken 失效，或者权限不够，都会返回 null
+     * 通过图片的访问 token, 为当前用户获得图片的真实 id
+     * 如果当前用户无权限来访问这一张图片则返回 null
      */
     @Nullable
     public Long getImageIdFromAccessToken(String accessToken) {
         try {
-            Image image = decrypt(accessToken);
-            if (canAccessImage(image)) return image.getId();
+            int uid = userService.getCurrentUserId();
+            ImageWithPermission imageP = decrypt(accessToken);
+            if (canAccessImage(uid, imageP.permission)) return imageP.image.getId();
         } catch (IllegalTokenException e) {
             logger.debug("非法的图片访问 token", e);
             return null;
@@ -183,48 +112,132 @@ public class ImageServiceImpl implements ImageService {
         return null;
     }
 
-    public Image getLazyImageFromAccessToken(String accessToken) {
-        Session session = em.unwrap(Session.class);
-        Long id = getImageIdFromAccessToken(accessToken);
-        if (id == null) return null;
-        // 获取一个 Image 的动态代理，实现延迟加载数据
-        return (Image)session.load(Image.class, id);
+    private ImageWithPermission decrypt(String accessToken) throws IllegalTokenException {
+        String[] parts = accessToken.split("~");
+        if (parts.length < 2) throw new IllegalTokenException();
+
+        byte[] data = Cryptor.decrypt(parts[0]);
+        if (data == null) throw new IllegalTokenException();
+        try (ByteArrayInputStream arrIn = new ByteArrayInputStream(data);
+             ObjectInputStream in = new ObjectInputStream(arrIn)
+        ) {
+            ImageToken token = (ImageToken) in.readObject();
+
+            Image image = new Image();
+            image.setId(token.getId());
+
+            ImageAccessPermission permission = new ImageAccessPermission();
+            permission.setFlags(token.getFlags());
+            permission.setUid(token.getUid());
+            permission.setGid(token.getGid());
+
+            return new ImageWithPermission(image, permission);
+
+        } catch (IOException e) {
+            logger.error("无法反序列化 ImageToken", e);
+            throw new SystemError("无法反序列化 ImageToken", e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalTokenException();
+        }
     }
 
+    /**
+     * 判断 uid 用户是否有足够的权限来访问这张图片
+     */
+    private boolean canAccessImage(int uid, ImageAccessPermission permission) {
+        int flags = permission.getFlags();
+        if ((flags & ImageAccessPermission.FLAG_PRIVATE) == 0) return true; // 公共图片
+        if ((flags & ImageAccessPermission.FLAG_USER) > 0) {
+            if (uid == permission.getUid()) return true; // 就是用户自己的图片
+        }
+        if ((flags & ImageAccessPermission.FLAG_USER_GROUP) > 0) {
+            long gid = permission.getGid();
+            if (gid >= UserGroup.GID_BASE) {
+                // 检查当前用户是否为该组的成员
+                if (groupService.isUserInGroup(uid, gid)) return true;
+            } else {
+                int gidInt = (int) gid;
+                int imageUid = permission.getUid();
+                switch (gidInt) {
+                    case UserGroup.GID_FRIENDS:
+                        // 检查当前用户是否是图片 uid 的朋友
+                        if (userService.isSecondsFriend(uid, imageUid)) return true;
+                        break;
+                    case UserGroup.GID_FOLLOWINGS:
+                        // 检查当前用户是否是图片 uid 的粉丝
+                        if (userService.isSecondsFan(uid, imageUid)) return true;
+                        break;
+                    case UserGroup.GID_FANS:
+                        // 检查当前用户是否是图片 uid 关注的人
+                        if (userService.isSecondsFocus(uid, imageUid)) return true;
+                        break;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获得系统默认图片
+     */
+    @NotNull
     public DefaultImageService getDefault() {
         return defaultImageService;
     }
 
+    /**
+     * 为当前用户保存一张图片, 并保存默认的访问权限
+     * (即只有当前用户才能访问的私有图片)
+     * 当 API 再次将图片和其他实体(例如活动)关联的时候, 会修改相应的访问权限
+     * 例如: 允许组内成员访问的图片
+     */
     @NotNull
-    public Image createAndSaveImage(byte[] data, String tags) {
-        try {
-            int uid = userService.getCurrentUserId();
-            MessageDigest m = MessageDigest.getInstance("MD5");
-            m.reset();
-            m.update(data);
-            m.update("salt".getBytes());
-            byte[] digest = m.digest();
-            Base64.Encoder encoder = Base64.getEncoder();
-            String hash = encoder.encodeToString(digest);
-
-            Image image = new Image();
-            image.setData(convertToPNGImageData(data));
-            image.setFlags(Image.FLAG_PRIVATE);
-            image.setUid(uid);
-            image.setGid((long)UserGroup.GID_EMPTY);
-            image.setHash(hash);
+    public Image saveImageWithDefaultPermission(byte[] data, String tags) {
+        data = convertToPNGImageData(data);
+        String hash = hash(data);
+        Image image = imageRepo.findOneByHash(hash);
+        Image savedImage = null;
+        if (image == null) {
+            image = new Image();
+            image.setData(data);
+            image.setHash(Cryptor.md5(data));
             image.setUsed(0);
             image.setTags(tags);
+            savedImage = imageRepo.save(image);
+        }
 
-            Image savedImage = imageRepo.save(image);
+        ImageAccessPermission permission = new ImageAccessPermission();
+        permission.setFlags(FLAG_PRIVATE | FLAG_USER);
+        permission.setUid(userService.getCurrentUserId());
+        permission.setGid((long)UserGroup.GID_EMPTY);
 
-            if (savedImage == null) {
-                throw new PersistEntityException(Image.class);
-            }
-            return savedImage;
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("系统没有 MD5 摘要算法", e);
-            throw new RuntimeException(e);
+        ImageAccessPermission savedPermission = imageAccessPermissionRepo.save(permission);
+
+        if (savedImage == null) throw new PersistEntityException(Image.class);
+        if (savedPermission == null) throw new PersistEntityException(ImageAccessPermission.class);
+
+        return savedImage;
+    }
+
+    /**
+     * 转换用户提交的图片数据
+     */
+    private byte[] convertToPNGImageData(byte[] bytes) {
+        // TODO convert to png image data
+        return bytes;
+    }
+
+    private String hash(byte[] data) {
+        return Cryptor.md5(data);
+    }
+
+    private static class ImageWithPermission {
+        public Image image;
+        public ImageAccessPermission permission;
+
+        public ImageWithPermission(Image image, ImageAccessPermission permission) {
+            this.image = image;
+            this.permission = permission;
         }
     }
 }

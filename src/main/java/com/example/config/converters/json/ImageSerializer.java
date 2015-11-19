@@ -22,6 +22,7 @@ public class ImageSerializer extends JsonSerializer<Image> {
     @Override
     public void serialize(Image image, JsonGenerator jg, SerializerProvider provider) throws IOException, JsonProcessingException {
         String token = imageService.generateAccessToken(image);
-        jg.writeRaw(token);
+        System.out.println(token);
+        jg.writeString(token);
     }
 }

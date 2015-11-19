@@ -13,6 +13,9 @@ import java.util.TimeZone;
 @EnableConfigurationProperties(ApplicationProperties.class)
 public class App {
     public static final String NAME = "blackserver";
+    public static final String DEFAULT_AVATAR_TAG = "默认用户头像";
+    public static final String DEFAULT_BACKGROUND_TAG = "默认用户背景";
+    public static final String DEFAULT_COVER_TAG = "默认活动封面";
 
     public static void main(String[] args) {
         // 服务器使用 UTC 时间

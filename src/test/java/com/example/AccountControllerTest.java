@@ -1,7 +1,6 @@
 package com.example;
 
 import com.example.daos.UserRepo;
-import com.example.dev.DevHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -32,7 +31,7 @@ public class AccountControllerTest {
 
     @BeforeClass
     public static void setUpAll() {
-        DevHelper.initDb(null);
+        //DevHelper.initDb(null);
     }
 
     @Before

@@ -4,13 +4,19 @@ USE BLACK_SERVER;
 
 CREATE TABLE T_IMAGE (
   `id`    BIGINT PRIMARY KEY AUTO_INCREMENT,
-  `data`  LONGBLOB,
-  `flags` INT(32),
-  `uid`   INT(32),
-  `gid`   BIGINT(64),
+  `data`  MEDIUMBLOB,
   `hash`  VARCHAR(128),
   `used`  INT,
   `tags`  VARCHAR(30)
+);
+
+CREATE TABLE T_IMAGE_ACCESS_PERMISSION (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `flags` INT(32),
+  `uid` INT(32),
+  `gid` BIGINT(64),
+  `image_id` BIGINT,
+  FOREIGN KEY (`image_id`) REFERENCES T_IMAGE (id)
 );
 
 CREATE TABLE T_COLLEGE (

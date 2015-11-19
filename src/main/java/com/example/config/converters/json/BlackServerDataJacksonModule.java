@@ -1,6 +1,9 @@
 package com.example.config.converters.json;
 
-import com.example.models.*;
+import com.example.models.Activity;
+import com.example.models.Profile;
+import com.example.models.User;
+import com.example.models.UserGroup;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +19,11 @@ public class BlackServerDataJacksonModule extends SimpleModule {
     @Autowired
     public BlackServerDataJacksonModule(ImageDeserializer imageDeserializer, ImageSerializer imageSerializer) {
         super("BlackServerData", new Version(MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION, null, null, null));
-        assert imageDeserializer != null;
-        addDeserializer(Image.class, imageDeserializer);
-        assert imageSerializer != null;
-        addSerializer(Image.class, imageSerializer);
+        //assert imageDeserializer != null;
+        //addDeserializer(Image.class, imageDeserializer);
+        //assert imageSerializer != null;
+        //addSerializer(Image.class, imageSerializer);
+        //addSerializer(HibernateProxy.class, new HibernateProxySerializer());
     }
 
     @Override

@@ -4,7 +4,7 @@ users:
     signature:    今天没吃药感觉自己萌萌哒
     gender:       male
     realname:     任剑
-    emial:        renjian21@hotmail.com
+    email:        renjian21@hotmail.com
     phone:        13129342128
 
   - name:         东仙队长
@@ -125,12 +125,25 @@ academies:
 
 games:
   - name:         Counter Strike
+    logo:         cs
+
   - name:         Dota 2
+    logo:         dota2
+
   - name:         Hearthstone
+    logo:         heartstone
+
   - name:         League of Legends
+    logo:         lol
+
   - name:         Minecraft
+    logo:         minecraft
+
   - name:         StarCraft II
+    logo:         starcraft
+
   - name:         Warcraft III
+    logo:         warcraft
 
 groups:
   - name:         鬼畜全明星

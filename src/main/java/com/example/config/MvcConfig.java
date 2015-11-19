@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.config.security.TokenAuthenticationInterceptor;
 import com.example.dev.DebugRequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -46,5 +47,21 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 //            return f;
 //        });
     }
+
+//    @Bean
+//    public Hibernate4Module hibernate4Module(){
+//        return new Hibernate4Module();
+//    }
+
+//    @Bean
+//    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder(){
+//        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+//        ObjectMapper mapper = new ObjectMapper();
+//        SimpleModule module = new SimpleModule();
+//        module.addSerializer(Image.class, new ImageSerializer());
+//        mapper.registerModule(module);
+//        builder.configure(mapper);
+//        return builder;
+//    }
 
 }

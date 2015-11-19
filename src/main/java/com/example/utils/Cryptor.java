@@ -1,5 +1,7 @@
 package com.example.utils;
 
+import com.example.exceptions.SystemError;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,50 +9,54 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.MessageDigest;
 import java.util.Base64;
 
 public class Cryptor {
-    static final Logger log = LoggerFactory.getLogger(Cryptor.class);
+    static final Logger logger = LoggerFactory.getLogger(Cryptor.class);
     private static Cipher cipher;
     private static SecretKey secretKey;
+    private static MessageDigest md5;
+
     static {
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
             keyGenerator.init(128);
             secretKey = keyGenerator.generateKey();
-            log.debug("本次生成的 AES 密钥为：" + secretKeyToString(secretKey));
             cipher = Cipher.getInstance("AES");
-        } catch (Exception e){
-            e.printStackTrace();
+
+            md5 = MessageDigest.getInstance("MD5");
+        } catch (Exception e) {
+            throw new SystemError("无法初始化 Cryptor 类", e);
         }
     }
 
     /**
-     * @param data
      * @return 当出现异常的时候返回空字符串
      */
+    @Nullable
     public static String encrypt(byte[] data) {
         try {
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             byte[] encryptedByte = cipher.doFinal(data);
             Base64.Encoder encoder = Base64.getEncoder();
             return encoder.encodeToString(encryptedByte);
-        }catch (Exception e){
-            return "";
+        } catch (Exception e) {
+            return null;
         }
     }
 
     /**
-     * @param encryptedText
      * @return 当出现异常的时候返回 null
      */
+    @Nullable
     public static byte[] decrypt(String encryptedText) {
         try {
             Base64.Decoder decoder = Base64.getDecoder();
             byte[] encryptedTextByte = decoder.decode(encryptedText);
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             return cipher.doFinal(encryptedTextByte);
-        } catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
@@ -62,5 +68,13 @@ public class Cryptor {
     private static SecretKey stringToSecretKey(String str) {
         byte[] decodedKey = Base64.getDecoder().decode(str);
         return new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES");
+    }
+
+    public static String md5(byte[] data) {
+        md5.reset();
+        md5.update(data);
+        byte[] digest = md5.digest();
+        Base64.Encoder encoder = Base64.getEncoder();
+        return encoder.encodeToString(digest);
     }
 }

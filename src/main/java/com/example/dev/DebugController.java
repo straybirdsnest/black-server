@@ -21,7 +21,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 public class DebugController {
-    @Autowired DebugManager debugManager;
 
     @Autowired UserRepo userRepo;
 
@@ -31,7 +30,6 @@ public class DebugController {
 
     @RequestMapping("/requests")
     public String getAllRequests(Model model) {
-        model.addAttribute("requests", debugManager.requests);
         return "requests";
     }
 
