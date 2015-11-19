@@ -1,5 +1,6 @@
 package com.example.services.impl;
 
+import com.example.App;
 import com.example.config.security.ImageToken;
 import com.example.daos.ImageAccessPermissionRepo;
 import com.example.daos.ImageRepo;
@@ -8,20 +9,22 @@ import com.example.exceptions.PersistEntityException;
 import com.example.exceptions.SystemError;
 import com.example.models.Image;
 import com.example.models.ImageAccessPermission;
+import com.example.models.User;
 import com.example.models.UserGroup;
-import com.example.services.DefaultImageService;
+import com.example.services.DefaultImage;
 import com.example.services.GroupService;
 import com.example.services.ImageService;
 import com.example.services.UserService;
 import com.example.utils.Cryptor;
+import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.io.*;
 import java.util.Date;
 import java.util.List;
@@ -30,19 +33,45 @@ import static com.example.models.ImageAccessPermission.FLAG_PRIVATE;
 import static com.example.models.ImageAccessPermission.FLAG_USER;
 
 @Service
-public class ImageServiceImpl implements ImageService {
+public class ImageServiceImpl implements ImageService, DefaultImage {
     static final Logger logger = LoggerFactory.getLogger(ImageServiceImpl.class);
     @Autowired ImageRepo imageRepo;
-
     @Autowired ImageAccessPermissionRepo imageAccessPermissionRepo;
-
     @Autowired UserService userService;
-
     @Autowired GroupService groupService;
+    @Autowired ApplicationContext context;
+    private Image avatar;
+    private Image background;
+    private Image cover;
 
-    @Autowired EntityManager em;
+    @Autowired
+    public ImageServiceImpl(ApplicationContext context, ImageRepo imageRepo,
+                            ImageAccessPermissionRepo imageAccessPermissionRepo) throws IOException{
+        this.imageRepo = imageRepo;
+        this.imageAccessPermissionRepo = imageAccessPermissionRepo;
 
-    @Autowired DefaultImageService defaultImageService;
+        // TODO 检查路径在 Windows 上是否起作用
+        avatar = imageRepo.findOneByTags(App.DEFAULT_AVATAR_TAG);
+        if (avatar == null) {
+            byte[] data = IOUtils.toByteArray(
+                    context.getResource("classpath:default/default_avatar.png").getInputStream());
+            avatar = saveDefaultImage(data, App.DEFAULT_AVATAR_TAG);
+        }
+
+        background = imageRepo.findOneByTags(App.DEFAULT_BACKGROUND_TAG);
+        if (background == null) {
+            byte[] data = IOUtils.toByteArray(
+                    context.getResource("classpath:default/default_background.png").getInputStream());
+            background = saveDefaultImage(data, App.DEFAULT_BACKGROUND_TAG);
+        }
+
+        cover = imageRepo.findOneByTags(App.DEFAULT_COVER_TAG);
+        if (cover == null) {
+            byte[] data = IOUtils.toByteArray(
+                    context.getResource("classpath:default/default_cover.png").getInputStream());
+            cover = saveDefaultImage(data, App.DEFAULT_COVER_TAG);
+        }
+    }
 
     /**
      * 为当前用户生成一张图片的访问 token
@@ -181,8 +210,8 @@ public class ImageServiceImpl implements ImageService {
      * 获得系统默认图片
      */
     @NotNull
-    public DefaultImageService getDefault() {
-        return defaultImageService;
+    public DefaultImage getDefault() {
+        return this;
     }
 
     /**
@@ -200,7 +229,7 @@ public class ImageServiceImpl implements ImageService {
         if (image == null) {
             image = new Image();
             image.setData(data);
-            image.setHash(Cryptor.md5(data));
+            image.setHash(hash);
             image.setUsed(0);
             image.setTags(tags);
             savedImage = imageRepo.save(image);
@@ -209,7 +238,34 @@ public class ImageServiceImpl implements ImageService {
         ImageAccessPermission permission = new ImageAccessPermission();
         permission.setFlags(FLAG_PRIVATE | FLAG_USER);
         permission.setUid(userService.getCurrentUserId());
-        permission.setGid((long)UserGroup.GID_EMPTY);
+        permission.setGid((long) UserGroup.GID_EMPTY);
+        permission.setImage(image);
+
+        ImageAccessPermission savedPermission = imageAccessPermissionRepo.save(permission);
+
+        if (savedImage == null) throw new PersistEntityException(Image.class);
+        if (savedPermission == null) throw new PersistEntityException(ImageAccessPermission.class);
+
+        return savedImage;
+    }
+
+    private Image saveDefaultImage(byte[] data, String tags) {
+        data = convertToPNGImageData(data);
+        String hash = hash(data);
+        Image savedImage = null;
+        Image image;
+        image = new Image();
+        image.setData(data);
+        image.setHash(hash);
+        image.setUsed(0);
+        image.setTags(tags);
+        savedImage = imageRepo.save(image);
+
+        ImageAccessPermission permission = new ImageAccessPermission();
+        permission.setFlags(0); // 公共图片
+        permission.setUid(User.UID_PUBLIC);
+        permission.setGid((long) UserGroup.GID_EMPTY);
+        permission.setImage(image);
 
         ImageAccessPermission savedPermission = imageAccessPermissionRepo.save(permission);
 
@@ -229,6 +285,21 @@ public class ImageServiceImpl implements ImageService {
 
     private String hash(byte[] data) {
         return Cryptor.md5(data);
+    }
+
+    @Override
+    public Image avatar() {
+        return avatar;
+    }
+
+    @Override
+    public Image background() {
+        return background;
+    }
+
+    @Override
+    public Image cover() {
+        return cover;
     }
 
     private static class ImageWithPermission {

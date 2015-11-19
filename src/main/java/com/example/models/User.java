@@ -15,6 +15,7 @@ import java.util.Set;
 @JsonDeserialize(using = UserDeserializer.class)
 public class User {
     public static final int UID_SYSTEM = 0;
+    public static final int UID_PUBLIC = 1;
     public static final int UID_BASE = 100;
 
     @Id

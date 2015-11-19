@@ -2,7 +2,7 @@ package com.example.services;
 
 import com.example.models.Image;
 
-public interface DefaultImageService {
+public interface DefaultImage {
 
     Image avatar();
 

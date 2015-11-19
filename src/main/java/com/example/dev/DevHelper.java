@@ -216,7 +216,7 @@ public class DevHelper {
 //            insertImage(imageRepo, "/dev/data/default/default_avatar.png", App.DEFAULT_AVATAR_TAG, User.UID_SYSTEM);
 //            insertImage(imageRepo, "/dev/data/default/default_background.png", App.DEFAULT_BACKGROUND_TAG, User.UID_SYSTEM);
 //            insertImage(imageRepo, "/dev/data/default/default_cover.png", App.DEFAULT_COVER_TAG, User.UID_SYSTEM);
-//            DefaultImageService defaultImageService = context.getBean(DefaultImageService.class);
+//            DefaultImage defaultImageService = context.getBean(DefaultImage.class);
 //            ((DefaultImageServiceImpl) defaultImageService).loadDefaultImages(imageRepo);
 //
 //            // 插入背景图片

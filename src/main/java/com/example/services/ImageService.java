@@ -23,7 +23,7 @@ public interface ImageService {
      * 获得系统默认图片
      */
     @NotNull
-    DefaultImageService getDefault();
+    DefaultImage getDefault();
 
     /**
      * 为当前用户保存一张图片, 并保存默认的访问权限

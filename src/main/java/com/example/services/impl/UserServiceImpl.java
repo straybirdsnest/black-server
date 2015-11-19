@@ -73,6 +73,7 @@ public class UserServiceImpl implements UserService {
     public User createAndSaveUser(String phone, HttpServletRequest request) {
         User user = new User();
         user.setUsername(phone);
+        user.setEnabled(true);
 
         Profile p = user.getProfile();
         p.setPhone(phone);
