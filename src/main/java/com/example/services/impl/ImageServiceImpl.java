@@ -151,6 +151,9 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
              ObjectInputStream in = new ObjectInputStream(arrIn)
         ) {
             ImageToken token = (ImageToken) in.readObject();
+            
+            // token 过期
+            if (token.getExpire() < new Date().getTime()) throw new IllegalTokenException();
 
             Image image = new Image();
             image.setId(token.getId());
