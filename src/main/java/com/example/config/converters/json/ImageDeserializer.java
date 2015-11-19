@@ -6,11 +6,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.EntityManager;
 import java.io.IOException;
 
 @Component
@@ -19,10 +21,15 @@ public class ImageDeserializer extends JsonDeserializer<Image> {
 
     @Autowired ImageService imageService;
 
+    @Autowired EntityManager em;
+
     @Override
     public Image deserialize(JsonParser jp, DeserializationContext context) throws IOException, JsonProcessingException {
         String token = jp.getText();
         logger.trace("获得图片的访问 token = " + token);
-        return imageService.getLazyImageFromAccessToken(token);
+        Long id = imageService.getImageIdFromAccessToken(token);
+        if (id == null) return null;
+        Session session = em.unwrap(Session.class);
+        return (Image) session.load(Image.class, id);
     }
 }

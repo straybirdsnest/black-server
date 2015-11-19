@@ -60,7 +60,7 @@ public class ImageController {
         headers.setContentType(MediaType.TEXT_PLAIN);
         try {
             if (!file.isEmpty()) {
-                Image image = imageService.createAndSaveImage(file.getBytes(), null);
+                Image image = imageService.saveImageWithDefaultPermission(file.getBytes(), null);
                 String token = imageService.generateAccessToken(image);
                 return new ResponseEntity<>(token, headers, CREATED);
             }

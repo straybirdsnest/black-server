@@ -1,7 +1,6 @@
 package com.example;
 
 import com.example.daos.UserRepo;
-import com.example.dev.DevHelper;
 import com.example.models.User;
 import com.example.services.TokenService;
 import org.junit.Before;
@@ -39,7 +38,7 @@ public class ImageTest{
 
     @BeforeClass
     public static void setUpAll() {
-        DevHelper.initDb(null);
+        //DevHelper.initDb(null);
     }
 
     @Before
@@ -59,7 +58,7 @@ public class ImageTest{
         headers.add("X-Token", token);
         MockMultipartFile image =
                 new MockMultipartFile("file", "picture.png", "image/png",
-                        getClass().getResourceAsStream("/dev/wnm_avatar.png"));
+                        getClass().getResourceAsStream("/dev/data/avatars/wnm.png"));
 
         MvcResult result = mockMvc
                 .perform(MockMvcRequestBuilders.fileUpload("/api/image")

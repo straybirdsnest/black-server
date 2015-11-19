@@ -106,6 +106,16 @@
             <artifactId>geoip2</artifactId>
             <version>2.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate4</artifactId>
+            <version>2.5.3</version>
+        </dependency>
 
     </dependencies>
 	

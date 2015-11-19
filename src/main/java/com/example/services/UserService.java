@@ -12,11 +12,11 @@ public interface UserService {
 
     int getCurrentUserId();
 
-    boolean currentUserIsHisFriend(int userId);
+    boolean isSecondsFriend(int firstUid, int secondUid);
 
-    boolean currentUserIsHisFan(int userId);
+    boolean isSecondsFan(int firstUid, int secondUid);
 
-    boolean currentUserIsHisFocus(int userId);
+    boolean isSecondsFocus(int firstUid, int secondUid);
 
     @NotNull
     User createAndSaveUser(String phone, HttpServletRequest request);

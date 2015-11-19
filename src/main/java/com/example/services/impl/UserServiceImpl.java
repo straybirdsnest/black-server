@@ -54,18 +54,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean currentUserIsHisFriend(int userId) {
-        return userRepo.friendOf(getCurrentUserId(), userId);
+    public boolean isSecondsFriend(int firstUid, int secondUid) {
+        return userRepo.friendOf(firstUid, secondUid);
     }
 
     @Override
-    public boolean currentUserIsHisFan(int userId) {
-        return userRepo.fanOf(getCurrentUserId(), userId);
+    public boolean isSecondsFan(int firstUid, int secondUid) {
+        return userRepo.fanOf(firstUid, secondUid);
     }
 
     @Override
-    public boolean currentUserIsHisFocus(int userId) {
-        return userRepo.focusOf(getCurrentUserId(), userId);
+    public boolean isSecondsFocus(int firstUid, int secondUid) {
+        return userRepo.focusOf(firstUid, secondUid);
     }
 
     @NotNull
@@ -73,6 +73,7 @@ public class UserServiceImpl implements UserService {
     public User createAndSaveUser(String phone, HttpServletRequest request) {
         User user = new User();
         user.setUsername(phone);
+        user.setEnabled(true);
 
         Profile p = user.getProfile();
         p.setPhone(phone);

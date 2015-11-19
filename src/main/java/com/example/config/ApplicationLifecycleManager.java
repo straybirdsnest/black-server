@@ -14,7 +14,7 @@ public class ApplicationLifecycleManager implements ApplicationListener<Applicat
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         logger.debug("服务器成功启动，撒花 (￣▽￣)o∠※PAN!=.:*:'☆.:*:'★':*");
-        initDb(event.getApplicationContext());
+        //DevHelper.initDb(event.getApplicationContext());
     }
 
     @Transactional

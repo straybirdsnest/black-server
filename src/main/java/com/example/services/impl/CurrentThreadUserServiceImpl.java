@@ -1,5 +1,6 @@
 package com.example.services.impl;
 
+import com.example.models.User;
 import com.example.services.CurrentThreadUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +24,9 @@ public class CurrentThreadUserServiceImpl implements CurrentThreadUserService {
         Long threadId = Thread.currentThread().getId();
         Integer userId = userIdMap.get(threadId);
         if (userId == null) {
-            String errorMsg = String.format("当前请求线程（%d）没有对应的用户 ID", threadId);
-            RuntimeException e = new RuntimeException(errorMsg);
-            logger.error(errorMsg, e);
-            throw e;
+            //logger.error("未能找到当前线程 (id = %d) 对应的 UserId", threadId);
+            //throw new SystemError(String.format("未能找到当前线程 (id = %d) 对应的 UserId", threadId), null);
+            return User.UID_SYSTEM;
         }
         return userId;
     }

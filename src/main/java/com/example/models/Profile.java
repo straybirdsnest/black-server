@@ -21,7 +21,7 @@ public class Profile {
     @JoinColumn(name = "avatar_id")
     private Image avatar;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "background_image_id")
     private Image backgroundImage;
 
@@ -37,12 +37,10 @@ public class Profile {
 
     @ManyToOne
     @JoinColumn(name = "college_id", referencedColumnName = "id")
-
     private College college;
 
     @ManyToOne
     @JoinColumn(name = "academy_id", referencedColumnName = "id")
-
     private Academy academy;
 
     private String grade;

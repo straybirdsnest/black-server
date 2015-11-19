@@ -2,7 +2,6 @@ package com.example.dev;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -15,9 +14,6 @@ import java.util.stream.Collectors;
 @Component
 public class DebugRequestInterceptor implements HandlerInterceptor {
     static final Logger logger = LoggerFactory.getLogger(DebugRequestInterceptor.class);
-
-    @Autowired
-    DebugManager debugManager;
 
     @Override
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
@@ -65,6 +61,5 @@ public class DebugRequestInterceptor implements HandlerInterceptor {
             content = "暂且只能读取表单数据";
         }
         request.setContent(content);
-        debugManager.requests.add(0, request);
     }
 }

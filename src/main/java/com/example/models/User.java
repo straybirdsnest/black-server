@@ -8,9 +8,15 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 正常的用户从 UID_BASE 开始编号
+ */
 @Entity
 @JsonDeserialize(using = UserDeserializer.class)
 public class User {
+    public static final int UID_SYSTEM = 0;
+    public static final int UID_PUBLIC = 1;
+    public static final int UID_BASE = 100;
 
     @Id
     @GeneratedValue
@@ -23,9 +29,11 @@ public class User {
     private Boolean enabled;
 
     @Embedded
+    @Basic(fetch = FetchType.LAZY)
     private Profile profile = new Profile();
 
     @Embedded
+    @Basic(fetch = FetchType.LAZY)
     private RegInfo regInfo = new RegInfo();
 
     @ManyToMany
