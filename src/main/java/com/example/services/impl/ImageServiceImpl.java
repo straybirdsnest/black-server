@@ -110,7 +110,7 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
         token.setFlags(permission.getFlags());
         token.setUid(permission.getUid());
         token.setGid(permission.getGid());
-        token.setGid(new Date().getTime() + ImageToken.EXPIRE);
+        token.setExpire(new Date().getTime() + ImageToken.EXPIRE);
         token.setId(image.getId());
 
         try (ByteArrayOutputStream arrOut = new ByteArrayOutputStream(ImageToken.SIZE);
@@ -135,7 +135,7 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
             ImageWithPermission imageP = decrypt(accessToken);
             if (canAccessImage(uid, imageP.permission)) return imageP.image.getId();
         } catch (IllegalTokenException e) {
-            logger.debug("非法的图片访问 token", e);
+            logger.debug("非法的图片访问 token: " + accessToken, e);
             return null;
         }
         return null;
@@ -151,7 +151,7 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
              ObjectInputStream in = new ObjectInputStream(arrIn)
         ) {
             ImageToken token = (ImageToken) in.readObject();
-            
+
             // token 过期
             if (token.getExpire() < new Date().getTime()) throw new IllegalTokenException();
 

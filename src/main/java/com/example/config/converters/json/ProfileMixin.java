@@ -2,6 +2,7 @@ package com.example.config.converters.json;
 
 import com.example.config.jsonviews.UserView;
 import com.example.models.Gender;
+import com.example.models.Image;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -15,7 +16,7 @@ public abstract class ProfileMixin {
     }
 
     @JsonView(UserView.UserSummary.class)
-    abstract String getRealName();
+    abstract String getPhone();
 
     @JsonProperty("avatar")
     @JsonView(UserView.UserSummary.class)
@@ -24,9 +25,6 @@ public abstract class ProfileMixin {
     @JsonProperty("background")
     @JsonView(UserView.Profile.class)
     abstract String getBackgroundImageAccessToken();
-
-    @JsonView(UserView.Profile.class)
-    abstract String getIdCard();
 
     @JsonView(UserView.Profile.class)
     abstract Gender getGender();
@@ -60,4 +58,7 @@ public abstract class ProfileMixin {
 
     @JsonView(UserView.Profile.class)
     abstract String getGrade();
+
+    @JsonView(UserView.Profile.class)
+    abstract Image getAvatar();
 }

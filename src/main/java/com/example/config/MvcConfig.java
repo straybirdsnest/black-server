@@ -1,8 +1,5 @@
 package com.example.config;
 
-import com.example.config.security.TokenAuthenticationInterceptor;
-import com.example.dev.DebugRequestInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -14,9 +11,9 @@ import java.util.List;
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
-    @Autowired TokenAuthenticationInterceptor tokenAuthenticationInterceptor;
-
-    @Autowired DebugRequestInterceptor debugRequestInterceptor;
+//    @Autowired TokenAuthenticationInterceptor tokenAuthenticationInterceptor;
+//
+//    @Autowired DebugRequestInterceptor debugRequestInterceptor;
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -25,12 +22,12 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(debugRequestInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/requests", "/tokens", "/", "/error");
-        registry.addInterceptor(tokenAuthenticationInterceptor)
-                .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/register/**", "/api/token/**", "/api/availability/**");
+//        registry.addInterceptor(debugRequestInterceptor)
+//                .addPathPatterns("/**")
+//                .excludePathPatterns("/requests", "/tokens", "/", "/error");
+//        registry.addInterceptor(tokenAuthenticationInterceptor)
+//                .addPathPatterns("/api/**")
+//                .excludePathPatterns("/api/register/**", "/api/token/**", "/api/availability/**");
     }
 
     @Override

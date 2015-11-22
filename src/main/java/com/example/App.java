@@ -3,12 +3,19 @@ package com.example;
 import com.example.config.ApplicationLifecycleManager;
 import com.example.config.ApplicationProperties;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.TimeZone;
 
-@SpringBootApplication
+//@SpringBootApplication
+@Configuration
+@EnableWebMvc
+@ComponentScan
+@EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
 public class App {
     public static final String NAME = "blackserver";

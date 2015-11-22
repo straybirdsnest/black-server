@@ -40,6 +40,14 @@
 			<version>1.9.15</version>
 		</dependency>
 
+        <!-- ======================================= -->
+        <!-- ~ Web -->
+        <!-- ======================================= -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- ======================================== -->
         <!-- ~ Data -->
         <!-- ======================================== -->
@@ -100,12 +108,6 @@
             <artifactId>yamlbeans</artifactId>
             <version>1.09</version>
         </dependency>
-        <!-- 解析 IP 地址的地理位置 -->
-        <dependency>
-            <groupId>com.maxmind.geoip2</groupId>
-            <artifactId>geoip2</artifactId>
-            <version>2.3.1</version>
-        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -116,6 +118,31 @@
             <artifactId>jackson-datatype-hibernate4</artifactId>
             <version>2.5.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <version>2.6.11</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jayway.restassured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
 
     </dependencies>
 	
@@ -125,6 +152,14 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18.1</version>
+                <configuration>
+                    <argLine>-Dkeystore.file=src/main/resources/private/keystorejks -Dkeystore.pass=password</argLine>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 
