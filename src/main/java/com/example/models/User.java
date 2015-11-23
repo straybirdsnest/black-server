@@ -2,7 +2,6 @@ package com.example.models;
 
 import com.example.config.converters.json.UserDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -36,7 +35,7 @@ public class User {
     @Basic(fetch = FetchType.LAZY)
     private RegInfo regInfo = new RegInfo();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "T_SUBSCRIPTION",
             joinColumns = @JoinColumn(name = "subscriber_id"),
@@ -44,14 +43,22 @@ public class User {
     )
     private Set<User> focuses = new HashSet<>();
 
-    @ManyToMany(mappedBy = "focuses")
+    @ManyToMany(mappedBy = "focuses", fetch = FetchType.LAZY)
     private Set<User> fans = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Friendship> friendshipSet = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Membership> membershipSet = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable (
+            name = "T_AUTHORITIES",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<UserRole> roles = new HashSet<>();
 
     //<editor-fold desc="=== Getters & Setters ===">
 
@@ -79,7 +86,6 @@ public class User {
         this.email = email;
     }
 
-    @NotNull
     public Boolean getEnabled() {
         return enabled;
     }
@@ -134,6 +140,14 @@ public class User {
 
     public void setMembershipSet(Set<Membership> membershipSet) {
         this.membershipSet = membershipSet;
+    }
+
+    public Set<UserRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<UserRole> roles) {
+        this.roles = roles;
     }
 
     //</editor-fold>

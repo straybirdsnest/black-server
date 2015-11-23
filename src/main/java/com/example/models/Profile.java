@@ -35,11 +35,11 @@ public class Profile {
 
     private String highschool;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id", referencedColumnName = "id")
     private College college;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academy_id", referencedColumnName = "id")
     private Academy academy;
 

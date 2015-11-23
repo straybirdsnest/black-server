@@ -1,69 +1,63 @@
 package com.example.services.impl;
 
+import com.example.config.security.UserAuthentication;
 import com.example.daos.UserRepo;
-import com.example.exceptions.IllegalTokenException;
 import com.example.models.User;
 import com.example.services.TokenService;
-import com.example.utils.Cryptor;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-/**
- * 用于生成 Token 字符串
- * Token 是由用户ID（int, 4 个字节），经过 AES 加密的base64字符串
- * 为了简单，暂且这样定
- */
+import java.util.UUID;
+
 @Service
 public class TokenServiceImpl implements TokenService {
+    public static final String TOKEN_CACHE_NAME = "tokenCache";
+    public static final int HALF_AN_HOUR_IN_MILLISECONDS = 30 * 60 * 1000;
+    private static final Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
+    private static final Cache tokenCache = CacheManager.getInstance().getCache(TOKEN_CACHE_NAME);
 
-    @Autowired
-    UserRepo userRepo;
+    @Autowired UserRepo userRepo;
 
-    public String generateToken(User user) {
-        int id = user.getId();
-        byte[] bytes = new byte[]{
-                (byte) (id >>> 24),
-                (byte) (id >>> 16),
-                (byte) (id >>> 8),
-                (byte) id};
-        return Cryptor.encrypt(bytes);
-    }
-
-    public String generateTokenByPhone(String phone) {
-        int id = userRepo.findUserIdByphone(phone);
-        byte[] bytes = new byte[]{
-                (byte) (id >>> 24),
-                (byte) (id >>> 16),
-                (byte) (id >>> 8),
-                (byte) id};
-        return Cryptor.encrypt(bytes);
+    @Scheduled(fixedRate = HALF_AN_HOUR_IN_MILLISECONDS)
+    public void evictExpiredTokens() {
+        tokenCache.evictExpiredElements();
     }
 
     @NotNull
-    public User getUser(String token) throws IllegalTokenException {
-        User u = userRepo.findOne(getUserId(token));
-        if (u == null) throw new IllegalTokenException();
-        return u;
+    @Override
+    public String generateToken(User user) {
+        UserAuthentication auth = new UserAuthentication(user);
+        String token = UUID.randomUUID().toString();
+        tokenCache.put(new Element(token, auth));
+        return token;
     }
 
-    public int getUserId(String token) throws IllegalTokenException {
-        byte[] data = Cryptor.decrypt(token);
-        if (data == null) throw new IllegalTokenException();
-        int id = data[0];
-        id = (id << 8) | data[1];
-        id = (id << 8) | data[2];
-        id = (id << 8) | data[3];
-        return id;
+    @NotNull
+    @Override
+    public String generateTokenByPhone(String phone) {
+        Integer id = userRepo.findUserIdByphone(phone);
+        User user = userRepo.findOne(id);
+        return generateToken(user);
     }
 
+    @Nullable
+    @Override
+    public Object getObject(String token) {
+        Element element = tokenCache.get(token);
+        if (element == null) return null;
+        return element.getObjectValue();
+    }
+
+    @Override
     public boolean isAvailable(String token) {
-        try {
-            getUserId(token);
-        } catch (IllegalTokenException e) {
-            return false;
-        }
-        return true;
+        return tokenCache.get(token) != null;
     }
-
 }

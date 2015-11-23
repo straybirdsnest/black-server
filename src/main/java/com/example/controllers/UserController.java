@@ -50,9 +50,9 @@ public class UserController {
      */
     @RequestMapping(value = "/api/token", method = GET)
     public String getToken(@RequestParam String phone, @RequestParam String vcode) {
-        User user = userService.getCurrentUser();
-        if (!phone.equals(user.getProfile().getPhone()))
-            throw new UpdateTokenWithOtherPhoneException(user.getId(), phone);
+//        User user = userService.getCurrentUser();
+//        if (!phone.equals(user.getProfile().getPhone()))
+//            throw new UpdateTokenWithOtherPhoneException(user.getId(), phone);
         if (!vcodeService.verify("86", phone, vcode))
             throw new VcodeVerificationException(phone, vcode);
         return tokenService.generateTokenByPhone(phone);
@@ -79,8 +79,7 @@ public class UserController {
      * @return 如果注册成功则返回访问 API 的 token
      */
     @RequestMapping(value = "/api/register", method = POST)
-    public String register(@RequestParam String phone, @RequestParam String vcode,
-                           HttpServletRequest request) {
+    public String register(@RequestParam String phone, @RequestParam String vcode, HttpServletRequest request) {
         if (!vcodeService.verify("86", phone, vcode)) throw new RegistedWithInvalidVcodeException(vcode);
         boolean existed = userService.isPhoneExisted(phone);
         if (existed) throw new RegistedWithExistedPhoneException(phone);

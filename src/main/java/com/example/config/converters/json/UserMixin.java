@@ -11,9 +11,8 @@ public abstract class UserMixin {
     UserMixin() {
     }
 
-    @JsonProperty("phone")
     @JsonView(UserView.Profile.class)
-    abstract String getPhone();
+    abstract String getUsername();
 
     @JsonProperty("email")
     @JsonView(UserView.Profile.class)

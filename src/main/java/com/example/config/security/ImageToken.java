@@ -2,7 +2,7 @@ package com.example.config.security;
 
 import java.io.Serializable;
 
-public class ImageToken implements Token, Serializable {
+public class ImageToken implements Serializable {
     public static final int EXPIRE = 1000 * 60 * 5; // 有效时间 5 分钟，单位毫秒
     public static final int SIZE = 40; // 被序列化以后占用多少个字节
     private static final long serialVersionUID = 1L;

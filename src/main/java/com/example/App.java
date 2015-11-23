@@ -8,7 +8,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 import java.util.TimeZone;
 
+//@SpringBootApplication
 @SpringBootApplication
+//@EnableWebMvc
 @EnableConfigurationProperties(ApplicationProperties.class)
 public class App {
     public static final String NAME = "blackserver";

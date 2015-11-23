@@ -11,11 +11,12 @@ import com.example.services.CurrentThreadUserService;
 import com.example.services.ImageService;
 import com.example.services.UserService;
 import com.example.utils.DateUtils;
-import org.hibernate.Session;
+import com.example.utils.EntityUpdateHelper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -36,21 +37,25 @@ public class UserServiceImpl implements UserService {
     @NotNull
     @Override
     public User getCurrentUser() {
-        int id = currentThreadUserService.getCurrentThreadUserId();
-        Session session = em.unwrap(Session.class);
-        User user = (User) session.load(User.class, id);
-        if (user == null) {
-            String errorMsg = String.format("无法在数据库内找到用户 (id = %d)", id);
-            RuntimeException e = new RuntimeException(errorMsg);
-            logger.error(errorMsg, e);
-            throw e;
-        }
-        return user;
+//        int id = currentThreadUserService.getCurrentThreadUserId();
+//        logger.debug("获取用户 " + id);
+//        Session session = em.unwrap(Session.class);
+//        User user = (User) session.load(User.class, id);
+//        if (user == null) {
+//            String errorMsg = String.format("无法在数据库内找到用户 (id = %d)", id);
+//            RuntimeException e = new RuntimeException(errorMsg);
+//            logger.error(errorMsg, e);
+//            throw e;
+//        }
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO 搭配使用 Ehcache 和 Hibernate
+        return userRepo.findOne(user.getId());
     }
 
     @Override
     public int getCurrentUserId() {
-        return currentThreadUserService.getCurrentThreadUserId();
+        //return currentThreadUserService.getCurrentThreadUserId();
+        return getCurrentUser().getId();
     }
 
     @Override
@@ -94,7 +99,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(User u) {
         // 首先传入进来的 user 是数据格式合法的 user, 这里检测更新的逻辑合法性
-        filterUnchangableFields(u);
+        u = filterUnchangableFields(u);
+        User existedUser = getCurrentUser();
+        EntityUpdateHelper.copyNonNullProperties(existedUser, u);
         User updatedUser = userRepo.save(u);
         if (updatedUser == null) throw new PersistEntityException(User.class);
         return updatedUser;
