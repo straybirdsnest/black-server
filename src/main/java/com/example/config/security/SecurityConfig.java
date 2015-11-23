@@ -1,12 +1,15 @@
 package com.example.config.security;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.example.services.TokenService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -21,79 +24,40 @@ import javax.servlet.http.HttpServletResponse;
 // @EnableWebSecurity does not disable the authentication manager configuration
 // 也就是说还会有一个默认密码的
 // @EnableWebSecurity
-@EnableScheduling
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-//@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+@EnableScheduling
+@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 //@Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
-@Order(1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${backend.admin.role}")
-    private String backendAdminRole;
-
-//    @Bean
-//    public AuthenticationManager authenticationManager() throws Exception{
-//        return authenticationManagerBean();
-//    }
+    @Autowired TokenService tokenService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
+        http.addFilterBefore(new TokenAuthenticationFilter(tokenService), BasicAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .csrf().disable()
+                .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers(actuatorEndpoints()).hasRole(backendAdminRole)
+                .antMatchers("/api/register", "/api/token").permitAll()
                 .anyRequest().authenticated()
-                .antMatchers("/health", "/").permitAll()
-                .and()
-                .anonymous().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint())
-                .and()
-                .addFilterBefore(new AuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class)
-                .addFilterBefore(new ManagementEndpointAuthenticationFilter(authenticationManager()), BasicAuthenticationFilter.class);
-    }
-
-    private String[] actuatorEndpoints() {
-        return new String[]{ApiController.AUTOCONFIG_ENDPOINT, ApiController.BEANS_ENDPOINT, ApiController.CONFIGPROPS_ENDPOINT,
-                ApiController.ENV_ENDPOINT, ApiController.MAPPINGS_ENDPOINT,
-                ApiController.METRICS_ENDPOINT, ApiController.SHUTDOWN_ENDPOINT};
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(domainUsernamePasswordAuthenticationProvider()).
-                authenticationProvider(backendAdminUsernamePasswordAuthenticationProvider()).
-                authenticationProvider(tokenAuthenticationProvider());
-    }
-
-    @Bean
-    public TokenService tokenService() {
-        return new TokenService();
-    }
-
-    @Bean
-    public ExternalServiceAuthenticator someExternalServiceAuthenticator() {
-        return new SomeExternalServiceAuthenticator();
-    }
-
-    @Bean
-    public AuthenticationProvider domainUsernamePasswordAuthenticationProvider() {
-        return new DomainUsernamePasswordAuthenticationProvider(tokenService(), someExternalServiceAuthenticator());
-    }
-
-    @Bean
-    public AuthenticationProvider backendAdminUsernamePasswordAuthenticationProvider() {
-        return new BackendAdminUsernamePasswordAuthenticationProvider();
-    }
-
-    @Bean
-    public AuthenticationProvider tokenAuthenticationProvider() {
-        return new TokenAuthenticationProvider(tokenService());
+                .and().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
     }
 
     @Bean
     public AuthenticationEntryPoint unauthorizedEntryPoint() {
         return (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Configuration
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    protected static class CleanAuthenticationManager extends GlobalAuthenticationConfigurerAdapter {
+
+        @Override
+        public void init(AuthenticationManagerBuilder auth) throws Exception {
+            // do nothing
+            auth.authenticationProvider(null);
+        }
     }
 }

@@ -12,7 +12,6 @@ import com.example.services.ImageService;
 import com.example.services.UserService;
 import com.example.utils.DateUtils;
 import com.example.utils.EntityUpdateHelper;
-import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,24 +37,25 @@ public class UserServiceImpl implements UserService {
     @NotNull
     @Override
     public User getCurrentUser() {
-        int id = currentThreadUserService.getCurrentThreadUserId();
-        logger.debug("获取用户 " + id);
-        Session session = em.unwrap(Session.class);
-        User user = (User) session.load(User.class, id);
-        if (user == null) {
-            String errorMsg = String.format("无法在数据库内找到用户 (id = %d)", id);
-            RuntimeException e = new RuntimeException(errorMsg);
-            logger.error(errorMsg, e);
-            throw e;
-        }
-        return user;
+//        int id = currentThreadUserService.getCurrentThreadUserId();
+//        logger.debug("获取用户 " + id);
+//        Session session = em.unwrap(Session.class);
+//        User user = (User) session.load(User.class, id);
+//        if (user == null) {
+//            String errorMsg = String.format("无法在数据库内找到用户 (id = %d)", id);
+//            RuntimeException e = new RuntimeException(errorMsg);
+//            logger.error(errorMsg, e);
+//            throw e;
+//        }
+        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        // TODO 搭配使用 Ehcache 和 Hibernate
+        return userRepo.findOne(user.getId());
     }
 
     @Override
     public int getCurrentUserId() {
         //return currentThreadUserService.getCurrentThreadUserId();
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user.getId();
+        return getCurrentUser().getId();
     }
 
     @Override

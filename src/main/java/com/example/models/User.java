@@ -52,6 +52,14 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Membership> membershipSet = new HashSet<>();
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable (
+            name = "T_AUTHORITIES",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<UserRole> roles = new HashSet<>();
+
     //<editor-fold desc="=== Getters & Setters ===">
 
     public Integer getId() {
@@ -132,6 +140,14 @@ public class User {
 
     public void setMembershipSet(Set<Membership> membershipSet) {
         this.membershipSet = membershipSet;
+    }
+
+    public Set<UserRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<UserRole> roles) {
+        this.roles = roles;
     }
 
     //</editor-fold>
