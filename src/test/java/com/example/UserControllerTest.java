@@ -26,10 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(UserControllerTest.class);
-    @Autowired
-    WebApplicationContext webApplicationContext;
-    @Autowired
-    TokenService tokenService;
+    @Autowired WebApplicationContext webApplicationContext;
+    @Autowired TokenService tokenService;
     private MockMvc mockMvc;
     private String xtoken;
 

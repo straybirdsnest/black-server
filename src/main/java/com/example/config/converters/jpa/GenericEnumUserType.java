@@ -23,7 +23,7 @@ import java.util.Properties;
  * @author Chun ping Wang.
  *
  *
- * https://developer.jboss.org/wiki/Java5EnumUserType
+ * ,
  *
  */
 public class GenericEnumUserType  implements UserType, ParameterizedType {
