@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
@@ -19,11 +20,10 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import javax.servlet.http.HttpServletResponse;
 
+import static com.example.App.API_TOKEN;
+import static com.example.App.API_USER;
+
 @Configuration
-// To switch off the default web security configuration completely
-// @EnableWebSecurity does not disable the authentication manager configuration
-// 也就是说还会有一个默认密码的
-// @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableScheduling
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
@@ -40,7 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/api/register", "/api/token").permitAll()
+                .antMatchers(HttpMethod.POST, API_USER).permitAll()
+                .antMatchers(HttpMethod.GET, API_TOKEN).permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
     }

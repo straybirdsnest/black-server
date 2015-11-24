@@ -61,4 +61,17 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 //        return builder;
 //    }
 
+//    @Bean
+//    public CustomEditorConfigurer customEditorConfigurer(){
+//        CustomEditorConfigurer configurer = new CustomEditorConfigurer();
+//        CustomPropertyEditorRegistrar registrar = new CustomPropertyEditorRegistrar();
+//        configurer.setPropertyEditorRegistrars(new PropertyEditorRegistrar[]{registrar});
+//        return configurer;
+//    }
+
+
+//    @Override
+//    public void addFormatters(FormatterRegistry registry) {
+//        registry.addConverter(new StringToUserConverter());
+//    }
 }

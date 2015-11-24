@@ -3,15 +3,11 @@ package com.example.services.impl;
 import com.example.daos.UserRepo;
 import com.example.exceptions.PersistEntityException;
 import com.example.exceptions.UserNotFoundException;
-import com.example.models.Gender;
-import com.example.models.Profile;
-import com.example.models.RegInfo;
-import com.example.models.User;
+import com.example.models.*;
 import com.example.services.CurrentThreadUserService;
 import com.example.services.ImageService;
 import com.example.services.UserService;
 import com.example.utils.DateUtils;
-import com.example.utils.EntityUpdateHelper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -47,7 +44,7 @@ public class UserServiceImpl implements UserService {
 //            logger.error(errorMsg, e);
 //            throw e;
 //        }
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // TODO 搭配使用 Ehcache 和 Hibernate
         return userRepo.findOne(user.getId());
     }
@@ -97,17 +94,53 @@ public class UserServiceImpl implements UserService {
 
     @NotNull
     @Override
-    public User updateUser(User u) {
+    public User updateUser(User newUser) {
         // 首先传入进来的 user 是数据格式合法的 user, 这里检测更新的逻辑合法性
-        u = filterUnchangableFields(u);
+        filterUnchangableFields(newUser);
         User existedUser = getCurrentUser();
-        EntityUpdateHelper.copyNonNullProperties(existedUser, u);
-        User updatedUser = userRepo.save(u);
+        mergeToExistedUser(newUser, existedUser);
+        User updatedUser = userRepo.save(existedUser);
         if (updatedUser == null) throw new PersistEntityException(User.class);
         return updatedUser;
     }
 
-    private User filterUnchangableFields (User u) {
+    private void mergeToExistedUser(User newUser, User existedUser) {
+        String username = newUser.getUsername();
+        String email = newUser.getEmail();
+
+        Profile p = newUser.getProfile();
+        String nickname = p.getNickname();
+        Gender gender = p.getGender();
+        Image avatar = p.getAvatar();
+        Image background = p.getBackgroundImage();
+        Date birthday = p.getBirthday();
+        String signature = p.getSignature();
+        String hometown = p.getHometown();
+        String phone = p.getPhone();
+        String highschool = p.getHighschool();
+        College college = p.getCollege();
+        Academy academy = p.getAcademy();
+        String grade = p.getGrade();
+
+        if (username != null) existedUser.setUsername(username);
+        if (email != null) existedUser.setEmail(email);
+
+        Profile profile = existedUser.getProfile();
+        if (nickname != null) profile.setNickname(nickname);
+        if (gender != null) profile.setGender(gender);
+        if (avatar != null) profile.setAvatar(avatar);
+        if (background != null) profile.setBackgroundImage(background);
+        if (birthday != null) profile.setBirthday(birthday);
+        if (signature != null) profile.setSignature(signature);
+        if (hometown != null) profile.setHometown(hometown);
+        if (phone != null) profile.setPhone(phone);
+        if (highschool != null) profile.setHighschool(highschool);
+        if (college != null) profile.setCollege(college);
+        if (academy != null) profile.setAcademy(academy);
+        if (grade != null) profile.setGrade(grade);
+    }
+
+    private void filterUnchangableFields(User u) {
         // id 虽然不可改变, 但是 hibernate 保存的时候设置的 id 是无效的, 所以这里可以不用过滤
         u.setRegInfo(null);
         // TODO 用户设置邮箱需要验证邮箱真伪, 所以这里暂且过滤
@@ -126,8 +159,6 @@ public class UserServiceImpl implements UserService {
         p.setIdCard(null);
         // 头像和背景在 jackson 转换的时候已经获取, 非法的token会导致这里的头像和背景是 null, 不影响更新
         // 大学和学院也是在 jackson 转换的时候确认的合法性
-
-        return u;
     }
 
     @Override
