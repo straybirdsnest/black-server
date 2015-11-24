@@ -20,8 +20,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import javax.servlet.http.HttpServletResponse;
 
-import static com.example.App.API_TOKEN;
-import static com.example.App.API_USER;
+import static com.example.App.*;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -42,6 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, API_USER).permitAll()
                 .antMatchers(HttpMethod.GET, API_TOKEN).permitAll()
+                .antMatchers(API_AVAILABILITY + "/**").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
     }

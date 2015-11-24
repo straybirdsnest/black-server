@@ -35,5 +35,5 @@ public interface ImageService {
      * 例如: 允许组内成员访问的图片
      */
     @NotNull
-    Image saveImageWithDefaultPermission(byte[] data, String tags);
+    Image saveImage(byte[] data, String tags);
 }

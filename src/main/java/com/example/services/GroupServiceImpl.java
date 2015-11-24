@@ -1,7 +1,6 @@
-package com.example.services.impl;
+package com.example.services;
 
 import com.example.daos.GroupRepo;
-import com.example.services.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

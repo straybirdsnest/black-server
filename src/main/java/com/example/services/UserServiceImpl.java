@@ -1,4 +1,4 @@
-package com.example.services.impl;
+package com.example.services;
 
 import com.example.config.security.UserAuthentication;
 import com.example.daos.UserRepo;
@@ -6,8 +6,6 @@ import com.example.exceptions.PersistEntityException;
 import com.example.exceptions.SystemError;
 import com.example.exceptions.UserNotFoundException;
 import com.example.models.*;
-import com.example.services.ImageService;
-import com.example.services.UserService;
 import com.example.utils.DateUtils;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;

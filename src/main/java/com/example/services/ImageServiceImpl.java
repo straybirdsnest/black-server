@@ -1,18 +1,9 @@
-package com.example.services.impl;
+package com.example.services;
 
 import com.example.App;
-import com.example.daos.ImageAccessPermissionRepo;
 import com.example.daos.ImageRepo;
 import com.example.exceptions.PersistEntityException;
-import com.example.exceptions.SystemError;
 import com.example.models.Image;
-import com.example.models.ImageAccessPermission;
-import com.example.models.User;
-import com.example.models.UserGroup;
-import com.example.services.DefaultImage;
-import com.example.services.GroupService;
-import com.example.services.ImageService;
-import com.example.services.UserService;
 import com.example.utils.Cryptor;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -24,14 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
-
-import static com.example.models.ImageAccessPermission.FLAG_PRIVATE;
-import static com.example.models.ImageAccessPermission.FLAG_USER;
 
 @Service
 public class ImageServiceImpl implements ImageService, DefaultImage {
@@ -39,7 +27,6 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
     static final Logger logger = LoggerFactory.getLogger(ImageServiceImpl.class);
     private static final Cache tokenCache = CacheManager.getInstance().getCache("imageTokenCache");
     @Autowired ImageRepo imageRepo;
-    @Autowired ImageAccessPermissionRepo imageAccessPermissionRepo;
     @Autowired UserService userService;
     @Autowired GroupService groupService;
     @Autowired ApplicationContext context;
@@ -49,10 +36,8 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
     private Image cover;
 
     @Autowired
-    public ImageServiceImpl(ApplicationContext context, ImageRepo imageRepo,
-                            ImageAccessPermissionRepo imageAccessPermissionRepo) throws IOException {
+    public ImageServiceImpl(ApplicationContext context, ImageRepo imageRepo) throws IOException {
         this.imageRepo = imageRepo;
-        this.imageAccessPermissionRepo = imageAccessPermissionRepo;
 
         // TODO 检查路径在 Windows 上是否起作用
         avatar = imageRepo.findOneByTags(App.DEFAULT_AVATAR_TAG);
@@ -77,29 +62,18 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
         }
     }
 
+    @Scheduled(fixedRate = HALF_AN_HOUR_IN_MILLISECONDS)
+    public void evictExpiredTokens() {
+        tokenCache.evictExpiredElements();
+    }
+
     /**
      * 为当前用户生成一张图片的访问 token
      */
     @NotNull
     public String generateAccessToken(Image image) {
-        int uid = userService.getCurrentUserId();
-        List<ImageAccessPermission> permissions = imageAccessPermissionRepo.findByImage(image);
-        ImageAccessPermission permission = null;
-        for (ImageAccessPermission p : permissions) {
-            if (canAccessImage(uid, p)) {
-                permission = p;
-                break;
-            }
-        }
-        if (permission == null) {
-            // 在图片的所有访问权限中找不到满足当前用户的权限
-            // 这种情况在系统正常运行的情况下是不会发生的
-            throw new SystemError(
-                    String.format("系统中保存这一张用户 (id = %d) 无权访问的图片 (id = %d)", uid, image.getId()), null);
-        }
         String token = UUID.randomUUID().toString();
-        ImageWithPermission imageP = new ImageWithPermission(image, permission);
-        tokenCache.put(new Element(token, imageP));
+        tokenCache.put(new Element(token, image));
         return token;
     }
 
@@ -109,12 +83,10 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
      */
     @Nullable
     public Long getImageIdFromAccessToken(String accessToken) {
-        int uid = userService.getCurrentUserId();
         Element element = tokenCache.get(accessToken);
         if (element == null) return null;
-        ImageWithPermission imageP = (ImageWithPermission) element.getObjectValue();
-        if (canAccessImage(uid, imageP.permission)) return imageP.image.getId();
-        return null;
+        Image image = (Image) element.getObjectValue();
+        return image.getId();
     }
 
     @Nullable
@@ -123,42 +95,6 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
         Long id = getImageIdFromAccessToken(accessToken);
         if (id == null) return null;
         return imageRepo.findOne(id);
-    }
-
-    /**
-     * 判断 uid 用户是否有足够的权限来访问这张图片
-     */
-    private boolean canAccessImage(int uid, ImageAccessPermission permission) {
-        int flags = permission.getFlags();
-        if ((flags & ImageAccessPermission.FLAG_PRIVATE) == 0) return true; // 公共图片
-        if ((flags & ImageAccessPermission.FLAG_USER) > 0) {
-            if (uid == permission.getUid()) return true; // 就是用户自己的图片
-        }
-        if ((flags & ImageAccessPermission.FLAG_USER_GROUP) > 0) {
-            long gid = permission.getGid();
-            if (gid >= UserGroup.GID_BASE) {
-                // 检查当前用户是否为该组的成员
-                if (groupService.isUserInGroup(uid, gid)) return true;
-            } else {
-                int gidInt = (int) gid;
-                int imageUid = permission.getUid();
-                switch (gidInt) {
-                    case UserGroup.GID_FRIENDS:
-                        // 检查当前用户是否是图片 uid 的朋友
-                        if (userService.isSecondsFriend(uid, imageUid)) return true;
-                        break;
-                    case UserGroup.GID_FOLLOWINGS:
-                        // 检查当前用户是否是图片 uid 的粉丝
-                        if (userService.isSecondsFan(uid, imageUid)) return true;
-                        break;
-                    case UserGroup.GID_FANS:
-                        // 检查当前用户是否是图片 uid 关注的人
-                        if (userService.isSecondsFocus(uid, imageUid)) return true;
-                        break;
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -176,7 +112,7 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
      * 例如: 允许组内成员访问的图片
      */
     @NotNull
-    public Image saveImageWithDefaultPermission(byte[] data, String tags) {
+    public Image saveImage(byte[] data, String tags) {
         data = convertToPNGImageData(data);
         String hash = hash(data);
         Image image = imageRepo.findOneByHash(hash);
@@ -190,16 +126,7 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
             savedImage = imageRepo.save(image);
         }
 
-        ImageAccessPermission permission = new ImageAccessPermission();
-        permission.setFlags(FLAG_PRIVATE | FLAG_USER);
-        permission.setUid(userService.getCurrentUserId());
-        permission.setGid((long) UserGroup.GID_EMPTY);
-        permission.setImage(image);
-
-        ImageAccessPermission savedPermission = imageAccessPermissionRepo.save(permission);
-
         if (savedImage == null) throw new PersistEntityException(Image.class);
-        if (savedPermission == null) throw new PersistEntityException(ImageAccessPermission.class);
 
         return savedImage;
     }
@@ -207,7 +134,7 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
     private Image saveDefaultImage(byte[] data, String tags) {
         data = convertToPNGImageData(data);
         String hash = hash(data);
-        Image savedImage = null;
+        Image savedImage;
         Image image;
         image = new Image();
         image.setData(data);
@@ -216,16 +143,7 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
         image.setTags(tags);
         savedImage = imageRepo.save(image);
 
-        ImageAccessPermission permission = new ImageAccessPermission();
-        permission.setFlags(0); // 公共图片
-        permission.setUid(User.UID_SYSTEM);
-        permission.setGid((long) UserGroup.GID_EMPTY);
-        permission.setImage(image);
-
-        ImageAccessPermission savedPermission = imageAccessPermissionRepo.save(permission);
-
         if (savedImage == null) throw new PersistEntityException(Image.class);
-        if (savedPermission == null) throw new PersistEntityException(ImageAccessPermission.class);
 
         return savedImage;
     }
@@ -255,15 +173,5 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
     @Override
     public Image cover() {
         return cover;
-    }
-
-    public static class ImageWithPermission {
-        public Image image;
-        public ImageAccessPermission permission;
-
-        public ImageWithPermission(Image image, ImageAccessPermission permission) {
-            this.image = image;
-            this.permission = permission;
-        }
     }
 }
