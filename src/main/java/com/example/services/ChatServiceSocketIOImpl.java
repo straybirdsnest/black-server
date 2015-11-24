@@ -1,4 +1,4 @@
-package com.example.services.impl;
+package com.example.services;
 
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.Configuration;
@@ -9,7 +9,6 @@ import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.example.config.ApplicationProperties;
 import com.example.models.ChatMessage;
-import com.example.services.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

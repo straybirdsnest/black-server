@@ -62,7 +62,7 @@ public class UserController {
      * 检查可用性
      * type = phone|token
      */
-    @RequestMapping(value = API_AVAILABILITY + "{type}", method = GET)
+    @RequestMapping(value = API_AVAILABILITY + "/{type}", method = GET)
     public boolean isAvailable(@PathVariable String type, @RequestParam(value = "q") String content) {
         switch (type) {
             case "phone":

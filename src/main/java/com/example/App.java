@@ -21,6 +21,7 @@ public class App {
     public static final String API_FOCUSES = "/api/focuses";
     public static final String API_FANS = "/api/fans";
     public static final String API_FRIENDS = "/api/friends";
+    public static final String API_IMAGE = "/api/image";
     public static SpringApplication handle;
 
     public static void main(String[] args) {

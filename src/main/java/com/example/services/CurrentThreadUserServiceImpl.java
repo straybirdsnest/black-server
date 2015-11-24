@@ -1,7 +1,6 @@
-package com.example.services.impl;
+package com.example.services;
 
 import com.example.models.User;
-import com.example.services.CurrentThreadUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
