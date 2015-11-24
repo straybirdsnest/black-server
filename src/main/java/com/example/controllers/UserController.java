@@ -5,7 +5,6 @@ import com.example.daos.FriendshipRepo;
 import com.example.exceptions.*;
 import com.example.models.Friendship;
 import com.example.models.User;
-import com.example.services.TokenService;
 import com.example.services.UserService;
 import com.example.services.VcodeService;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -28,8 +27,6 @@ public class UserController {
     @Autowired UserService userService;
 
     @Autowired FriendshipRepo friendshipRepo;
-
-    @Autowired TokenService tokenService;
 
     @Autowired VcodeService vcodeService;
 
@@ -58,7 +55,7 @@ public class UserController {
 //            throw new UpdateTokenWithOtherPhoneException(user.getId(), phone);
         if (!vcodeService.verify("86", phone, vcode))
             throw new VcodeVerificationException(phone, vcode);
-        return tokenService.generateTokenByPhone(phone);
+        return userService.generateTokenByPhone(phone);
     }
 
     /**
@@ -71,7 +68,7 @@ public class UserController {
             case "phone":
                 return !userService.isPhoneExisted(content);
             case "token":
-                return tokenService.isAvailable(content);
+                return userService.isTokenValid(content);
         }
         return false;
     }
@@ -87,7 +84,7 @@ public class UserController {
         boolean existed = userService.isPhoneExisted(phone);
         if (existed) throw new RegistedWithExistedPhoneException(phone);
         User user = userService.createAndSaveUser(phone, request);
-        return tokenService.generateToken(user);
+        return userService.generateToken(user);
     }
 
     /**
@@ -111,7 +108,7 @@ public class UserController {
      * 更新当前用户的个人信息
      */
     @RequestMapping(value = API_USER, method = PUT)
-    public void updateCurrentUsersProfile(User newProfile) {
+    public void updateCurrentUsersProfile(@JsonView(UserView.Profile.class) User newProfile) {
         userService.updateUser(newProfile);
     }
 

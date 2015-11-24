@@ -1,49 +1,80 @@
 package com.example.services.impl;
 
+import com.example.config.security.UserAuthentication;
 import com.example.daos.UserRepo;
 import com.example.exceptions.PersistEntityException;
+import com.example.exceptions.SystemError;
 import com.example.exceptions.UserNotFoundException;
 import com.example.models.*;
-import com.example.services.CurrentThreadUserService;
 import com.example.services.ImageService;
 import com.example.services.UserService;
 import com.example.utils.DateUtils;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
+    public static final int HALF_AN_HOUR_IN_MILLISECONDS = 30 * 60 * 1000;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
+    private static final Cache tokenCache = CacheManager.getInstance().getCache("userTokenCache");
     @Autowired UserRepo userRepo;
-
     @Autowired ImageService imageService;
-
-    @Autowired CurrentThreadUserService currentThreadUserService;
-
     @Autowired EntityManager em;
+
+    @Scheduled(fixedRate = HALF_AN_HOUR_IN_MILLISECONDS)
+    public void evictExpiredTokens() {
+        tokenCache.evictExpiredElements();
+    }
+
+    @NotNull
+    @Override
+    public String generateToken(User user) {
+        UserAuthentication auth = new UserAuthentication(user);
+        String token = UUID.randomUUID().toString();
+        tokenCache.put(new Element(token, auth));
+        return token;
+    }
+
+    @NotNull
+    @Override
+    public String generateTokenByPhone(String phone) {
+        Integer id = userRepo.findUserIdByphone(phone);
+        User user = userRepo.findOne(id);
+        if (user == null) throw new SystemError("无法找到手机号为 " + phone + " 的用户");
+        return generateToken(user);
+    }
+
+    @Nullable
+    @Override
+    public UserAuthentication getUserAuthenticationFromToken(String token) {
+        Element element = tokenCache.get(token);
+        if (element == null) return null;
+        return (UserAuthentication) element.getObjectValue();
+    }
+
+    @Override
+    public boolean isTokenValid(String token) {
+        Element element = tokenCache.get(token);
+        return element != null;
+    }
 
     @NotNull
     @Override
     public User getCurrentUser() {
-//        int id = currentThreadUserService.getCurrentThreadUserId();
-//        logger.debug("获取用户 " + id);
-//        Session session = em.unwrap(Session.class);
-//        User user = (User) session.load(User.class, id);
-//        if (user == null) {
-//            String errorMsg = String.format("无法在数据库内找到用户 (id = %d)", id);
-//            RuntimeException e = new RuntimeException(errorMsg);
-//            logger.error(errorMsg, e);
-//            throw e;
-//        }
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         // TODO 搭配使用 Ehcache 和 Hibernate
         return userRepo.findOne(user.getId());
@@ -51,7 +82,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public int getCurrentUserId() {
-        //return currentThreadUserService.getCurrentThreadUserId();
         return getCurrentUser().getId();
     }
 

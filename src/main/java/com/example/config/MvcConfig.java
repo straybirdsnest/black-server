@@ -1,7 +1,13 @@
 package com.example.config;
 
+import com.example.config.propertyeditors.UserResolver;
+import com.example.daos.AcademyRepo;
+import com.example.daos.CollegeRepo;
+import com.example.services.ImageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -14,6 +20,40 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 //    @Autowired TokenAuthenticationInterceptor tokenAuthenticationInterceptor;
 //
 //    @Autowired DebugRequestInterceptor debugRequestInterceptor;
+
+    @Autowired CollegeRepo collegeRepo;
+    @Autowired AcademyRepo academyRepo;
+    @Autowired ImageService imageService;
+
+//    @Bean
+//    public Hibernate4Module hibernate4Module(){
+//        return new Hibernate4Module();
+//    }
+
+//    @Bean
+//    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder(){
+//        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+//        ObjectMapper mapper = new ObjectMapper();
+//        SimpleModule module = new SimpleModule();
+//        module.addSerializer(Image.class, new ImageSerializer());
+//        mapper.registerModule(module);
+//        builder.configure(mapper);
+//        return builder;
+//    }
+
+//    @Bean
+//    public CustomEditorConfigurer customEditorConfigurer(){
+//        CustomEditorConfigurer configurer = new CustomEditorConfigurer();
+//        CustomPropertyEditorRegistrar registrar = new CustomPropertyEditorRegistrar();
+//        configurer.setPropertyEditorRegistrars(new PropertyEditorRegistrar[]{registrar});
+//        return configurer;
+//    }
+
+
+//    @Override
+//    public void addFormatters(FormatterRegistry registry) {
+//        registry.addConverter(new StringToUserConverter());
+//    }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -45,33 +85,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 //        });
     }
 
-//    @Bean
-//    public Hibernate4Module hibernate4Module(){
-//        return new Hibernate4Module();
-//    }
-
-//    @Bean
-//    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder(){
-//        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-//        ObjectMapper mapper = new ObjectMapper();
-//        SimpleModule module = new SimpleModule();
-//        module.addSerializer(Image.class, new ImageSerializer());
-//        mapper.registerModule(module);
-//        builder.configure(mapper);
-//        return builder;
-//    }
-
-//    @Bean
-//    public CustomEditorConfigurer customEditorConfigurer(){
-//        CustomEditorConfigurer configurer = new CustomEditorConfigurer();
-//        CustomPropertyEditorRegistrar registrar = new CustomPropertyEditorRegistrar();
-//        configurer.setPropertyEditorRegistrars(new PropertyEditorRegistrar[]{registrar});
-//        return configurer;
-//    }
-
-
-//    @Override
-//    public void addFormatters(FormatterRegistry registry) {
-//        registry.addConverter(new StringToUserConverter());
-//    }
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(new UserResolver(collegeRepo, academyRepo, imageService));
+    }
 }

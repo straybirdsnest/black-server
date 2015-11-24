@@ -1,7 +1,9 @@
 package com.example.services;
 
+import com.example.config.security.UserAuthentication;
 import com.example.models.User;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,4 +32,15 @@ public interface UserService {
     User getUserById(int id);
 
     boolean isPhoneExisted(String phone);
+
+    @NotNull
+    String generateToken(User user);
+
+    @NotNull
+    String generateTokenByPhone(String phone);
+
+    @Nullable
+    UserAuthentication getUserAuthenticationFromToken(String token);
+
+    boolean isTokenValid(String token);
 }

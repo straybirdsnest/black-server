@@ -1,10 +1,8 @@
 package com.example.services.impl;
 
 import com.example.App;
-import com.example.config.security.ImageToken;
 import com.example.daos.ImageAccessPermissionRepo;
 import com.example.daos.ImageRepo;
-import com.example.exceptions.IllegalTokenException;
 import com.example.exceptions.PersistEntityException;
 import com.example.exceptions.SystemError;
 import com.example.models.Image;
@@ -16,6 +14,9 @@ import com.example.services.GroupService;
 import com.example.services.ImageService;
 import com.example.services.UserService;
 import com.example.utils.Cryptor;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,28 +26,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import static com.example.models.ImageAccessPermission.FLAG_PRIVATE;
 import static com.example.models.ImageAccessPermission.FLAG_USER;
 
 @Service
 public class ImageServiceImpl implements ImageService, DefaultImage {
+    public static final int HALF_AN_HOUR_IN_MILLISECONDS = 30 * 60 * 1000;
     static final Logger logger = LoggerFactory.getLogger(ImageServiceImpl.class);
+    private static final Cache tokenCache = CacheManager.getInstance().getCache("imageTokenCache");
     @Autowired ImageRepo imageRepo;
     @Autowired ImageAccessPermissionRepo imageAccessPermissionRepo;
     @Autowired UserService userService;
     @Autowired GroupService groupService;
     @Autowired ApplicationContext context;
+
     private Image avatar;
     private Image background;
     private Image cover;
 
     @Autowired
     public ImageServiceImpl(ApplicationContext context, ImageRepo imageRepo,
-                            ImageAccessPermissionRepo imageAccessPermissionRepo) throws IOException{
+                            ImageAccessPermissionRepo imageAccessPermissionRepo) throws IOException {
         this.imageRepo = imageRepo;
         this.imageAccessPermissionRepo = imageAccessPermissionRepo;
 
@@ -93,35 +97,10 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
             throw new SystemError(
                     String.format("系统中保存这一张用户 (id = %d) 无权访问的图片 (id = %d)", uid, image.getId()), null);
         }
-        return encrypt(image, permission);
-    }
-
-    /**
-     * token 的组成
-     * - flags  int32
-     * - uid    int32
-     * - gid    int64
-     * - expire int64
-     * - id     int64
-     * 总共 40 个字节
-     */
-    private String encrypt(Image image, ImageAccessPermission permission) {
-        ImageToken token = new ImageToken();
-        token.setFlags(permission.getFlags());
-        token.setUid(permission.getUid());
-        token.setGid(permission.getGid());
-        token.setExpire(new Date().getTime() + ImageToken.EXPIRE);
-        token.setId(image.getId());
-
-        try (ByteArrayOutputStream arrOut = new ByteArrayOutputStream(ImageToken.SIZE);
-             ObjectOutputStream out = new ObjectOutputStream(arrOut)
-        ) {
-            out.writeObject(token);
-            return Cryptor.encrypt(arrOut.toByteArray()) + "~" + image.getHash();
-        } catch (IOException e) {
-            logger.error("无法序列化 ImageToken", e);
-            throw new SystemError("无法序列化 ImageToken", e);
-        }
+        String token = UUID.randomUUID().toString();
+        ImageWithPermission imageP = new ImageWithPermission(image, permission);
+        tokenCache.put(new Element(token, imageP));
+        return token;
     }
 
     /**
@@ -130,47 +109,20 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
      */
     @Nullable
     public Long getImageIdFromAccessToken(String accessToken) {
-        try {
-            int uid = userService.getCurrentUserId();
-            ImageWithPermission imageP = decrypt(accessToken);
-            if (canAccessImage(uid, imageP.permission)) return imageP.image.getId();
-        } catch (IllegalTokenException e) {
-            logger.debug("非法的图片访问 token: " + accessToken, e);
-            return null;
-        }
+        int uid = userService.getCurrentUserId();
+        Element element = tokenCache.get(accessToken);
+        if (element == null) return null;
+        ImageWithPermission imageP = (ImageWithPermission) element.getObjectValue();
+        if (canAccessImage(uid, imageP.permission)) return imageP.image.getId();
         return null;
     }
 
-    private ImageWithPermission decrypt(String accessToken) throws IllegalTokenException {
-        String[] parts = accessToken.split("~");
-        if (parts.length < 2) throw new IllegalTokenException();
-
-        byte[] data = Cryptor.decrypt(parts[0]);
-        if (data == null) throw new IllegalTokenException();
-        try (ByteArrayInputStream arrIn = new ByteArrayInputStream(data);
-             ObjectInputStream in = new ObjectInputStream(arrIn)
-        ) {
-            ImageToken token = (ImageToken) in.readObject();
-
-            // token 过期
-            if (token.getExpire() < new Date().getTime()) throw new IllegalTokenException();
-
-            Image image = new Image();
-            image.setId(token.getId());
-
-            ImageAccessPermission permission = new ImageAccessPermission();
-            permission.setFlags(token.getFlags());
-            permission.setUid(token.getUid());
-            permission.setGid(token.getGid());
-
-            return new ImageWithPermission(image, permission);
-
-        } catch (IOException e) {
-            logger.error("无法反序列化 ImageToken", e);
-            throw new SystemError("无法反序列化 ImageToken", e);
-        } catch (ClassNotFoundException e) {
-            throw new IllegalTokenException();
-        }
+    @Nullable
+    @Override
+    public Image getImageFromAccessToken(String accessToken) {
+        Long id = getImageIdFromAccessToken(accessToken);
+        if (id == null) return null;
+        return imageRepo.findOne(id);
     }
 
     /**
@@ -266,7 +218,7 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
 
         ImageAccessPermission permission = new ImageAccessPermission();
         permission.setFlags(0); // 公共图片
-        permission.setUid(User.UID_PUBLIC);
+        permission.setUid(User.UID_SYSTEM);
         permission.setGid((long) UserGroup.GID_EMPTY);
         permission.setImage(image);
 
@@ -305,7 +257,7 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
         return cover;
     }
 
-    private static class ImageWithPermission {
+    public static class ImageWithPermission {
         public Image image;
         public ImageAccessPermission permission;
 

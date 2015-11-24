@@ -1,6 +1,6 @@
 package com.example.config.security;
 
-import com.example.services.TokenService;
+import com.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
@@ -30,11 +30,11 @@ import static com.example.App.API_USER;
 //@Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired TokenService tokenService;
+    @Autowired UserService userService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.addFilterBefore(new TokenAuthenticationFilter(tokenService), BasicAuthenticationFilter.class)
+        http.addFilterBefore(new TokenAuthenticationFilter(userService), BasicAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .csrf().disable()

@@ -6,7 +6,7 @@ import com.example.exceptions.MyCustomError;
 import com.example.exceptions.MyCustomException;
 import com.example.models.Image;
 import com.example.models.User;
-import com.example.services.TokenService;
+import com.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +22,7 @@ public class AdminController {
 
     @Autowired ImageRepo imageRepo;
 
-    @Autowired TokenService tokenService;
+    @Autowired UserService userService;
 
     @RequestMapping("/admin/users")
     public Set<User> getAllUsers() {
@@ -56,7 +56,7 @@ public class AdminController {
         Map<String, String> result = new HashMap<>();
         while (i.hasNext()) {
             User u = i.next();
-            result.put(u.getProfile().getPhone(), tokenService.generateToken(u));
+            result.put(u.getProfile().getPhone(), userService.generateToken(u));
         }
         return result;
     }

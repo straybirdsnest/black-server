@@ -1,6 +1,6 @@
 package com.example.config.security;
 
-import com.example.services.TokenService;
+import com.example.services.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -15,10 +15,10 @@ import java.io.IOException;
  */
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     public static final String TOKEN_HEADER = "X-Token";
-    private final TokenService tokenService;
+    private final UserService userService;
 
-    public TokenAuthenticationFilter(TokenService tokenService) {
-        this.tokenService = tokenService;
+    public TokenAuthenticationFilter(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-        UserAuthentication auth = (UserAuthentication)tokenService.getObject(token);
+        UserAuthentication auth = userService.getUserAuthenticationFromToken(token);
         if (auth != null) {
             SecurityContextHolder.getContext().setAuthentication(auth);
         } else {

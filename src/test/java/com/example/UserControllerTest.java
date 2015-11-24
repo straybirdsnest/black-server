@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.services.TokenService;
 import com.example.services.UserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +36,6 @@ public class UserControllerTest {
     public static final String UNREGISTERED_PHONE = "13728495536";
     private static final Logger logger = LoggerFactory.getLogger(UserControllerTest.class);
     @Autowired WebApplicationContext webApplicationContext;
-    @Autowired TokenService tokenService;
     @Autowired UserService userService;
     private MockMvc mockMvc;
     private String xtoken;
