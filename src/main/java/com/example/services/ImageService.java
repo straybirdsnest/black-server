@@ -19,6 +19,9 @@ public interface ImageService {
     @Nullable
     Long getImageIdFromAccessToken(String accessToken);
 
+    @Nullable
+    Image getImageFromAccessToken(String accessToken);
+
     /**
      * 获得系统默认图片
      */

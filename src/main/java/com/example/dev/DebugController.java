@@ -3,7 +3,6 @@ package com.example.dev;
 import com.example.daos.UserRepo;
 import com.example.models.RegInfo;
 import com.example.models.User;
-import com.example.services.TokenService;
 import com.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +23,6 @@ public class DebugController {
 
     @Autowired UserRepo userRepo;
 
-    @Autowired TokenService tokenService;
-
     @Autowired UserService userService;
 
     @RequestMapping("/requests")
@@ -40,7 +37,7 @@ public class DebugController {
         for (User user : users) {
             UserWithToken u = new UserWithToken();
             u.setPhone(user.getProfile().getPhone());
-            u.setToken(tokenService.generateToken(user));
+            u.setToken(userService.generateToken(user));
             tokens.add(u);
         }
         model.addAttribute("tokens", tokens);

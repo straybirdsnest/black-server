@@ -1,6 +1,7 @@
 package com.example.controllers;
 
 import com.example.exceptions.MyCustomError;
+import com.example.exceptions.RegistedWithExistedPhoneException;
 import com.example.exceptions.SystemError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,11 @@ public class ExceptionHandlingController {
     public void handleSystemError(SystemError e) {
         logger.error("严重系统错误, 即将关闭服务器", e);
         ((ConfigurableApplicationContext)context).close();
+    }
+
+    @ExceptionHandler(RegistedWithExistedPhoneException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public void handleRegistedWithExistedPhoneException() {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)

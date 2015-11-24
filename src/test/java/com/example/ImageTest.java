@@ -2,7 +2,7 @@ package com.example;
 
 import com.example.daos.UserRepo;
 import com.example.models.User;
-import com.example.services.TokenService;
+import com.example.services.UserService;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = App.class)
 @WebAppConfiguration
-public class ImageTest{
+public class ImageTest {
 
-    @Autowired TokenService tokenService;
+    @Autowired UserService userService;
 
     @Autowired UserRepo userRepo;
 
@@ -51,9 +51,9 @@ public class ImageTest{
      * 测试上传图片
      */
     @Test
-    public void uploadImage() throws Exception{
+    public void uploadImage() throws Exception {
         User u = userRepo.findOne(1);
-        String token = tokenService.generateToken(u);
+        String token = userService.generateToken(u);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Token", token);
         MockMultipartFile image =
