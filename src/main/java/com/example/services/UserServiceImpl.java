@@ -3,7 +3,6 @@ package com.example.services;
 import com.example.config.security.UserAuthentication;
 import com.example.daos.UserRepo;
 import com.example.exceptions.PersistEntityException;
-import com.example.exceptions.SystemError;
 import com.example.exceptions.UserNotFoundException;
 import com.example.models.*;
 import com.example.utils.DateUtils;
@@ -45,15 +44,6 @@ public class UserServiceImpl implements UserService {
         String token = UUID.randomUUID().toString();
         tokenCache.put(new Element(token, auth));
         return token;
-    }
-
-    @NotNull
-    @Override
-    public String generateTokenByPhone(String phone) {
-        Integer id = userRepo.findUserIdByphone(phone);
-        User user = userRepo.findOne(id);
-        if (user == null) throw new SystemError("无法找到手机号为 " + phone + " 的用户");
-        return generateToken(user);
     }
 
     @Nullable
@@ -206,5 +196,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isPhoneExisted(String phone) {
         return userRepo.existsByPhone(phone);
+    }
+
+    @Override
+    public User findByPhone(String phone) {
+        return userRepo.findByPhone(phone);
     }
 }

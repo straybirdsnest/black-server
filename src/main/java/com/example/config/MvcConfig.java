@@ -68,6 +68,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 //        registry.addInterceptor(tokenAuthenticationInterceptor)
 //                .addPathPatterns("/api/**")
 //                .excludePathPatterns("/api/register/**", "/api/token/**", "/api/availability/**");
+        registry.addInterceptor(new DebugInterceptor()).addPathPatterns("/**");
     }
 
     @Override
@@ -89,4 +90,10 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new UserResolver(collegeRepo, academyRepo, imageService));
     }
+
+//    @Override
+//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+//        converters.add(new MappingJackson2HttpMessageConverter());
+//        converters.add(new StringHttpMessageConverter());
+//    }
 }

@@ -73,6 +73,10 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
     @NotNull
     public String generateAccessToken(Image image) {
         String token = UUID.randomUUID().toString();
+        long id = image.getId();
+        // TODO 改进 Ehcache 和 Hibernate 的协作关系, 这里获取 id 是为了通过 token 拿出来的 image 可以获取到 id
+        // 避免出现延迟加载没有 session 的问题
+        // logger.debug(String.format("生成图片 (id=%d) 的 token: %s", id, token));
         tokenCache.put(new Element(token, image));
         return token;
     }
@@ -121,7 +125,6 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
             image = new Image();
             image.setData(data);
             image.setHash(hash);
-            image.setUsed(0);
             image.setTags(tags);
             savedImage = imageRepo.save(image);
         }
@@ -139,7 +142,6 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
         image = new Image();
         image.setData(data);
         image.setHash(hash);
-        image.setUsed(0);
         image.setTags(tags);
         savedImage = imageRepo.save(image);
 

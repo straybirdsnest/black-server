@@ -1,6 +1,6 @@
 package com.example.controllers;
 
-import com.example.config.jsonviews.GroupView;
+import com.example.config.json.Views;
 import com.example.daos.GroupRepo;
 import com.example.daos.UserRepo;
 import com.example.models.UserGroup;
@@ -26,7 +26,7 @@ public class GroupController {
     UserRepo userRepo;
 
     @RequestMapping(value = "/api/groups/{id}", method = RequestMethod.GET)
-    @JsonView(GroupView.GroupSummary.class)
+    @JsonView(Views.Group.class)
     public ResponseEntity<?> getGroupDetails(@PathVariable("id") Long id) {
         UserGroup group = groupRepo.findOne(id);
         if (group == null) {

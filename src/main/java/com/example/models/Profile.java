@@ -1,8 +1,12 @@
 package com.example.models;
 
+import com.example.config.json.Views;
+import com.fasterxml.jackson.annotation.*;
+
 import javax.persistence.*;
 import java.util.Date;
 
+@SuppressWarnings("unused")
 @Embeddable
 public class Profile {
 
@@ -14,7 +18,8 @@ public class Profile {
     @Column(name = "idcard")
     private String idCard;
 
-    @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum")
     private Gender gender;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,17 +41,27 @@ public class Profile {
     private String highschool;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "college_id", referencedColumnName = "id")
+    @JoinColumn(name = "college_id")
     private College college;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "academy_id", referencedColumnName = "id")
+    @JoinColumn(name = "academy_id")
     private Academy academy;
 
     private String grade;
 
+
+    /////////////////////////////////////////////////////////////////
+    //                                                             //
+    //                    ~~~~~~~~~~~~~~~~~                        //
+    //                        GET & SET                            //
+    //                    =================                        //
+    //                                                             //
+    /////////////////////////////////////////////////////////////////
+
     //<editor-fold desc="=== Getters & Setters ===">
 
+    @JsonView(Views.UserSummary.class)
     public String getNickname() {
         return nickname;
     }
@@ -55,6 +70,7 @@ public class Profile {
         this.nickname = nickname;
     }
 
+    @JsonIgnore
     public String getRealName() {
         return realName;
     }
@@ -63,6 +79,7 @@ public class Profile {
         this.realName = realName;
     }
 
+    @JsonIgnore
     public String getIdCard() {
         return idCard;
     }
@@ -71,6 +88,7 @@ public class Profile {
         this.idCard = idCard;
     }
 
+    @JsonView(Views.UserDetails.class)
     public Gender getGender() {
         return gender;
     }
@@ -79,6 +97,7 @@ public class Profile {
         this.gender = gender;
     }
 
+    @JsonView(Views.UserSummary.class)
     public Image getAvatar() {
         return avatar;
     }
@@ -87,6 +106,8 @@ public class Profile {
         this.avatar = avatar;
     }
 
+    @JsonView(Views.UserDetails.class)
+    @JsonProperty("background")
     public Image getBackgroundImage() {
         return backgroundImage;
     }
@@ -95,6 +116,8 @@ public class Profile {
         this.backgroundImage = backgroundImage;
     }
 
+    @JsonView(Views.UserDetails.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     public Date getBirthday() {
         return birthday;
     }
@@ -103,6 +126,7 @@ public class Profile {
         this.birthday = birthday;
     }
 
+    @JsonView(Views.UserSummary.class)
     public String getSignature() {
         return signature;
     }
@@ -111,6 +135,7 @@ public class Profile {
         this.signature = signature;
     }
 
+    @JsonView(Views.UserDetails.class)
     public String getHometown() {
         return hometown;
     }
@@ -119,6 +144,7 @@ public class Profile {
         this.hometown = hometown;
     }
 
+    @JsonView(Views.UserDetails.class)
     public String getPhone() {
         return phone;
     }
@@ -127,6 +153,7 @@ public class Profile {
         this.phone = phone;
     }
 
+    @JsonView(Views.UserDetails.class)
     public String getHighschool() {
         return highschool;
     }
@@ -135,6 +162,9 @@ public class Profile {
         this.highschool = highschool;
     }
 
+    @JsonUnwrapped
+    @JsonView(Views.UserDetails.class)
+    @JsonIgnore
     public College getCollege() {
         return college;
     }
@@ -143,6 +173,7 @@ public class Profile {
         this.college = college;
     }
 
+    @JsonIgnore
     public Academy getAcademy() {
         return academy;
     }
@@ -151,6 +182,7 @@ public class Profile {
         this.academy = academy;
     }
 
+    @JsonIgnore
     public String getGrade() {
         return grade;
     }
@@ -159,22 +191,23 @@ public class Profile {
         this.grade = grade;
     }
 
-
     //</editor-fold>
 
+    @JsonProperty("college")
+    @JsonView(Views.UserDetails.class)
     public String getCollegeName() {
         if (college != null) {
             return college.getName();
-        } else {
-            return null;
         }
+        return null;
     }
 
+    @JsonProperty("academy")
+    @JsonView(Views.UserDetails.class)
     public String getAcademyName() {
         if (academy != null) {
             return academy.getName();
-        } else {
-            return null;
         }
+        return null;
     }
 }

@@ -11,6 +11,7 @@ import java.util.Set;
  * 2 - 表示使用户的粉丝形成的用户组
  * 正常的用户组从 GID_BASE 开始编号
  */
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "T_GROUP")
 public class UserGroup {

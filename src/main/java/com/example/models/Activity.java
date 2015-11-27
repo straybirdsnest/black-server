@@ -1,25 +1,26 @@
 package com.example.models;
 
-import com.example.config.converters.json.ActivityDeserializer;
+import com.example.config.json.ActivityDeserializer;
+import com.example.config.json.Views;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+@SuppressWarnings("unused")
 @Entity
 @JsonDeserialize(using = ActivityDeserializer.class)
+@Table(name = "T_ACTIVITY")
 public class Activity {
-
-    @Transient
-    private final static Logger logger = LoggerFactory.getLogger(Activity.class);
-
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "cover_image_id")
@@ -31,27 +32,23 @@ public class Activity {
 
     private Date registrationDeadline;
 
+    private Date creationTime;
+
     private String location;
 
     @ManyToOne
     @JoinColumn(name = "promoter_id")
     private User promoter;
 
-    @Column(columnDefinition = "text")
+    private String title;
+
     private String content;
 
     @ManyToOne
     @JoinColumn(name = "game_id")
     private Game game;
 
-    @Column(columnDefinition = "enum('MATCH', 'BLACK')")
-    private Type type;
-
-    @Column(columnDefinition = "enum('READY', 'RUNNING', 'STOPPED')")
-    private Status status;
-
-    @Column(columnDefinition = "text")
-    private String title;
+    private String tags;
 
     @ManyToOne
     @JoinColumn(name = "group_id")
@@ -59,30 +56,45 @@ public class Activity {
 
     @OneToMany
     @JoinTable(name = "T_ACTIVITY_IMAGE",
-            joinColumns = @JoinColumn(name = "activity_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "image_id", referencedColumnName = "id", unique = true))
+            joinColumns = @JoinColumn(name = "activity_id"),
+            inverseJoinColumns = @JoinColumn(name = "image_id"))
     private Set<Image> photos = new HashSet<>();
 
-    @Transient
-    private String coverImageAccessToken;
 
-    @Transient
-    private Set<String> photosAccessToken;
+    @OneToMany
+    @JoinTable(name = "T_ACTIVITY_COMMENTS",
+            joinColumns = @JoinColumn(name = "activity_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id")
+    )
+    private Set<Post> comments = new HashSet<>();
 
-    public Activity() {
+    @OneToMany(mappedBy = "activity")
+    private Set<ActivityLike> likes = new HashSet<>();
 
-    }
+
+    /////////////////////////////////////////////////////////////////
+    //                                                             //
+    //                    ~~~~~~~~~~~~~~~~~                        //
+    //                        GET & SET                            //
+    //                    =================                        //
+    //                                                             //
+    /////////////////////////////////////////////////////////////////
 
     //<editor-fold desc="=== Getters & Setters ===">
 
-    public Integer getId() {
+
+
+    @JsonView(Views.ActivitySummary.class)
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
+    @JsonProperty("cover")
+    @JsonView(Views.ActivitySummary.class)
     public Image getCoverImage() {
         return coverImage;
     }
@@ -91,6 +103,8 @@ public class Activity {
         this.coverImage = coverImage;
     }
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonView(Views.ActivitySummary.class)
     public Date getStartTime() {
         return startTime;
     }
@@ -99,6 +113,8 @@ public class Activity {
         this.startTime = startTime;
     }
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonView(Views.ActivitySummary.class)
     public Date getEndTime() {
         return endTime;
     }
@@ -107,6 +123,8 @@ public class Activity {
         this.endTime = endTime;
     }
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonView(Views.ActivitySummary.class)
     public Date getRegistrationDeadline() {
         return registrationDeadline;
     }
@@ -115,6 +133,7 @@ public class Activity {
         this.registrationDeadline = registrationDeadline;
     }
 
+    @JsonView(Views.ActivitySummary.class)
     public String getLocation() {
         return location;
     }
@@ -123,6 +142,7 @@ public class Activity {
         this.location = location;
     }
 
+    @JsonView(Views.ActivityDetails.class)
     public User getPromoter() {
         return promoter;
     }
@@ -131,6 +151,7 @@ public class Activity {
         this.promoter = promoter;
     }
 
+    @JsonView(Views.ActivityDetails.class)
     public String getContent() {
         return content;
     }
@@ -139,6 +160,7 @@ public class Activity {
         this.content = content;
     }
 
+    @JsonIgnore
     public Game getGame() {
         return game;
     }
@@ -147,22 +169,16 @@ public class Activity {
         this.game = game;
     }
 
-    public Type getType() {
-        return type;
+    @JsonView(Views.ActivitySummary.class)
+    public String getTags() {
+        return tags;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
+    @JsonView(Views.ActivitySummary.class)
     public String getTitle() {
         return title;
     }
@@ -171,6 +187,7 @@ public class Activity {
         this.title = title;
     }
 
+    @JsonIgnore
     public UserGroup getGroup() {
         return group;
     }
@@ -179,6 +196,7 @@ public class Activity {
         this.group = group;
     }
 
+    @JsonView(Views.ActivityDetails.class)
     public Set<Image> getPhotos() {
         return photos;
     }
@@ -187,22 +205,34 @@ public class Activity {
         this.photos = photos;
     }
 
-    public String getCoverImageAccessToken() {
-        return coverImageAccessToken;
+    public Date getCreationTime() {
+        return creationTime;
     }
 
-    public void setCoverImageAccessToken(String accessToken) {
-        this.coverImageAccessToken = accessToken;
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
     }
 
-    public Set<String> getPhotosAccessToken() {
-        return photosAccessToken;
+    public Set<Post> getComments() {
+        return comments;
     }
 
-    public void setPhotosAccessToken(Set<String> photosAccessToken) {
-        this.photosAccessToken = photosAccessToken;
+    public void setComments(Set<Post> comments) {
+        this.comments = comments;
     }
 
+    public Set<ActivityLike> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<ActivityLike> likes) {
+        this.likes = likes;
+    }
+
+    //</editor-fold>
+
+    @JsonProperty("game")
+    @JsonView(Views.ActivitySummary.class)
     public String getGameName() {
         if (game != null) {
             return game.getName();
@@ -210,20 +240,12 @@ public class Activity {
         return null;
     }
 
+    @JsonProperty("group")
+    @JsonView(Views.ActivityDetails.class)
     public Long getGroupId() {
         if (group != null) {
             return group.getId();
         }
         return null;
-    }
-
-//</editor-fold>
-
-    public enum Type {
-        MATCH, BLACK
-    }
-
-    public enum Status {
-        READY, RUNNING, STOPPED
     }
 }

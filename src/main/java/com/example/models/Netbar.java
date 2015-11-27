@@ -2,7 +2,9 @@ package com.example.models;
 
 import javax.persistence.*;
 
+@SuppressWarnings("unused")
 @Entity
+@Table(name = "T_NETBAR")
 public class Netbar {
     @Id
     @GeneratedValue

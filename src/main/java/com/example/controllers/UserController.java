@@ -1,14 +1,16 @@
 package com.example.controllers;
 
-import com.example.config.jsonviews.UserView;
+import com.example.Api;
+import com.example.config.json.Views;
 import com.example.daos.FriendshipRepo;
-import com.example.exceptions.*;
+import com.example.exceptions.VcodeVerificationException;
 import com.example.models.Friendship;
 import com.example.models.User;
 import com.example.services.UserService;
 import com.example.services.VcodeService;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +24,7 @@ import static com.example.App.*;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
+@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class UserController {
 
     @Autowired UserService userService;
@@ -46,45 +49,47 @@ public class UserController {
     //<editor-fold desc="=== Account ===">
 
     /**
-     * 更新用户无效的 token，需要先向 Mob 验证手机，然后再给用户刷新 token
+     * 获取 token, 如果手机号没有注册则注册新用户
+     *
+     * @return
+     * {
+     *     "token": "3b92e87b-69c1-41fe-9b3d-923e2138c00b"
+     * }
+     *
+     * @throws VcodeVerificationException
      */
     @RequestMapping(value = API_TOKEN, method = GET)
-    public String getToken(@RequestParam String phone, @RequestParam String vcode) {
-//        User user = userService.getCurrentUser();
-//        if (!phone.equals(user.getProfile().getPhone()))
-//            throw new UpdateTokenWithOtherPhoneException(user.getId(), phone);
-        if (!vcodeService.verify("86", phone, vcode))
+    public Api.Result getToken(@RequestParam String phone, @RequestParam String vcode, HttpServletRequest request) {
+        if(!vcodeService.verify("86", phone, vcode)) {
             throw new VcodeVerificationException(phone, vcode);
-        return userService.generateTokenByPhone(phone);
+        }
+        User user;
+        if (!userService.isPhoneExisted(phone)) {
+            user = userService.createAndSaveUser(phone, request);
+        } else {
+            user = userService.findByPhone(phone);
+        }
+        return Api.result().param("token", userService.generateToken(user));
     }
 
     /**
      * 检查可用性
      * type = phone|token
+     *
+     * @return
+     * {
+     *     "result": true|false
+     * }
      */
     @RequestMapping(value = API_AVAILABILITY + "/{type}", method = GET)
-    public boolean isAvailable(@PathVariable String type, @RequestParam(value = "q") String content) {
+    public Api.Result isAvailable(@PathVariable String type, @RequestParam(value = "q") String content) {
         switch (type) {
             case "phone":
-                return !userService.isPhoneExisted(content);
+                return Api.result().param("result", !userService.isPhoneExisted(content));
             case "token":
-                return userService.isTokenValid(content);
+                return Api.result().param("result", userService.isTokenValid(content));
         }
-        return false;
-    }
-
-    /**
-     * 注册新用户，通过向 Mob 发送手机验证码，来验证用户的身份，从而注册新用户
-     *
-     * @return 如果注册成功则返回访问 API 的 token
-     */
-    @RequestMapping(value = API_USER, method = POST)
-    public String register(@RequestParam String phone, @RequestParam String vcode, HttpServletRequest request) {
-        if (!vcodeService.verify("86", phone, vcode)) throw new RegistedWithInvalidVcodeException(vcode);
-        boolean existed = userService.isPhoneExisted(phone);
-        if (existed) throw new RegistedWithExistedPhoneException(phone);
-        User user = userService.createAndSaveUser(phone, request);
-        return userService.generateToken(user);
+        return Api.result().param("result", false);
     }
 
     /**
@@ -99,7 +104,7 @@ public class UserController {
      * 获取当前用户的个人信息
      */
     @RequestMapping(value = API_USER, method = GET)
-    @JsonView(UserView.Profile.class)
+    @JsonView(Views.UserDetails.class)
     public User getCurrentUsersProfile() {
         return userService.getCurrentUser();
     }
@@ -108,7 +113,7 @@ public class UserController {
      * 更新当前用户的个人信息
      */
     @RequestMapping(value = API_USER, method = PUT)
-    public void updateCurrentUsersProfile(@JsonView(UserView.Profile.class) User newProfile) {
+    public void updateCurrentUsersProfile(@JsonView(Views.UserDetails.class) User newProfile) {
         userService.updateUser(newProfile);
     }
 
@@ -116,7 +121,7 @@ public class UserController {
      * 查看其他用户的 Profile
      */
     @RequestMapping(value = API_USER + "/{id}", method = GET)
-    @JsonView(UserView.Profile.class)
+    @JsonView(Views.UserDetails.class)
     public User getOthersProfile(@PathVariable int id) {
         return userService.getUserById(id);
     }
@@ -136,8 +141,8 @@ public class UserController {
     /**
      * 获取当前用户的关注列表
      */
-    @RequestMapping(value = API_FOCUSES, method = GET)
-    @JsonView(UserView.UserSummary.class)
+    @RequestMapping(value = API_USER + "/focuses", method = GET)
+    @JsonView(Views.UserSummary.class)
     public Set<User> getCurrentUsersFocuses() {
         return userService.getCurrentUser().getFocuses();
     }
@@ -145,8 +150,8 @@ public class UserController {
     /**
      * 获取当前用户的粉丝列表
      */
-    @RequestMapping(value = API_FANS, method = GET)
-    @JsonView(UserView.UserSummary.class)
+    @RequestMapping(value = API_USER + "/fans", method = GET)
+    @JsonView(Views.UserSummary.class)
     public Set<User> getCurrentUsersFans() {
         return userService.getCurrentUser().getFocuses();
     }
@@ -154,11 +159,11 @@ public class UserController {
     /**
      * 关注一个用户
      */
-    @RequestMapping(value = API_FOCUSES + "/{id}", method = POST)
+    @RequestMapping(value = API_USER + "/focuses/{id}", method = POST)
     public void focusSomeone(@PathVariable int id) {
         User user = userService.getCurrentUser();
         // 不能关注自己
-        if (user.getId() == id) throw new FocusMyselfException(id);
+        if (user.getId() == id) return;
         User focus = userService.getUserById(id);
         user.getFocuses().add(focus);
         userService.updateUser(user);
@@ -169,7 +174,7 @@ public class UserController {
     /**
      * 取消关注一个用户
      */
-    @RequestMapping(value = API_FOCUSES + "/{id}", method = DELETE)
+    @RequestMapping(value = API_USER + "/focuses/{id}", method = DELETE)
     public void unfocusSomeone(@PathVariable int id) {
         User user = userService.getCurrentUser();
         user.getFocuses().removeIf(u -> u.getId() == id);
@@ -192,8 +197,8 @@ public class UserController {
     /**
      * 获取当前用户的朋友
      */
-    @RequestMapping(value = API_FRIENDS, method = GET)
-    @JsonView(UserView.UserSummary.class)
+    @RequestMapping(value = API_USER + "/friends", method = GET)
+    @JsonView(Views.UserSummary.class)
     public Set<Friendship> getCurrentUsersFriends() {
         return userService.getCurrentUser().getFriendshipSet();
     }
@@ -201,11 +206,11 @@ public class UserController {
     /**
      * 添加一个朋友
      */
-    @RequestMapping(value = API_FRIENDS + "/{id}", method = POST)
+    @RequestMapping(value = API_USER + "/friends/{id}", method = POST)
     public void friendSomeone(@PathVariable int id, @RequestParam(required = false) String alias) {
         User user = userService.getCurrentUser();
         // 不能和自己成为朋友
-        if (user.getId() == id) throw new FriendMyselfException(id);
+        if (user.getId() == id) return;
         User friend = userService.getUserById(id);
 
         Friendship friendship = new Friendship();
@@ -221,7 +226,7 @@ public class UserController {
     /**
      * 删除一个朋友
      */
-    @RequestMapping(value = API_FRIENDS + "/{id}", method = DELETE)
+    @RequestMapping(value = API_USER + "/friends/{id}", method = DELETE)
     public void unfriendSomeone(@PathVariable int id) {
         User user = userService.getCurrentUser();
         user.getFriendshipSet().removeIf(f -> f.getUser().getId() == id);
@@ -233,7 +238,7 @@ public class UserController {
     /**
      * 修改一个朋友的备注名称
      */
-    @RequestMapping(value = API_FRIENDS + "/{id}", method = PUT)
+    @RequestMapping(value = API_USER + "/friends/{id}", method = PUT)
     public void updateFriendAlias(@PathVariable int id, @RequestParam String alias) {
         User user = userService.getCurrentUser();
         Optional<Friendship> friendship = user.getFriendshipSet().stream()

@@ -33,8 +33,9 @@ public class VcodeServiceMobImpl implements VcodeService {
 //        int result = requestData(MOB_VERIFY_URL,
 //                String.format("appkey=%s&phone=%s&zone=%s&code=%s", MOB_APPKEY, phone, zone, vcode));
 //        return result == CODE_SUCCESS;
-        logger.debug(String.format("向 Mob 验证 +%s-%s %s", zone, phone, vcode));
-        return true;
+        //logger.debug(String.format("向 Mob 验证 +%s-%s %s", zone, phone, vcode));
+        if (vcode.equals("1234")) return true;
+        return false;
     }
 
     private int requestData(String address, String params) {
