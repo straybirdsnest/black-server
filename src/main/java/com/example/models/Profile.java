@@ -1,5 +1,7 @@
 package com.example.models;
 
+import org.hibernate.annotations.*;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -14,6 +16,8 @@ public class Profile {
     @Column(name = "idcard")
     private String idCard;
 
+    @Type(type = "com.example.config.converters.jpa.GenericEnumUserType", parameters = {
+    @org.hibernate.annotations.Parameter(name = "enumClass", value = "com.example.models.Gender")})
     @Column(columnDefinition = "enum('MALE', 'FEMAE', 'SECRET')")
     private Gender gender;
 
