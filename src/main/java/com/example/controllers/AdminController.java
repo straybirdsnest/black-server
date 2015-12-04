@@ -2,8 +2,6 @@ package com.example.controllers;
 
 import com.example.daos.ImageRepo;
 import com.example.daos.UserRepo;
-import com.example.exceptions.MyCustomError;
-import com.example.exceptions.MyCustomException;
 import com.example.models.Image;
 import com.example.models.User;
 import com.example.services.UserService;
@@ -30,16 +28,6 @@ public class AdminController {
         Stream<User> s = StreamSupport.stream(Spliterators.spliteratorUnknownSize(i, Spliterator.ORDERED), false);
         Set<User> users = s.collect(Collectors.toSet());
         return users;
-    }
-
-    @RequestMapping("/admin/a")
-    public Image a() throws Exception{
-        throw new MyCustomException();
-    }
-
-    @RequestMapping("/admin/b")
-    public Image b() throws Exception{
-        throw new MyCustomError();
     }
 
     @RequestMapping("/admin/images")

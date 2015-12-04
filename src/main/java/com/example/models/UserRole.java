@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "T_ROLE")
 public class UserRole {

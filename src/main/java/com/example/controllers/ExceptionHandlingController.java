@@ -1,41 +1,37 @@
 package com.example.controllers;
 
-import com.example.exceptions.MyCustomError;
-import com.example.exceptions.RegistedWithExistedPhoneException;
-import com.example.exceptions.SystemError;
+import com.example.Api;
+import com.example.exceptions.BusinessException;
+import com.example.exceptions.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 @ControllerAdvice
+@RestController
+@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class ExceptionHandlingController {
     static final Logger logger = LoggerFactory.getLogger(ExceptionHandlingController.class);
 
     @Autowired ApplicationContext context;
 
-    @ExceptionHandler(MyCustomError.class)
+    @ExceptionHandler(SystemException.class)
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "服务器发生内部错误, 即将关闭")
-    public void handleMyCustomException(Exception e) {
-        logger.error("自定义错误", e);
-    }
-
-    @ExceptionHandler(SystemError.class)
-    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "服务器发生内部错误, 即将关闭")
-    public void handleSystemError(SystemError e) {
+    public void handleSystemError(SystemException e) {
         logger.error("严重系统错误, 即将关闭服务器", e);
         ((ConfigurableApplicationContext)context).close();
     }
 
-    @ExceptionHandler(RegistedWithExistedPhoneException.class)
+    @ExceptionHandler(BusinessException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public void handleRegistedWithExistedPhoneException() {
+    public Api.Result handleBusinessException(BusinessException exception) {
+        return Api.error(exception);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)

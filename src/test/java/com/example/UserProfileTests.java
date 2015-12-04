@@ -1,23 +1,12 @@
 package com.example;
 
 import com.example.services.UserService;
-import org.junit.Before;
+import org.json.JSONObject;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
-import javax.servlet.Filter;
-import javax.transaction.Transactional;
 
 import static com.example.App.*;
 import static com.example.config.security.TokenAuthenticationFilter.TOKEN_HEADER;
@@ -26,34 +15,21 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = App.class)
-@WebAppConfiguration
-@IntegrationTest("server.port:0") // random port
-@Transactional
-public class UserProfileTests {
+public class UserProfileTests extends BaseTests{
     public static final String UNREGISTERED_PHONE = "13728495536";
 
-    @Autowired WebApplicationContext context;
-    @Autowired Filter springSecurityFilterChain;
     @Autowired UserService userService;
-    private MockMvc mockMvc;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).addFilter(springSecurityFilterChain).build();
-    }
 
     @Test
     public void register_withValidPhoneAndVcode() throws Exception {
-        mockMvc.perform(post(API_USER).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
+        mockMvc.perform(get(API_TOKEN).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void unregister() throws Exception {
         MvcResult result = mockMvc
-                .perform(post(API_USER).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
+                .perform(get(API_TOKEN).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
                 .andExpect(status().isOk())
                 .andReturn();
         String token = result.getResponse().getContentAsString();
@@ -64,7 +40,7 @@ public class UserProfileTests {
     @Test
     public void updateProfile_username() throws Exception {
         MvcResult result = mockMvc
-                .perform(post(API_USER).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
+                .perform(get(API_TOKEN).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
                 .andExpect(status().isOk())
                 .andReturn();
         String token = result.getResponse().getContentAsString();
@@ -83,7 +59,7 @@ public class UserProfileTests {
     @Test
     public void updateProfile_signatureAndUsername() throws Exception {
         MvcResult result = mockMvc
-                .perform(post(API_USER).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
+                .perform(get(API_TOKEN).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
                 .andExpect(status().isOk())
                 .andReturn();
         String token = result.getResponse().getContentAsString();
@@ -105,7 +81,7 @@ public class UserProfileTests {
     @Test
     public void updateProfile_avatar() throws Exception {
         MvcResult result = mockMvc
-                .perform(post(API_USER).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
+                .perform(get(API_TOKEN).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
                 .andExpect(status().isOk())
                 .andReturn();
         String token = result.getResponse().getContentAsString();
@@ -130,16 +106,30 @@ public class UserProfileTests {
 
     @Test
     public void getCurrentUserProfile() throws Exception {
-        MvcResult result = mockMvc
-                .perform(post(API_USER).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
-                .andExpect(status().isOk())
-                .andReturn();
-        String token = result.getResponse().getContentAsString();
+        String token = createUserAndGetToken();
 
         mockMvc.perform(get(API_USER).header(TOKEN_HEADER, token))
                 .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.phone").value(UNREGISTERED_PHONE))
                 .andExpect(jsonPath("$.username").value(UNREGISTERED_PHONE));
+    }
+
+    @Test
+    public void getProfile() throws Exception {
+        String token = getToken();
+        MvcResult result = mockMvc.perform(get(API_USER).header(TOKEN_HEADER, token))
+                .andExpect(status().isOk()).andReturn();
+        printFormatedJsonString(result);
+    }
+
+    private String createUserAndGetToken() throws Exception{
+        MvcResult result = mockMvc
+                .perform(get(API_TOKEN).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
+                .andExpect(status().isOk())
+                .andReturn();
+        JSONObject token = new JSONObject(result.getResponse().getContentAsString());
+        return token.toString();
     }
 
     @Test
@@ -149,7 +139,7 @@ public class UserProfileTests {
     @Test
     public void updateToken() throws Exception {
         MvcResult result = mockMvc
-                .perform(post(API_USER).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
+                .perform(get(API_TOKEN).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
                 .andExpect(status().isOk())
                 .andReturn();
         String token = result.getResponse().getContentAsString();
@@ -161,7 +151,7 @@ public class UserProfileTests {
 
     @Test
     public void checkAvailability_phone() throws Exception {
-        mockMvc.perform(post(API_USER).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
+        mockMvc.perform(get(API_TOKEN).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
                 .andExpect(status().isOk())
                 .andReturn();
         mockMvc.perform(get(API_AVAILABILITY + "/phone").param("q", UNREGISTERED_PHONE))

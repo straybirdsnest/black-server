@@ -1,10 +1,11 @@
 package com.example.models;
 
-import com.example.config.converters.json.ImageSerializer;
+import com.example.config.json.ImageSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
 
+@SuppressWarnings("unused")
 @JsonSerialize(using = ImageSerializer.class)
 @Entity
 public class Image {
@@ -16,9 +17,8 @@ public class Image {
     @Column(columnDefinition = "mediumblob")
     private byte[] data;
 
-    private String hash; // 选择速度最快的信息摘要算法 md5
-
-    private Integer used;
+    @Column(columnDefinition = "char", length = 32)
+    private String hash; // hex(md5(data)) 32 个字符
 
     private String tags;
 
@@ -46,14 +46,6 @@ public class Image {
 
     public void setHash(String hash) {
         this.hash = hash;
-    }
-
-    public Integer getUsed() {
-        return used;
-    }
-
-    public void setUsed(Integer used) {
-        this.used = used;
     }
 
     public String getTags() {

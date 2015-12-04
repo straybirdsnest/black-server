@@ -1,6 +1,5 @@
 package com.example;
 
-import com.example.config.ApplicationLifecycleManager;
 import com.example.config.ApplicationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,10 +17,10 @@ public class App {
     public static final String API_USER = "/api/user";
     public static final String API_TOKEN = "/api/token";
     public static final String API_AVAILABILITY = "/api/availability";
-    public static final String API_FOCUSES = "/api/focuses";
-    public static final String API_FANS = "/api/fans";
-    public static final String API_FRIENDS = "/api/friends";
     public static final String API_IMAGE = "/api/image";
+    public static final String API_HEALTH = "/health";
+    public static final String API_POST = "/api/post";
+    public static final String API_ACTIVITY = "/api/activity";
     public static SpringApplication handle;
 
     public static void main(String[] args) {
@@ -29,7 +28,7 @@ public class App {
         TimeZone.setDefault(TimeZone.getTimeZone("Etc/UTC"));
         // 启动服务器
         handle = new SpringApplication(App.class);
-        handle.addListeners(new ApplicationLifecycleManager());
+        //handle.addListeners(new ApplicationLifecycleManager());
         handle.run(args);
     }
 }

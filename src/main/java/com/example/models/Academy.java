@@ -1,17 +1,15 @@
 package com.example.models;
 
-import com.example.config.jsonviews.UserView;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
-
 import javax.persistence.*;
 
+@SuppressWarnings("unused")
 @Entity
+@Table(name = "T_ACADEMY")
 public class Academy {
     @Id
     @GeneratedValue
     private Integer id;
-    @JsonView(UserView.Profile.class)
+
     private String name;
 
     @ManyToOne
@@ -20,8 +18,16 @@ public class Academy {
 
     @ManyToOne
     @JoinColumn(name = "college_id")
-    @JsonIgnore
     private College college;
+
+
+    /////////////////////////////////////////////////////////////////
+    //                                                             //
+    //                    ~~~~~~~~~~~~~~~~~                        //
+    //                        GET & SET                            //
+    //                    =================                        //
+    //                                                             //
+    /////////////////////////////////////////////////////////////////
 
     //<editor-fold desc="=== Getters & Setters ===">
 

@@ -2,6 +2,7 @@ package com.example.models;
 
 import javax.persistence.Embeddable;
 
+@SuppressWarnings("unused")
 @Embeddable
 public class Location {
     private double longitude;
