@@ -2,6 +2,7 @@ package com.example.models;
 
 import javax.persistence.*;
 
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "T_GAME")
 public class Game {

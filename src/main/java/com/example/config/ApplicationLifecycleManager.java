@@ -1,28 +1,29 @@
 package com.example.config;
 
+import com.example.games.Dota2PostExtension;
+import com.example.services.PostService;
+import com.example.services.extensions.ImagePostExtension;
+import com.example.services.extensions.PollPostExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
-
-public class ApplicationLifecycleManager implements ApplicationListener<ApplicationReadyEvent> {
+@Component
+public class ApplicationLifecycleManager{
     private static final Logger logger = LoggerFactory.getLogger(ApplicationLifecycleManager.class);
 
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        logger.info("服务器成功启动，撒花 (￣▽￣)o∠※PAN!=.:*:'☆.:*:'★':*");
-        //DevHelper.initDb(event.getApplicationContext());
-    }
+    @Autowired ApplicationContext context;
 
-    @Transactional
-    private void initDb(ApplicationContext context) {
-//        EntityManagerFactory factory = context.getBean(EntityManagerFactory.class);
-//        EntityManager em = factory.createEntityManager();
-//        Session session = em.unwrap(Session.class);
-//        //User user = new User("999999");
-//        session.save(user);
+    @EventListener
+    public void handleContextRefresh(ContextRefreshedEvent event) {
+        logger.info("服务器成功启动，撒花 (￣▽￣)o∠※PAN!=.:*:'☆.:*:'★':*");
+        PostService postService = event.getApplicationContext().getBean(PostService.class);
+        postService.registerPostExtention(Dota2PostExtension.class);
+        postService.registerPostExtention(ImagePostExtension.class);
+        postService.registerPostExtention(PollPostExtension.class);
     }
 }

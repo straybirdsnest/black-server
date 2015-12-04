@@ -1,6 +1,7 @@
 package com.example.utils;
 
-import com.example.exceptions.SystemError;
+import com.example.exceptions.SystemException;
+import org.apache.commons.codec.binary.Hex;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class Cryptor {
 
             md5 = MessageDigest.getInstance("MD5");
         } catch (Exception e) {
-            throw new SystemError("无法初始化 Cryptor 类", e);
+            throw new SystemException("无法初始化 Cryptor 类", e);
         }
     }
 
@@ -76,5 +77,12 @@ public class Cryptor {
         byte[] digest = md5.digest();
         Base64.Encoder encoder = Base64.getEncoder();
         return encoder.encodeToString(digest);
+    }
+
+    public static String md5_hex(byte[] data) {
+        md5.reset();
+        md5.update(data);
+        byte[] digest = md5.digest(); // 16 bytes
+        return Hex.encodeHexString(digest); // 32 character
     }
 }

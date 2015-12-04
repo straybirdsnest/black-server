@@ -1,6 +1,10 @@
 package com.example.models;
 
-import com.example.config.converters.json.UserDeserializer;
+import com.example.config.json.UserDeserializer;
+import com.example.config.json.Views;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import javax.persistence.*;
@@ -10,6 +14,7 @@ import java.util.Set;
 /**
  * 正常的用户从 UID_BASE 开始编号
  */
+@SuppressWarnings("unused")
 @Entity
 @JsonDeserialize(using = UserDeserializer.class)
 public class User {
@@ -27,11 +32,9 @@ public class User {
     private Boolean enabled;
 
     @Embedded
-    @Basic(fetch = FetchType.LAZY)
     private Profile profile = new Profile();
 
     @Embedded
-    @Basic(fetch = FetchType.LAZY)
     private RegInfo regInfo = new RegInfo();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -59,8 +62,20 @@ public class User {
     )
     private Set<UserRole> roles = new HashSet<>();
 
+
+
+
+    /////////////////////////////////////////////////////////////////
+    //                                                             //
+    //                    ~~~~~~~~~~~~~~~~~                        //
+    //                        GET & SET                            //
+    //                    =================                        //
+    //                                                             //
+    /////////////////////////////////////////////////////////////////
+
     //<editor-fold desc="=== Getters & Setters ===">
 
+    @JsonIgnore
     public Integer getId() {
         return id;
     }
@@ -69,6 +84,7 @@ public class User {
         this.id = id;
     }
 
+    @JsonView(Views.UserSummary.class)
     public String getUsername() {
         return username;
     }
@@ -77,6 +93,7 @@ public class User {
         this.username = username;
     }
 
+    @JsonView(Views.UserDetails.class)
     public String getEmail() {
         return email;
     }
@@ -85,6 +102,7 @@ public class User {
         this.email = email;
     }
 
+    @JsonIgnore
     public Boolean getEnabled() {
         return enabled;
     }
@@ -93,6 +111,8 @@ public class User {
         this.enabled = enabled;
     }
 
+    @JsonView(Views.UserSummary.class)
+    @JsonUnwrapped
     public Profile getProfile() {
         return profile;
     }
@@ -101,6 +121,7 @@ public class User {
         this.profile = profile;
     }
 
+    @JsonIgnore
     public RegInfo getRegInfo() {
         return regInfo;
     }
@@ -109,6 +130,7 @@ public class User {
         this.regInfo = regInfo;
     }
 
+    @JsonIgnore
     public Set<User> getFocuses() {
         return focuses;
     }
@@ -117,6 +139,7 @@ public class User {
         this.focuses = focuses;
     }
 
+    @JsonIgnore
     public Set<User> getFans() {
         return fans;
     }
@@ -125,6 +148,7 @@ public class User {
         this.fans = fans;
     }
 
+    @JsonIgnore
     public Set<Friendship> getFriendshipSet() {
         return friendshipSet;
     }
@@ -133,6 +157,7 @@ public class User {
         this.friendshipSet = friendshipSet;
     }
 
+    @JsonIgnore
     public Set<Membership> getMembershipSet() {
         return membershipSet;
     }
@@ -141,6 +166,7 @@ public class User {
         this.membershipSet = membershipSet;
     }
 
+    @JsonIgnore
     public Set<UserRole> getRoles() {
         return roles;
     }

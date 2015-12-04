@@ -1,5 +1,6 @@
 package com.example.models;
 
+@SuppressWarnings("unused")
 public class ChatMessage {
 	private String userName;
 	private String message;

@@ -36,11 +36,10 @@ public interface UserService {
     @NotNull
     String generateToken(User user);
 
-    @NotNull
-    String generateTokenByPhone(String phone);
-
     @Nullable
     UserAuthentication getUserAuthenticationFromToken(String token);
 
     boolean isTokenValid(String token);
+
+    User findByPhone(String phone);
 }

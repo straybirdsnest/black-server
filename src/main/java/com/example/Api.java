@@ -1,15 +1,32 @@
 package com.example;
 
-@Deprecated
+import com.example.exceptions.BusinessException;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class Api {
-    public static final String RESULT_FILTER_NAME = "apiResultFilter";
-    public static final int SUCCESS = 0;
-    public static final int ERR_PHONE_EXISTED = 1;
-    public static final int ERR_DATA_NOT_FOUND = 2;
-    public static final int UPDATE_TOKEN_FAILED = 3;
-    public static final int VCODE_VERIFICATION_FAILED = 4;
-    public static final int STATUS_OK = 0; // 服务器运行正常
-    public static final int STATUS_MAINTENANCE = 1; // 服务器维护
+    public static Result result() {
+        return new Result();
+    }
+
+    public static Result error(BusinessException exception) {
+        return result().param("error", exception.getErrorCode()).param("errorMessage", exception.getErrorMessage());
+    }
+
+    public static class Result {
+        Map<String, Object> data = new HashMap<>();
+        public Result param(String key, Object value) {
+            data.put(key, value);
+            return this;
+        }
+
+        @JsonAnyGetter
+        public Map<String, Object> getData() {
+            return data;
+        }
+    }
 
 //    public static Result result(int returnCode) {
 //        return new Result(returnCode);

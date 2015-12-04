@@ -6,7 +6,7 @@ import static com.example.App.API_USER;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class UserRelationTests extends BaseTests{
+public class UserRelationTests extends BaseTests {
 
     @Test
     public void focusSomeone() throws Exception {
@@ -48,5 +48,21 @@ public class UserRelationTests extends BaseTests{
     public void updateFriendAlias() {
 
     }
+
+//    @Autowired
+//    ImageRepo imageRepo;
+//
+//    @Test
+//    @Rollback(false)
+//    public void allImageHash() {
+//        Iterable<Image> images = imageRepo.findAll();
+//        images.forEach(e -> {
+//            System.out.println(e.getId());
+//            String hash = Cryptor.md5(e.getData());
+//            System.out.println(hash);
+//            e.setHash(hash);
+//            imageRepo.save(e);
+//        });
+//    }
 
 }

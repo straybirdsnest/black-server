@@ -36,6 +36,7 @@ public class ImageController {
      */
     @RequestMapping(value = "/api/image", method = GET)
     public ResponseEntity getImage(@RequestParam String q) {
+        //logger.debug("获取图片 " + q);
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_PNG);
         Long id = imageService.getImageIdFromAccessToken(q);
