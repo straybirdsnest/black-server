@@ -7,4 +7,5 @@ public class Views {
     public interface ActivityDetails extends ActivitySummary, UserSummary{}
     public interface Post extends UserSummary{}
     public interface Group{}
+    public interface Game{}
 }
