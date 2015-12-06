@@ -14,7 +14,7 @@ import org.team10424102.services.GameService;
 
 import java.util.Locale;
 
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.team10424102.App.API_GAME;
 
 /**
@@ -32,7 +32,7 @@ public class GameController implements MessageSourceAware {
    */
   @RequestMapping(value = API_GAME, method = GET)
   @JsonView(Views.Game.class)
-  public Game getActivity(@RequestParam String identifier, @RequestHeader("Accept-Language") Locale locale) {
+  public Game getGame(@RequestParam String identifier, @RequestHeader("Accept-Language") Locale locale) {
     Game game = gameService.getGame(identifier);
     game.setLocalizedName(messageSource.getMessage("game." + game.getIdentifier(), null, locale));
     return game;
