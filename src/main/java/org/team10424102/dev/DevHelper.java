@@ -16,7 +16,7 @@ import java.util.Properties;
 
 public class DevHelper {
     public static final String INIT_SCRIPT = "/dev/init.sql";
-    public static final String CONFIGURATION_FILE = "/application.properties";
+    public static final String CONFIGURATION_FILE = "/src/test/application.properties";
     public static final String JDBC_USERNAME = "spring.datasource.username";
     public static final String JDBC_PASSWORD = "spring.datasource.password";
     public static final String JDBC_URL = "spring.datasource.url";

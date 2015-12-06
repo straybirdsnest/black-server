@@ -21,6 +21,7 @@ public class App {
     public static final String API_HEALTH = "/health";
     public static final String API_POST = "/api/post";
     public static final String API_ACTIVITY = "/api/activity";
+    public static final String API_GAME = "/api/game";
     public static SpringApplication handle;
 
     public static void main(String[] args) {
