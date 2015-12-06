@@ -7,5 +7,5 @@ import org.team10424102.models.Game;
  */
 public interface GameService {
 
-  Game getGame(String name);
+  Game getGame(String identifier);
 }

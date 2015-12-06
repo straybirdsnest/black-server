@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class Game {
     @Id
     private Integer id;
-    private String name;
+    private String identifier;
 
     @ManyToOne
     @JoinColumn(name = "logo_id")
@@ -19,6 +19,8 @@ public class Game {
 
     @Transient
     private String localizedName;
+
+
 
     public Integer getId() {
         return id;
@@ -28,12 +30,13 @@ public class Game {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    @JsonView(Views.Game.class)
+    public String getIdentifier() {
+        return identifier;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     @JsonView(Views.Game.class)
@@ -43,11 +46,6 @@ public class Game {
 
     public void setLogo(Image logo) {
         this.logo = logo;
-    }
-
-    @JsonView(Views.Game.class)
-    public String getIdentifier() {
-        return this.name;
     }
 
     @JsonView(Views.Game.class)
