@@ -2,6 +2,7 @@ package org.team10424102.games;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.team10424102.config.json.Views;
 import org.team10424102.models.User;
@@ -47,7 +48,8 @@ public class Dota2MatchResult {
         this.id = id;
     }
 
-    @JsonIgnore
+    @JsonView(Views.Post.class)
+    @JsonUnwrapped
     public Dota2Hero getHero() {
         return hero;
     }
@@ -101,9 +103,9 @@ public class Dota2MatchResult {
         this.match = match;
     }
 
-    @JsonProperty("hero")
-    @JsonView(Views.Post.class)
-    public String getHeroName(){
-        return hero.getName();
-    }
+//    @JsonProperty("hero")
+//    @JsonView(Views.Post.class)
+//    public String getHeroName(){
+//        return hero.getName();
+//    }
 }

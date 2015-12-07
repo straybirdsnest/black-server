@@ -2,11 +2,9 @@ package org.team10424102.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.team10424102.App;
 import org.team10424102.config.json.Views;
 import org.team10424102.models.Post;
@@ -14,6 +12,7 @@ import org.team10424102.models.PostLike;
 import org.team10424102.services.PostService;
 
 import java.util.List;
+import java.util.Locale;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
@@ -33,8 +32,10 @@ public class PostController {
      */
     @RequestMapping(value = App.API_POST + "/{category}", method = GET)
     @JsonView(Views.Post.class)
-    public List<Post> getPosts(@PathVariable String category, Pageable pageable) {
+    public List<Post> getPosts(@PathVariable String category, Pageable pageable,
+                               @RequestHeader("Accept-Language") Locale locale) {
         List<Post> posts = null;
+        LocaleContextHolder.setLocale(locale);
         switch (category.toLowerCase()) {
             case TYPE_SCHOOL:
                 posts = postService.getSchoolMatchPosts(pageable);
