@@ -205,6 +205,7 @@ public class Activity {
         this.photos = photos;
     }
 
+    @JsonView(Views.ActivityDetails.class)
     public Date getCreationTime() {
         return creationTime;
     }
@@ -247,5 +248,19 @@ public class Activity {
             return group.getId();
         }
         return null;
+    }
+
+    @JsonProperty("likes")
+    @JsonView(Views.ActivityDetails.class)
+    public int getLikesCount() {
+        if (likes!=null) return likes.size();
+        return 0;
+    }
+
+    @JsonProperty("comments")
+    @JsonView(Views.ActivityDetails.class)
+    public int getCommentsCount() {
+        if (comments!=null) return comments.size();
+        return 0;
     }
 }

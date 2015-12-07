@@ -35,5 +35,14 @@ public class ActivityTests extends BaseTests {
         printFormatedJsonString(result);
     }
 
+    @Test
+    public void getActivityDetails() throws Exception {
+        String token = getToken();
+        MvcResult result = mockMvc.perform(get(API_ACTIVITY + "/1").header("X-Token", token))
+                .andExpect(status().isOk())
+                .andReturn();
+        printFormatedJsonString(result);
+    }
+
 
 }
