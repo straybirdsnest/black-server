@@ -33,7 +33,7 @@ public class UserProfileTests extends BaseTests{
                 .andExpect(status().isOk())
                 .andReturn();
         String token = result.getResponse().getContentAsString();
-        mockMvc.perform(MockMvcRequestBuilders.delete(App.API_USER).header(TokenAuthenticationFilter.TOKEN_HEADER, token))
+        mockMvc.perform(MockMvcRequestBuilders.delete(App.API_USER).header(AUTH_HEADER, token))
                 .andExpect(status().isOk());
     }
 
@@ -46,11 +46,11 @@ public class UserProfileTests extends BaseTests{
         String token = result.getResponse().getContentAsString();
 
         mockMvc.perform(MockMvcRequestBuilders.put(App.API_USER)
-                .header(TokenAuthenticationFilter.TOKEN_HEADER, token)
+                .header(AUTH_HEADER, token)
                 .param("username", "张三"))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get(App.API_USER).header(TokenAuthenticationFilter.TOKEN_HEADER, token))
+        mockMvc.perform(get(App.API_USER).header(AUTH_HEADER, token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.phone").value(UNREGISTERED_PHONE))
                 .andExpect(jsonPath("$.username").value("张三"));
@@ -65,12 +65,12 @@ public class UserProfileTests extends BaseTests{
         String token = result.getResponse().getContentAsString();
 
         mockMvc.perform(MockMvcRequestBuilders.put(App.API_USER)
-                .header(TokenAuthenticationFilter.TOKEN_HEADER, token)
+                .header(AUTH_HEADER, token)
                 .param("signature", "今天好开心")
                 .param("username", "张三"))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get(App.API_USER).header(TokenAuthenticationFilter.TOKEN_HEADER, token))
+        mockMvc.perform(get(App.API_USER).header(AUTH_HEADER, token))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.phone").value(UNREGISTERED_PHONE))
@@ -89,17 +89,18 @@ public class UserProfileTests extends BaseTests{
         MockMultipartFile image = new MockMultipartFile("file", "my_avatar.png", "image/png",
                 getClass().getResourceAsStream("/test_avatar.png"));
 
-        MvcResult uploadResult = mockMvc.perform(MockMvcRequestBuilders.fileUpload(App.API_IMAGE).file(image).header(TokenAuthenticationFilter.TOKEN_HEADER, token))
+        MvcResult uploadResult = mockMvc.perform(MockMvcRequestBuilders.fileUpload(App.API_IMAGE)
+                .file(image).header(AUTH_HEADER, token))
                 .andExpect(status().isCreated())
                 .andReturn();
 
         String imageToken = uploadResult.getResponse().getContentAsString();
 
-        mockMvc.perform(MockMvcRequestBuilders.put(App.API_USER).header(TokenAuthenticationFilter.TOKEN_HEADER, token)
+        mockMvc.perform(MockMvcRequestBuilders.put(App.API_USER).header(AUTH_HEADER, token)
                 .param("avatar", imageToken))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get(App.API_USER).header(TokenAuthenticationFilter.TOKEN_HEADER, token))
+        mockMvc.perform(get(App.API_USER).header(AUTH_HEADER, token))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print());
     }
@@ -108,7 +109,7 @@ public class UserProfileTests extends BaseTests{
     public void getCurrentUserProfile() throws Exception {
         String token = createUserAndGetToken();
 
-        mockMvc.perform(get(App.API_USER).header(TokenAuthenticationFilter.TOKEN_HEADER, token))
+        mockMvc.perform(get(App.API_USER).header(AUTH_HEADER, token))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.phone").value(UNREGISTERED_PHONE))
@@ -118,7 +119,7 @@ public class UserProfileTests extends BaseTests{
     @Test
     public void getProfile() throws Exception {
         String token = getToken();
-        MvcResult result = mockMvc.perform(get(App.API_USER).header(TokenAuthenticationFilter.TOKEN_HEADER, token))
+        MvcResult result = mockMvc.perform(get(App.API_USER).header(AUTH_HEADER, token))
                 .andExpect(status().isOk()).andReturn();
         printFormatedJsonString(result);
     }

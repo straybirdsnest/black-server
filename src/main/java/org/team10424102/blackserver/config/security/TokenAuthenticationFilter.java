@@ -14,7 +14,7 @@ import java.io.IOException;
  * 自定义的 Token 验证过滤器
  */
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
-    public static final String TOKEN_HEADER = "X-Token";
+    public static final String HTTP_HEADER = "X-Token";
     private final UserService userService;
 
     public TokenAuthenticationFilter(UserService userService) {
@@ -24,7 +24,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String token = request.getHeader(TOKEN_HEADER);
+        String token = request.getHeader(HTTP_HEADER);
         if (token == null) {
             chain.doFilter(request, response);
             return;

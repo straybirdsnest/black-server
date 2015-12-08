@@ -8,11 +8,12 @@ import org.team10424102.blackserver.models.Image;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "T_DOTA2_HERO")
 public class Dota2Hero {
     @Id
     @GeneratedValue
     private Integer id;
-    private String name;
+    private String identifier;
 
     @OneToOne
     @JoinColumn(name = "avatar_id")
@@ -29,12 +30,12 @@ public class Dota2Hero {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getIdentifier() {
+        return identifier;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     @JsonProperty("heroAvatar")

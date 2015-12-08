@@ -32,10 +32,8 @@ public class PostController {
      */
     @RequestMapping(value = App.API_POST + "/{category}", method = GET)
     @JsonView(Views.Post.class)
-    public List<Post> getPosts(@PathVariable String category, Pageable pageable,
-                               @RequestHeader("Accept-Language") Locale locale) {
+    public List<Post> getPosts(@PathVariable String category, Pageable pageable) {
         List<Post> posts = null;
-        LocaleContextHolder.setLocale(locale);
         switch (category.toLowerCase()) {
             case TYPE_SCHOOL:
                 posts = postService.getSchoolMatchPosts(pageable);

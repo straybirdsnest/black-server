@@ -1,15 +1,19 @@
 package org.team10424102.blackserver.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.team10424102.blackserver.config.propertyeditors.UserResolver;
 import org.team10424102.blackserver.daos.AcademyRepo;
 import org.team10424102.blackserver.daos.CollegeRepo;
-import org.team10424102.blackserver.config.propertyeditors.UserResolver;
 import org.team10424102.blackserver.services.ImageService;
 
 import java.util.List;
@@ -17,43 +21,9 @@ import java.util.List;
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
-//    @Autowired TokenAuthenticationInterceptor tokenAuthenticationInterceptor;
-//
-//    @Autowired DebugRequestInterceptor debugRequestInterceptor;
-
     @Autowired CollegeRepo collegeRepo;
     @Autowired AcademyRepo academyRepo;
     @Autowired ImageService imageService;
-
-//    @Bean
-//    public Hibernate4Module hibernate4Module(){
-//        return new Hibernate4Module();
-//    }
-
-//    @Bean
-//    public Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder(){
-//        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-//        ObjectMapper mapper = new ObjectMapper();
-//        SimpleModule module = new SimpleModule();
-//        module.addSerializer(Image.class, new ImageSerializer());
-//        mapper.registerModule(module);
-//        builder.configure(mapper);
-//        return builder;
-//    }
-
-//    @Bean
-//    public CustomEditorConfigurer customEditorConfigurer(){
-//        CustomEditorConfigurer configurer = new CustomEditorConfigurer();
-//        CustomPropertyEditorRegistrar registrar = new CustomPropertyEditorRegistrar();
-//        configurer.setPropertyEditorRegistrars(new PropertyEditorRegistrar[]{registrar});
-//        return configurer;
-//    }
-
-
-//    @Override
-//    public void addFormatters(FormatterRegistry registry) {
-//        registry.addConverter(new StringToUserConverter());
-//    }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -62,13 +32,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(debugRequestInterceptor)
-//                .addPathPatterns("/**")
-//                .excludePathPatterns("/requests", "/tokens", "/", "/error");
-//        registry.addInterceptor(tokenAuthenticationInterceptor)
-//                .addPathPatterns("/api/**")
-//                .excludePathPatterns("/api/register/**", "/api/token/**", "/api/availability/**");
         registry.addInterceptor(new DebugInterceptor()).addPathPatterns("/**");
+        registry.addInterceptor(new LocalizationInterceptor()).addPathPatterns("/**");
     }
 
     @Override
@@ -91,9 +56,11 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         argumentResolvers.add(new UserResolver(collegeRepo, academyRepo, imageService));
     }
 
-//    @Override
-//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-//        converters.add(new MappingJackson2HttpMessageConverter());
-//        converters.add(new StringHttpMessageConverter());
-//    }
+    @Bean
+    public MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
+        source.setDefaultEncoding("UTF-8");
+        source.setBasename("classpath:messages");
+        return source;
+    }
 }
