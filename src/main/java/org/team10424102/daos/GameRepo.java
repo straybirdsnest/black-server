@@ -6,5 +6,6 @@ import org.team10424102.models.Game;
 
 @Repository
 public interface GameRepo extends PagingAndSortingRepository<Game, Integer> {
-    Game findOneByName(String name);
+
+    Game findOneByIdentifier(String identifier);
 }

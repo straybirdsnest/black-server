@@ -1,5 +1,8 @@
 package org.team10424102.models;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import org.team10424102.config.json.Views;
+
 import javax.persistence.*;
 
 @SuppressWarnings("unused")
@@ -8,11 +11,16 @@ import javax.persistence.*;
 public class Game {
     @Id
     private Integer id;
-    private String name;
+    private String identifier;
 
     @ManyToOne
     @JoinColumn(name = "logo_id")
     private Image logo;
+
+    @Transient
+    private String localizedName;
+
+
 
     public Integer getId() {
         return id;
@@ -22,19 +30,30 @@ public class Game {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    @JsonView(Views.Game.class)
+    public String getIdentifier() {
+        return identifier;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
+    @JsonView(Views.Game.class)
     public Image getLogo() {
         return logo;
     }
 
     public void setLogo(Image logo) {
         this.logo = logo;
+    }
+
+    @JsonView(Views.Game.class)
+    public String getLocalizedName() {
+        return localizedName;
+    }
+
+    public void setLocalizedName(String localizedName) {
+        this.localizedName = localizedName;
     }
 }

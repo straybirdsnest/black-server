@@ -73,7 +73,7 @@ public class ActivityDeserializer extends JsonDeserializer<Activity> {
 //        }
 
         Game game = new Game();
-        game.setName(gameString);
+        game.setIdentifier(gameString);
 
         UserGroup group = new UserGroup();
         group.setId(groupId);

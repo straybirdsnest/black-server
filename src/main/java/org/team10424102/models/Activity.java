@@ -235,7 +235,7 @@ public class Activity {
     @JsonView(Views.ActivitySummary.class)
     public String getGameName() {
         if (game != null) {
-            return game.getName();
+            return game.getIdentifier();
         }
         return null;
     }

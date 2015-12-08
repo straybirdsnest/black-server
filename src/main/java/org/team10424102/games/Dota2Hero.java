@@ -1,8 +1,11 @@
 package org.team10424102.games;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.team10424102.config.json.Views;
+import org.team10424102.models.Image;
+
+import javax.persistence.*;
 
 @Entity
 public class Dota2Hero {
@@ -10,6 +13,13 @@ public class Dota2Hero {
     @GeneratedValue
     private Integer id;
     private String name;
+
+    @OneToOne
+    @JoinColumn(name = "avatar_id")
+    private Image avatar;
+
+    @Transient
+    private String heroName;
 
     public Integer getId() {
         return id;
@@ -25,5 +35,24 @@ public class Dota2Hero {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @JsonProperty("heroAvatar")
+    @JsonView(Views.Post.class)
+    public Image getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Image avatar) {
+        this.avatar = avatar;
+    }
+
+    @JsonView(Views.Post.class)
+    public String getHeroName() {
+        return heroName;
+    }
+
+    public void setHeroName(String heroName) {
+        this.heroName = heroName;
     }
 }
