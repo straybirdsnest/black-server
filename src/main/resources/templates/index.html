@@ -9,8 +9,13 @@
     <link href="../static/css/bootstrap-3.3.5.min.css" th:href="@{/css/bootstrap-3.3.5.min.css}" rel="stylesheet">
     <link href="../static/css/index.css" th:href="@{/css/index.css}" rel="stylesheet">
     <!-- DO NOT SUPPORT IE -->
+    <style type="text/css">
+        [ng\:cloak], [ng-cloak], .ng-cloak {
+        display: none !important;
+        }
+    </style>
 </head>
-<body>
+<body ng-app="blackserverweb" ng-cloak class="ng-cloak" ng-controller="navigation">
 <div>
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
@@ -110,11 +115,11 @@
             </div>
         </div>
     </div>
-    <script src="../static/js/jquery-2.1.4.min.js" th:src="@{/js/jquery-2.1.4.min.js}"></script>
     <script src="../static/js/angular-1.4.7.min.js" th:src="@{/js/angular-1.4.7.min.js}"></script>
-    <script src="../static/js/angular-ui-bootstrap-tpls-0.14.3.js"
-            th:src="@{/js/angular-ui-bootstrap-tpls-0.14.3.js}"></script>
+    <script src="../static/js/angular-ui-bootstrap-tpls-0.14.3.min.js"
+            th:src="@{/js/angular-ui-bootstrap-tpls-0.14.3.min.js}"></script>
     <script src="../static/js/angular-route-1.4.7.js" th:src="@{/js/angular-route-1.4.7.js}"></script>
+    <script src="../static/js/blackserverwebapp.js" th:src="@{/js/blackserverwebapp.js}"></script>
 </div>
 </body>
 </html>
