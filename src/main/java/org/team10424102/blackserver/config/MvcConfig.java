@@ -33,7 +33,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new DebugInterceptor()).addPathPatterns("/**");
-        registry.addInterceptor(new LocalizationInterceptor()).addPathPatterns("/**");
+        //registry.addInterceptor(new LocalizationInterceptor()).addPathPatterns("/**");
     }
 
     @Override

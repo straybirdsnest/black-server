@@ -49,6 +49,7 @@ public class Dota2Hero {
     }
 
     @JsonView(Views.Post.class)
+    @JsonProperty("hero")
     public String getHeroName() {
         return heroName;
     }

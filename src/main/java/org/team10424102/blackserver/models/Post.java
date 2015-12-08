@@ -45,6 +45,7 @@ public class Post {
     )
     private Set<Post> comments = new HashSet<>();
 
+    @Column(columnDefinition = "tinyint")
     private boolean commentative;
 
     @Transient

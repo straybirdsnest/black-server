@@ -29,6 +29,7 @@ public class User {
 
     private String email;
 
+    @Column(columnDefinition = "tinyint")
     private Boolean enabled;
 
     @Embedded

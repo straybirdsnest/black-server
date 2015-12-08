@@ -34,7 +34,6 @@ public class PostTests extends BaseTests {
         MvcResult result = mockMvc.perform(get(App.API_POST + "/SCHOOL?page=0&size=5")
                 .header("X-Token", token))
                 .andExpect(status().isOk())
-                //.andDo(MockMvcResultHandlers.print())
                 .andReturn();
 
         printFormatedJsonString(result);
@@ -51,13 +50,23 @@ public class PostTests extends BaseTests {
                     .header("X-Token", token)
                     .locale(Locale.SIMPLIFIED_CHINESE))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[4].extension.data.heroName", is("敌法师")));
+                    .andExpect(jsonPath("$[4].extension.data.hero", is("敌法师")));
+            mockMvc.perform(get(App.API_POST + "/SCHOOL?page=0&size=5")
+                    .header("X-Token", token)
+                    .header("Accept-Language", "zh_CN"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[4].extension.data.hero", is("敌法师")));
         } else {
             mockMvc.perform(get(App.API_POST + "/SCHOOL?page=0&size=5")
                     .header("X-Token", token)
                     .locale(Locale.ENGLISH))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[4].extension.data.heroName", is("Anti-Mage")));
+                    .andExpect(jsonPath("$[4].extension.data.hero", is("Anti-Mage")));
+            mockMvc.perform(get(App.API_POST + "/SCHOOL?page=0&size=5")
+                    .header("X-Token", token)
+                    .header("Accept-Language", "en_US"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[4].extension.data.hero", is("Anti-Mage")));
         }
 
     }
