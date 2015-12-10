@@ -7,18 +7,27 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.team10424102.blackserver.config.security.TokenAuthenticationFilter;
 import org.team10424102.blackserver.services.UserService;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.team10424102.blackserver.App.API_USER;
 
-public class UserProfileTests extends BaseTests{
+public class UserProfileTests extends BaseTests {
     public static final String UNREGISTERED_PHONE = "13728495536";
 
     @Autowired UserService userService;
+
+    @Test
+    public void getProfiles() throws Exception {
+        MvcResult result = mockMvc.perform(get(API_USER).header(AUTH_HEADER, getToken()))
+                .andExpect(status().isOk())
+                .andReturn();
+        printFormatedJsonString(result);
+    }
+
 
     @Test
     public void register_withValidPhoneAndVcode() throws Exception {
@@ -124,7 +133,7 @@ public class UserProfileTests extends BaseTests{
         printFormatedJsonString(result);
     }
 
-    private String createUserAndGetToken() throws Exception{
+    private String createUserAndGetToken() throws Exception {
         MvcResult result = mockMvc
                 .perform(get(App.API_TOKEN).param("phone", UNREGISTERED_PHONE).param("vcode", "1234"))
                 .andExpect(status().isOk())

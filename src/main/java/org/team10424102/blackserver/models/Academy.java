@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_ACADEMY")
+@Table(name = "t_academy")
 public class Academy {
     @Id
     @GeneratedValue
@@ -12,11 +12,11 @@ public class Academy {
 
     private String name;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "logo_id")
     private Image logo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id")
     private College college;
 

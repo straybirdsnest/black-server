@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_FRIENDSHIP")
+@Table(name = "t_friendship")
 public class Friendship {
     @Id
     @GeneratedValue

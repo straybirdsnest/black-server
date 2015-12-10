@@ -3,7 +3,7 @@ package org.team10424102.blackserver.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.team10424102.blackserver.daos.GameRepo;
-import org.team10424102.blackserver.models.Game;
+import org.team10424102.blackserver.game.Game;
 
 /**
  * Created by sk on 15-12-5.

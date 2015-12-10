@@ -1,13 +1,14 @@
-package org.team10424102.blackserver.models;
+package org.team10424102.blackserver.game;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.team10424102.blackserver.config.json.Views;
+import org.team10424102.blackserver.models.Image;
 
 import javax.persistence.*;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_GAME")
+@Table(name = "t_game")
 public class Game {
     @Id
     private Integer id;

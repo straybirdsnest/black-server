@@ -3,7 +3,7 @@ package org.team10424102.blackserver.models;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "T_ACTIVITY_LIKES")
+@Table(name = "t_activity_likes")
 public class ActivityLike {
     @Id
     @GeneratedValue

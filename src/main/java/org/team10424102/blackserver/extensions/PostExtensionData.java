@@ -1,4 +1,4 @@
-package org.team10424102.blackserver.services.extensions;
+package org.team10424102.blackserver.extensions;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.team10424102.blackserver.config.json.Views;

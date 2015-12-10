@@ -1,5 +1,6 @@
-package org.team10424102.blackserver.services.extensions;
+package org.team10424102.blackserver.extensions.poll;
 
+import org.team10424102.blackserver.extensions.poll.Poll;
 import org.team10424102.blackserver.models.User;
 
 import javax.persistence.*;

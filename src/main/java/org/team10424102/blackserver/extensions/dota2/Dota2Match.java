@@ -1,4 +1,4 @@
-package org.team10424102.blackserver.games;
+package org.team10424102.blackserver.extensions.dota2;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

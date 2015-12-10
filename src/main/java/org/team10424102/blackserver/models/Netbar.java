@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_NETBAR")
+@Table(name = "t_netbar")
 public class Netbar {
     @Id
     @GeneratedValue

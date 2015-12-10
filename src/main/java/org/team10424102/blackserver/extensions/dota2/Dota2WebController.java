@@ -1,4 +1,4 @@
-package org.team10424102.blackserver.games;
+package org.team10424102.blackserver.extensions.dota2;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
