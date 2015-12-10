@@ -1,4 +1,4 @@
-package org.team10424102.blackserver.services.extensions;
+package org.team10424102.blackserver.extensions;
 
 @SuppressWarnings("unused")
 public interface PostExtension {

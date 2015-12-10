@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.team10424102.blackserver.config.json.Views;
-import org.team10424102.blackserver.services.extensions.PostExtensionData;
+import org.team10424102.blackserver.extensions.PostExtensionData;
 
 import javax.persistence.*;
 import java.util.Date;

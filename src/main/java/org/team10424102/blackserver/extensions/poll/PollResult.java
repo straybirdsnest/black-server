@@ -1,4 +1,4 @@
-package org.team10424102.blackserver.services.extensions;
+package org.team10424102.blackserver.extensions.poll;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.apache.commons.lang3.StringUtils;

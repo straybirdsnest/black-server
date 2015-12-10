@@ -1,7 +1,8 @@
-package org.team10424102.blackserver.models;
+package org.team10424102.blackserver.game;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.team10424102.blackserver.config.json.Views;
+import org.team10424102.blackserver.models.Image;
 
 import javax.persistence.*;
 

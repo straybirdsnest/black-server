@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.team10424102.blackserver.config.json.ActivityDeserializer;
 import org.team10424102.blackserver.config.json.Views;
+import org.team10424102.blackserver.game.Game;
 
 import javax.persistence.*;
 import java.util.Date;

@@ -11,9 +11,9 @@ import org.team10424102.blackserver.daos.LikesRepo;
 import org.team10424102.blackserver.daos.PostRepo;
 import org.team10424102.blackserver.models.Friendship;
 import org.team10424102.blackserver.models.Post;
-import org.team10424102.blackserver.services.extensions.PostExtension;
-import org.team10424102.blackserver.services.extensions.PostExtensionData;
-import org.team10424102.blackserver.services.extensions.PostExtensionIdentifier;
+import org.team10424102.blackserver.extensions.PostExtension;
+import org.team10424102.blackserver.extensions.PostExtensionData;
+import org.team10424102.blackserver.extensions.PostExtensionIdentifier;
 
 import java.util.*;
 import java.util.stream.Collectors;

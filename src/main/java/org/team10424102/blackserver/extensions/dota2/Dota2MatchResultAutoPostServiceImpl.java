@@ -1,4 +1,4 @@
-package org.team10424102.blackserver.games;
+package org.team10424102.blackserver.extensions.dota2;
 
 import org.springframework.stereotype.Service;
 import org.team10424102.blackserver.models.User;

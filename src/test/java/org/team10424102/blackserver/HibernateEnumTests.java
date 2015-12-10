@@ -3,10 +3,10 @@ package org.team10424102.blackserver;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
-import org.team10424102.blackserver.games.Dota2MatchResult;
-import org.team10424102.blackserver.games.Dota2MatchResultRepo;
-import org.team10424102.blackserver.games.Dota2MatchType;
-import org.team10424102.blackserver.games.MatchResult;
+import org.team10424102.blackserver.extensions.dota2.Dota2MatchResult;
+import org.team10424102.blackserver.extensions.dota2.Dota2MatchResultRepo;
+import org.team10424102.blackserver.extensions.dota2.Dota2MatchType;
+import org.team10424102.blackserver.game.MatchResult;
 
 public class HibernateEnumTests extends BaseTests {
 

@@ -1,9 +1,10 @@
-package org.team10424102.blackserver.games;
+package org.team10424102.blackserver.extensions.dota2;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.team10424102.blackserver.config.json.Views;
+import org.team10424102.blackserver.game.MatchResult;
 import org.team10424102.blackserver.models.User;
 
 import javax.persistence.*;

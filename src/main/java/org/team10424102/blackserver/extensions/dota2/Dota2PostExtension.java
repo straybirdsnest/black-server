@@ -1,11 +1,11 @@
-package org.team10424102.blackserver.games;
+package org.team10424102.blackserver.extensions.dota2;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
-import org.team10424102.blackserver.services.extensions.PostExtension;
-import org.team10424102.blackserver.services.extensions.PostExtensionIdentifier;
+import org.team10424102.blackserver.extensions.PostExtension;
+import org.team10424102.blackserver.extensions.PostExtensionIdentifier;
 
 @PostExtensionIdentifier("dota2_match_result")
 @Component
