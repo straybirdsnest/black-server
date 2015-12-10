@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.team10424102.blackserver.Api;
 import org.team10424102.blackserver.App;
 import org.team10424102.blackserver.config.json.Views;
+import org.team10424102.blackserver.config.security.CurrentUser;
 import org.team10424102.blackserver.daos.FriendshipRepo;
 import org.team10424102.blackserver.exceptions.VcodeVerificationException;
 import org.team10424102.blackserver.models.Friendship;
@@ -51,16 +52,13 @@ public class UserController {
     /**
      * 获取 token, 如果手机号没有注册则注册新用户
      *
-     * @return
-     * {
-     *     "token": "3b92e87b-69c1-41fe-9b3d-923e2138c00b"
+     * @return {
+     * "token": "3b92e87b-69c1-41fe-9b3d-923e2138c00b"
      * }
-     *
-     * @throws VcodeVerificationException
      */
     @RequestMapping(value = App.API_TOKEN, method = GET)
     public Api.Result getToken(@RequestParam String phone, @RequestParam String vcode, HttpServletRequest request) {
-        if(!vcodeService.verify("86", phone, vcode)) {
+        if (!vcodeService.verify("86", phone, vcode)) {
             throw new VcodeVerificationException(phone, vcode);
         }
         User user;
@@ -76,9 +74,8 @@ public class UserController {
      * 检查可用性
      * type = phone|token
      *
-     * @return
-     * {
-     *     "result": true|false
+     * @return {
+     * "result": true|false
      * }
      */
     @RequestMapping(value = App.API_AVAILABILITY + "/{type}", method = GET)
@@ -113,9 +110,62 @@ public class UserController {
      * 更新当前用户的个人信息
      */
     @RequestMapping(value = App.API_USER, method = PUT)
-    public void updateCurrentUsersProfile(@JsonView(Views.UserDetails.class) User newProfile) {
-        userService.updateUser(newProfile);
+    public void updateCurrentUsersProfile(@JsonView(Views.UserDetails.class) User newUser) {
+        userService.updateUser(newUser);
     }
+
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateNickName(@RequestParam String val, @CurrentUser User user) {
+//        user.getProfile().setNickname(val);
+//        userService.updateUser(user);
+//    }
+//
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateUserName(@RequestParam String val, @CurrentUser User user) {
+//
+//    }
+//
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateBirthday(@RequestParam String val, @CurrentUser User user) {
+//
+//    }
+//
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateGender(@RequestParam String val, @CurrentUser User user) {
+//
+//    }
+//
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateSignature(@RequestParam String val, @CurrentUser User user) {
+//
+//    }
+//
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateHighschool(@RequestParam String val, @CurrentUser User user) {
+//
+//    }
+//
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateHometown(@RequestParam String val, @CurrentUser User user) {
+//
+//    }
+//
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateCollege(@RequestParam String val, @CurrentUser User user) {
+//
+//    }
+//
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateAcademy(@RequestParam String val, @CurrentUser User user) {
+//
+//    }
+//
+//    @RequestMapping(value = App.API_USER, method = PATCH)
+//    public void updateGrade(@RequestParam String val, @CurrentUser User user) {
+//
+//    }
+
+
 
     /**
      * 查看其他用户的 Profile

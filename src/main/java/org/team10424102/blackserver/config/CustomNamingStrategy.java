@@ -10,13 +10,10 @@ public class CustomNamingStrategy extends ImprovedNamingStrategy {
 
     /**
      * 将驼峰法命名的类名 MyEntityClass，改成 T_MY_ENTITY_CLASS 这样的表名
-     *
-     * @param className
-     * @return
      */
     @Override
     public String classToTableName(String className) {
         String[] words = className.split(SPLIT_REGEX);
-        return "T_" + Arrays.stream(words).map(String::toUpperCase).collect(Collectors.joining("_"));
+        return "t_" + Arrays.stream(words).map(String::toLowerCase).collect(Collectors.joining("_"));
     }
 }

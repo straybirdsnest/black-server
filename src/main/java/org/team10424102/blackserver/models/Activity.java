@@ -16,7 +16,7 @@ import java.util.Set;
 @SuppressWarnings("unused")
 @Entity
 @JsonDeserialize(using = ActivityDeserializer.class)
-@Table(name = "T_ACTIVITY")
+@Table(name = "t_activity")
 public class Activity {
     @Id
     @GeneratedValue

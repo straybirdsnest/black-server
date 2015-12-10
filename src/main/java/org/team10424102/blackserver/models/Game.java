@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_GAME")
+@Table(name = "t_game")
 public class Game {
     @Id
     private Integer id;

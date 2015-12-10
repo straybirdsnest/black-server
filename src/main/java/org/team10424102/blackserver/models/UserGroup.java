@@ -13,7 +13,7 @@ import java.util.Set;
  */
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_GROUP")
+@Table(name = "t_group")
 public class UserGroup {
     public static final int GID_EMPTY = 0;
     public static final int GID_FRIENDS = 1;

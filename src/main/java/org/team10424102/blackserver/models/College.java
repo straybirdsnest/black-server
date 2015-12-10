@@ -6,7 +6,7 @@ import java.util.Set;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_COLLEGE")
+@Table(name = "t_college")
 public class College {
 
     @Id
@@ -17,13 +17,13 @@ public class College {
 
     private String nameExt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "logo_id")
     private Image logo;
 
     private String location;
 
-    @OneToMany(mappedBy = "college")
+    @OneToMany(mappedBy = "college", fetch = FetchType.LAZY)
     private Set<Academy> academies = new HashSet<>();
 
     //<editor-fold desc="=== Getters & Setters ===">

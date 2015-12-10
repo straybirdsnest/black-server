@@ -27,9 +27,10 @@ public class User {
 
     private String username;
 
+    @Basic(fetch = FetchType.LAZY)
     private String email;
 
-    @Column(columnDefinition = "tinyint")
+    //@Column(columnDefinition = "tinyint")
     private Boolean enabled;
 
     @Embedded

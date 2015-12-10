@@ -23,6 +23,8 @@ import java.util.TimeZone;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.team10424102.blackserver.App.*;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = App.class)
 @WebAppConfiguration
@@ -55,7 +57,9 @@ public class BaseTests {
 
     protected String getToken() throws Exception {
         if (token != null) return token;
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(App.API_TOKEN).param("phone", "123456789").param("vcode", "1234"))
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(API_TOKEN)
+                .param("phone", "123456789")
+                .param("vcode", "1234"))
                 .andExpect(status().isOk()).andReturn();
         String tokenJson = result.getResponse().getContentAsString();
         JSONObject obj = new JSONObject(tokenJson);
