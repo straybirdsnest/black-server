@@ -25,7 +25,7 @@ import java.util.Set;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = App.API_USER, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class UserController {
 
     @Autowired UserService userService;
@@ -33,11 +33,6 @@ public class UserController {
     @Autowired FriendshipRepo friendshipRepo;
 
     @Autowired VcodeService vcodeService;
-
-//    @InitBinder
-//    public void initBinder(WebDataBinder binder) {
-//        binder.registerCustomEditor(User.class, new UserTypeEditor());
-//    }
 
     /////////////////////////////////////////////////////////////////
     //                                                             //
