@@ -36,43 +36,42 @@ public class UserResolver implements HandlerMethodArgumentResolver {
         user.setUsername(request.getParameter("username"));
         user.setEmail(request.getParameter("email"));
 
-        Profile profile = user.getProfile();
-        profile.setNickname(request.getParameter("nickname"));
+        user.setNickname(request.getParameter("nickname"));
         String genderName = request.getParameter("gender");
         if (genderName != null) {
-            profile.setGender(Gender.valueOf(genderName.toUpperCase()));
+            user.setGender(Gender.valueOf(genderName.toUpperCase()));
         }
         // TODO avatar
         String avatarToken = request.getParameter("avatar");
         if (avatarToken != null) {
             Image avatar = imageService.getImageFromAccessToken(avatarToken);
-            profile.setAvatar(avatar);
+            user.setAvatar(avatar);
         }
         // TODO background
         String backgroundToken = request.getParameter("background");
         if (backgroundToken != null) {
             Image background = imageService.getImageFromAccessToken(backgroundToken);
-            profile.setBackgroundImage(background);
+            user.setBackground(background);
         }
         String birthdayStr = request.getParameter("birthday");
         if (birthdayStr != null) {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            profile.setBirthday(df.parse(birthdayStr));
+            user.setBirthday(df.parse(birthdayStr));
         }
-        profile.setSignature(request.getParameter("signature"));
-        profile.setHometown(request.getParameter("hometown"));
-        profile.setHighschool(request.getParameter("highschool"));
+        user.setSignature(request.getParameter("signature"));
+        user.setHometown(request.getParameter("hometown"));
+        user.setHighschool(request.getParameter("highschool"));
         String collegeName = request.getParameter("college");
         if (collegeName != null) {
             College college = collegeRepo.findOneByName(collegeName);
-            profile.setCollege(college);
+            user.setCollege(college);
         }
         String academyName = request.getParameter("academy");
         if (academyName != null) {
             Academy academy = academyRepo.findOneByName(academyName);
-            profile.setAcademy(academy);
+            user.setAcademy(academy);
         }
-        profile.setGrade(request.getParameter("grade"));
+        user.setGrade(request.getParameter("grade"));
         return user;
     }
 }

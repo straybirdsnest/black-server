@@ -51,7 +51,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> getSchoolMatchPosts(Pageable pageable) {
         User user = userService.getCurrentUser();
-        List<Post> posts = postRepo.findByCommentativeFalseAndSenderProfileCollege(user.getProfile().getCollege(), pageable);
+        List<Post> posts = postRepo.findByCommentativeFalseAndSenderCollege(user.getCollege(), pageable);
         posts.forEach(this::inflatePostExtension);
         return posts;
     }

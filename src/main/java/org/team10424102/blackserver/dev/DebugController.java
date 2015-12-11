@@ -36,7 +36,7 @@ public class DebugController {
         List<UserWithToken> tokens = new ArrayList<>();
         for (User user : users) {
             UserWithToken u = new UserWithToken();
-            u.setPhone(user.getProfile().getPhone());
+            u.setPhone(user.getPhone());
             u.setToken(userService.generateToken(user));
             tokens.add(u);
         }

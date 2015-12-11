@@ -7,6 +7,5 @@ import org.team10424102.blackserver.models.ActivityRecommendation;
 
 
 @Repository
-@Transactional
 public interface ActivityRecommendationRepo extends PagingAndSortingRepository<ActivityRecommendation, Long> {
 }

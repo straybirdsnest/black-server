@@ -39,8 +39,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, App.API_USER).permitAll()
-                .antMatchers(HttpMethod.GET, App.API_TOKEN).permitAll()
-                .antMatchers(App.API_AVAILABILITY + "/**").permitAll()
+                .antMatchers(HttpMethod.GET, App.API_USER + "/token").permitAll()
+                .antMatchers(HttpMethod.HEAD + App.API_USER + "/token").permitAll()
+                .antMatchers(HttpMethod.HEAD + App.API_USER + "/phone").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
     }

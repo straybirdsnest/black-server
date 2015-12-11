@@ -1,4 +1,4 @@
-package org.team10424102.blackserver;
+package org.team10424102.blackserver.utils;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import org.team10424102.blackserver.exceptions.BusinessException;
