@@ -45,7 +45,7 @@ public class PostTests extends AbstractTestNGSpringContextTests {
     }
 
     protected String getToken() throws Exception {
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(App.API_TOKEN).param("phone", "123456789").param("vcode", "1234"))
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(App.API_USER + "token").param("phone", "123456789").param("vcode", "1234"))
                 .andExpect(status().isOk()).andReturn();
         String tokenJson = result.getResponse().getContentAsString();
         JSONObject obj = new JSONObject(tokenJson);

@@ -32,35 +32,11 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
     @Autowired ApplicationContext context;
 
     private Image avatar;
+    private final Object avatarLock = new Object();
     private Image background;
+    private final Object backgroundLock = new Object();
     private Image cover;
-
-    @Autowired
-    public ImageServiceImpl(ApplicationContext context, ImageRepo imageRepo) throws IOException {
-        this.imageRepo = imageRepo;
-
-        // TODO 检查路径在 Windows 上是否起作用
-        avatar = imageRepo.findOneByTags(App.DEFAULT_AVATAR_TAG);
-        if (avatar == null) {
-            byte[] data = IOUtils.toByteArray(
-                    context.getResource("classpath:default/default_avatar.png").getInputStream());
-            avatar = saveDefaultImage(data, App.DEFAULT_AVATAR_TAG);
-        }
-
-        background = imageRepo.findOneByTags(App.DEFAULT_BACKGROUND_TAG);
-        if (background == null) {
-            byte[] data = IOUtils.toByteArray(
-                    context.getResource("classpath:default/default_background.png").getInputStream());
-            background = saveDefaultImage(data, App.DEFAULT_BACKGROUND_TAG);
-        }
-
-        cover = imageRepo.findOneByTags(App.DEFAULT_COVER_TAG);
-        if (cover == null) {
-            byte[] data = IOUtils.toByteArray(
-                    context.getResource("classpath:default/default_cover.png").getInputStream());
-            cover = saveDefaultImage(data, App.DEFAULT_COVER_TAG);
-        }
-    }
+    private final Object coverLock = new Object();
 
     @Scheduled(fixedRate = HALF_AN_HOUR_IN_MILLISECONDS)
     public void evictExpiredTokens() {
@@ -164,16 +140,61 @@ public class ImageServiceImpl implements ImageService, DefaultImage {
 
     @Override
     public Image avatar() {
+        if (avatar != null) return avatar;
+        synchronized (avatarLock) {
+            if (avatar != null) return avatar;
+
+            avatar = imageRepo.findOneByTags(App.DEFAULT_AVATAR_TAG);
+            if (avatar == null) {
+                try {
+                    byte[] data = IOUtils.toByteArray(
+                            context.getResource("classpath:default/default_avatar.png").getInputStream());
+                    avatar = saveDefaultImage(data, App.DEFAULT_AVATAR_TAG);
+                } catch (IOException e) {
+                    throw new IllegalStateException("cannot load default avatar", e);
+                }
+            }
+        }
         return avatar;
     }
 
     @Override
     public Image background() {
+        if (background != null) return background;
+        synchronized (backgroundLock) {
+            if (background != null) return background;
+
+            background = imageRepo.findOneByTags(App.DEFAULT_BACKGROUND_TAG);
+            if (background == null) {
+                try {
+                    byte[] data = IOUtils.toByteArray(
+                            context.getResource("classpath:default/default_background.png").getInputStream());
+                    background = saveDefaultImage(data, App.DEFAULT_BACKGROUND_TAG);
+                } catch (IOException e) {
+                    throw new IllegalStateException("cannot load default background", e);
+                }
+            }
+        }
         return background;
     }
 
     @Override
     public Image cover() {
+        if (cover != null) return cover;
+        synchronized (coverLock) {
+            if (cover != null) return cover;
+
+            cover = imageRepo.findOneByTags(App.DEFAULT_COVER_TAG);
+            if (cover == null) {
+                try {
+                    byte[] data = IOUtils.toByteArray(
+                            context.getResource("classpath:default/default_cover.png").getInputStream());
+                    cover = saveDefaultImage(data, App.DEFAULT_COVER_TAG);
+                } catch (IOException e) {
+                    throw new IllegalStateException("cannot load default cover", e);
+                }
+            }
+        }
         return cover;
     }
 }

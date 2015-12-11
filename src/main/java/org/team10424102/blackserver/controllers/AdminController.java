@@ -44,7 +44,7 @@ public class AdminController {
         Map<String, String> result = new HashMap<>();
         while (i.hasNext()) {
             User u = i.next();
-            result.put(u.getProfile().getPhone(), userService.generateToken(u));
+            result.put(u.getPhone(), userService.generateToken(u));
         }
         return result;
     }

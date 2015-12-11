@@ -37,7 +37,7 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<Activity> getSameSchoolActivities(Pageable pageable) {
         User user = userService.getCurrentUser();
-        return activityRepo.findByPromoterProfileCollege(user.getProfile().getCollege(), pageable);
+        return activityRepo.findByPromoterCollege(user.getCollege(), pageable);
     }
 
     @Override

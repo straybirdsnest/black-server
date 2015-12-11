@@ -3,9 +3,9 @@ package org.team10424102.blackserver.daos;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.team10424102.blackserver.models.College;
+import org.team10424102.blackserver.models.Academy;
+import org.team10424102.blackserver.models.FriendshipApplication;
 
 @Repository
-public interface CollegeRepo extends PagingAndSortingRepository<College, Integer> {
-    College findOneByName(String name);
+public interface FriendshipApplicationRepo extends PagingAndSortingRepository<FriendshipApplication, Long> {
 }

@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface PostRepo extends PagingAndSortingRepository<Post, Long> {
 
-    List<Post> findByCommentativeFalseAndSenderProfileCollege(College college, Pageable pageable);
+    List<Post> findByCommentativeFalseAndSenderCollege(College college, Pageable pageable);
 
     List<Post> findByCommentativeFalseAndSenderIn(Collection<User> users, Pageable pageable);
 

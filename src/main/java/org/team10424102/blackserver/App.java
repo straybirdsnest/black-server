@@ -15,13 +15,11 @@ public class App {
     public static final String DEFAULT_BACKGROUND_TAG = "默认用户背景";
     public static final String DEFAULT_COVER_TAG = "默认活动封面";
     public static final String API_USER = "/api/user";
-    public static final String API_TOKEN = "/api/token";
-    public static final String API_AVAILABILITY = "/api/availability";
     public static final String API_IMAGE = "/api/image";
-    public static final String API_HEALTH = "/health";
     public static final String API_POST = "/api/post";
     public static final String API_ACTIVITY = "/api/activity";
     public static final String API_GAME = "/api/game";
+    public static final String API_NOTIFICATION = "/api/notification";
     public static SpringApplication handle;
 
     public static void main(String[] args) {

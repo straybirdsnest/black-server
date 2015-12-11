@@ -1,71 +1,194 @@
 package org.team10424102.blackserver.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotBlank;
 import org.team10424102.blackserver.config.json.UserDeserializer;
 import org.team10424102.blackserver.config.json.Views;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * 正常的用户从 UID_BASE 开始编号
  */
-@SuppressWarnings("unused")
 @Entity
 @JsonDeserialize(using = UserDeserializer.class)
+@Table(name = "t_user")
 public class User {
     public static final int UID_SYSTEM = 0;
     public static final int UID_BASE = 100;
 
+    /**
+     * 编号, 普通用户从 100 开始计数
+     */
     @Id
     @GeneratedValue
     private Integer id;
 
+    /**
+     * 用户名, 使用户在服务器内的唯一标识符, 由英文字母组成
+     */
+    @NotBlank
+    @Pattern(regexp = "^[a-z0-9_-]{3,16}$")
     private String username;
 
+    /**
+     * 电子邮箱, 需要通过验证, 才能激活
+     */
     @Basic(fetch = FetchType.LAZY)
+    @Pattern(regexp = "^([a-z0-9_\\.-]+)@([\\da-z\\.-]+)\\.([a-z\\.]{2,6})$")
     private String email;
 
-    //@Column(columnDefinition = "tinyint")
-    private Boolean enabled;
+    /**
+     * 是否被激活
+     */
+    private Boolean enabled = true;
 
-    @Embedded
-    private Profile profile = new Profile();
-
-    @Embedded
-    private RegInfo regInfo = new RegInfo();
-
+    /**
+     * 角色
+     */
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "T_SUBSCRIPTION",
-            joinColumns = @JoinColumn(name = "subscriber_id"),
-            inverseJoinColumns = @JoinColumn(name = "broadcaster_id")
-    )
-    private Set<User> focuses = new HashSet<>();
-
-    @ManyToMany(mappedBy = "focuses", fetch = FetchType.LAZY)
-    private Set<User> fans = new HashSet<>();
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private Set<Friendship> friendshipSet = new HashSet<>();
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private Set<Membership> membershipSet = new HashSet<>();
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable (
-            name = "T_AUTHORITIES",
+            name = "t_authorities",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<UserRole> roles = new HashSet<>();
 
+    /**
+     * 注册信息
+     */
+    @Embedded
+    private RegInfo regInfo;
 
+    /**
+     * 关注对象
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "t_subscription",
+            joinColumns = @JoinColumn(name = "subscriber_id"),
+            inverseJoinColumns = @JoinColumn(name = "broadcaster_id")
+    )
+    private Set<User> focuses = new HashSet<>();
 
+    /**
+     * 粉丝
+     */
+    @ManyToMany(mappedBy = "focuses", fetch = FetchType.LAZY)
+    private Set<User> fans = new HashSet<>();
+
+    /**
+     * 好友
+     */
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<Friendship> friendshipSet = new HashSet<>();
+
+    /**
+     * 参加的群组
+     */
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<Membership> membershipSet = new HashSet<>();
+
+    /**
+     * 昵称, 可以重复, 例如张三
+     */
+    @Length(max = 30, min = 2)
+    private String nickname;
+
+    /**
+     * 用户的真实姓名
+     */
+    @Length(max = 30, min = 2)
+    private String realname;
+
+    /**
+     * 中华人民共和国居民身份证号码, 15 位或者 18 位
+     */
+    @Pattern(regexp = "(^\\d{15}$)|(^\\d{18}$)|(^\\d{17}(\\d|X|x)$)")
+    private String idcard;
+
+    /**
+     * 性别: MALE, FEMALE, OTHER, UNKNOWN
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum")
+    private Gender gender;
+
+    /**
+     * 头像
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "avatar_id")
+    private Image avatar;
+
+    /**
+     * 背景图片
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "background_id")
+    private Image background;
+
+    /**
+     * 生日
+     */
+    private Date birthday;
+
+    /**
+     * 个性化签名
+     */
+    private String signature;
+
+    /**
+     * 家乡
+     */
+    private String hometown;
+
+    /**
+     * 中国大陆 11 位手机号码 (+86)
+     */
+    @Pattern(regexp = "((\\d{11})|^((\\d{7,8})|(\\d{4}|\\d{3})-(\\d{7,8})|(\\d{4}|\\d{3})-(\\d{7,8})-(\\d{4}|\\d{3}|\\d{2}|\\d{1})|(\\d{7,8})-(\\d{4}|\\d{3}|\\d{2}|\\d{1}))$)")
+    private String phone;
+
+    /**
+     * 高中
+     */
+    @Length(min = 2, max = 30)
+    private String highschool;
+
+    /**
+     * 大学
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "college_id")
+    private College college;
+
+    /**
+     * 学院
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "academy_id")
+    private Academy academy;
+
+    /**
+     * 大学所在的年级
+     */
+    private String grade;
+
+    /**
+     * 黑名单
+     */
+    @ManyToMany
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "target_id")
+    )
+    private Set<User> blacklist = new HashSet<>();
 
     /////////////////////////////////////////////////////////////////
     //                                                             //
@@ -77,7 +200,7 @@ public class User {
 
     //<editor-fold desc="=== Getters & Setters ===">
 
-    @JsonIgnore
+    @JsonView(Views.UserSummary.class)
     public Integer getId() {
         return id;
     }
@@ -111,16 +234,6 @@ public class User {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
-    }
-
-    @JsonView(Views.UserSummary.class)
-    @JsonUnwrapped
-    public Profile getProfile() {
-        return profile;
-    }
-
-    public void setProfile(Profile profile) {
-        this.profile = profile;
     }
 
     @JsonIgnore
@@ -175,6 +288,163 @@ public class User {
 
     public void setRoles(Set<UserRole> roles) {
         this.roles = roles;
+    }
+
+    @JsonView(Views.UserSummary.class)
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    @JsonIgnore
+    public String getRealname() {
+        return realname;
+    }
+
+    public void setRealname(String realname) {
+        this.realname = realname;
+    }
+
+    @JsonIgnore
+    public String getIdcard() {
+        return idcard;
+    }
+
+    public void setIdcard(String idcard) {
+        this.idcard = idcard;
+    }
+
+
+    @JsonView(Views.UserDetails.class)
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    @JsonView(Views.UserSummary.class)
+    public Image getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Image avatar) {
+        this.avatar = avatar;
+    }
+
+    @JsonView(Views.UserDetails.class)
+    public Image getBackground() {
+        return background;
+    }
+
+    public void setBackground(Image backgroundImage) {
+        this.background = backgroundImage;
+    }
+
+    @JsonView(Views.UserDetails.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    public Date getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    @JsonView(Views.UserSummary.class)
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    @JsonView(Views.UserDetails.class)
+    public String getHometown() {
+        return hometown;
+    }
+
+    public void setHometown(String hometown) {
+        this.hometown = hometown;
+    }
+
+    @JsonView(Views.UserDetails.class)
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    @JsonView(Views.UserDetails.class)
+    public String getHighschool() {
+        return highschool;
+    }
+
+    public void setHighschool(String highschool) {
+        this.highschool = highschool;
+    }
+
+    @JsonUnwrapped
+    @JsonView(Views.UserDetails.class)
+    @JsonIgnore
+    public College getCollege() {
+        return college;
+    }
+
+    public void setCollege(College college) {
+        this.college = college;
+    }
+
+    @JsonIgnore
+    public Academy getAcademy() {
+        return academy;
+    }
+
+    public void setAcademy(Academy academy) {
+        this.academy = academy;
+    }
+
+    @JsonIgnore
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
+
+    @JsonProperty("college")
+    @JsonView(Views.UserDetails.class)
+    public String getCollegeName() {
+        if (college != null) {
+            return college.getName();
+        }
+        return null;
+    }
+
+    @JsonProperty("academy")
+    @JsonView(Views.UserDetails.class)
+    public String getAcademyName() {
+        if (academy != null) {
+            return academy.getName();
+        }
+        return null;
+    }
+
+    public Set<User> getBlacklist() {
+        return blacklist;
+    }
+
+    public void setBlacklist(Set<User> blacklist) {
+        this.blacklist = blacklist;
     }
 
     //</editor-fold>

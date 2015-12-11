@@ -57,7 +57,7 @@ public class BaseTests {
 
     protected String getToken() throws Exception {
         if (token != null) return token;
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(API_TOKEN)
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(API_USER + "/token")
                 .param("phone", "123456789")
                 .param("vcode", "1234"))
                 .andExpect(status().isOk()).andReturn();

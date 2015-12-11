@@ -1,5 +1,11 @@
 package org.team10424102.blackserver.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonView;
+import org.team10424102.blackserver.config.json.Views;
+
 import javax.persistence.*;
 
 @SuppressWarnings("unused")
@@ -22,6 +28,7 @@ public class Friendship {
 
     //<editor-fold desc="=== Getters & Setters ===">
 
+    @JsonIgnore
     public Integer getId() {
         return id;
     }
@@ -30,6 +37,7 @@ public class Friendship {
         this.id = id;
     }
 
+    @JsonIgnore
     public User getUser() {
         return user;
     }
@@ -38,6 +46,8 @@ public class Friendship {
         this.user = user;
     }
 
+    @JsonUnwrapped
+    @JsonView(Views.UserSummary.class)
     public User getFriend() {
         return friend;
     }
@@ -46,6 +56,8 @@ public class Friendship {
         this.friend = friend;
     }
 
+    @JsonProperty("alias")
+    @JsonView(Views.UserSummary.class)
     public String getFriendAlias() {
         return friendAlias;
     }
