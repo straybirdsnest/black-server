@@ -64,7 +64,7 @@ public class User {
      * 注册信息
      */
     @Embedded
-    private RegInfo regInfo;
+    private RegInfo regInfo = new RegInfo();
 
     /**
      * 关注对象
@@ -412,7 +412,7 @@ public class User {
         this.academy = academy;
     }
 
-    @JsonIgnore
+    @JsonView(Views.UserDetails.class)
     public String getGrade() {
         return grade;
     }
@@ -440,12 +440,40 @@ public class User {
         return null;
     }
 
+    @JsonIgnore
     public Set<User> getBlacklist() {
         return blacklist;
     }
 
     public void setBlacklist(Set<User> blacklist) {
         this.blacklist = blacklist;
+    }
+
+    @JsonProperty("friends")
+    @JsonView(Views.UserDetails.class)
+    public long getFriendsCount() {
+        if (friendshipSet != null) {
+            return friendshipSet.size();
+        }
+        return 0;
+    }
+
+    @JsonProperty("fans")
+    @JsonView(Views.UserDetails.class)
+    public long getFanssCount() {
+        if (fans != null) {
+            return fans.size();
+        }
+        return 0;
+    }
+
+    @JsonProperty("focuses")
+    @JsonView(Views.UserDetails.class)
+    public long getFocusesCount() {
+        if (focuses != null) {
+            return focuses.size();
+        }
+        return 0;
     }
 
     //</editor-fold>
