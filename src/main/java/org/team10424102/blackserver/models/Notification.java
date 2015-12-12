@@ -4,63 +4,53 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import org.jetbrains.annotations.Nullable;
 import org.team10424102.blackserver.config.json.Views;
 
 import javax.persistence.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 
 @Entity
 @Table(name = "t_notification")
 public class Notification {
-    public enum Type {
-        FRIEND_ADD("好友申请"),
-        FRIEND_REMOVE("友尽通知"),
-        GROUP_JOIN("入群申请"),
-        ACTIVITY_JOIN("参加活动申请"),
-        GROUP_QUIT("退群通知"),
-        ACTIVITY_QUIT("退出活动通知");
+    public static final int SYSTEM = 1;
+    public static final int FRIEND_ADD = 100;
+    public static final int FRIEND_ADD_PENDING = 101;
+    public static final int FRIEND_ADD_REPLY = 102;
+    public static final int FRIEND_REMOVE = 150;
+    public static final int GROUP_JOIN = 200;
+    public static final int GROUP_JOIN_PENDING = 201;
+    public static final int GROUP_JOIN_REPLY = 202;
+    public static final int GROUP_QUIT = 250;
+    public static final int ACTIVITY_JOIN = 300;
+    public static final int ACTIVITY_JOIN_PENDING = 301;
+    public static final int ACTIVITY_JOIN_REPLY = 302;
+    public static final int ACTIVITY_QUIT = 350;
 
-        private final static Map<String, Type> map = new HashMap<>();
-
-        static {
-            for (Type t: Type.values()) {
-                map.put(t.key, t);
-            }
-        }
-
-        public static Type fromKey(String key) {
-            return map.get(key);
-        }
-
-        private String key;
-
-        Type(String key) {
-            this.key = key;
-        }
-
-        @Override
-        public String toString() {
-            return key;
-        }
-    }
+    public static final int REPLY_YES = 1;
+    public static final int REPLY_NO = 2;
+    public static final int REPLY_DELETE = 3;
 
     @Id
     @GeneratedValue
     private Long id;
 
-    private String content;
+    private int type;
+
+    private Long dataId;
 
     @ManyToOne
+    @JoinColumn(name = "target_id")
     private User target;
+
+    private Date creationTime;
+
+    private int ttl;
+
+    private int reply;
 
     @Transient
     @JsonView(Views.Notification.class)
     private Object data;
-
-    @Transient
-    private String[] contentParts;
 
     @JsonIgnore
     public Long getId() {
@@ -71,35 +61,36 @@ public class Notification {
         this.id = id;
     }
 
-    @JsonIgnore
-    public String getContent() {
-        return content;
+    public int getType() {
+        return type;
     }
 
-    @JsonGetter
-    @JsonProperty("type")
-    public Type getType() {
-        if (contentParts == null) {
-            contentParts = content.split("-");
-        }
-        return Type.fromKey(contentParts[0]);
+    public void setType(int type) {
+        this.type = type;
     }
 
-    public String getExtra() {
-        if (contentParts == null) {
-            contentParts = content.split("-");
-        }
-        if (contentParts.length == 1) return null;
-        return contentParts[1];
+    public Long getDataId() {
+        return dataId;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setDataId(Long dataId) {
+        this.dataId = dataId;
     }
 
-    public void setContent(Type type, String extra) {
-        if (extra == null) content = type + "";
-        content = type + "-" + extra;
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(Date creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
     }
 
     @JsonIgnore
