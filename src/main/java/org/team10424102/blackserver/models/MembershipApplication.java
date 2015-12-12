@@ -13,9 +13,11 @@ public class MembershipApplication {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "applicant_id")
     private User applicant;
 
     @ManyToOne
+    @JoinColumn(name = "group_id")
     private UserGroup group;
 
     private String attachment;

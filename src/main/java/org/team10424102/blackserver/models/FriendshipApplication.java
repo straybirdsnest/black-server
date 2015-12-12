@@ -11,14 +11,18 @@ public class FriendshipApplication {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "applicant_id")
     private User applicant;
 
     @ManyToOne
+    @JoinColumn(name = "target_id")
     private User target;
 
     private String attachment;
 
     private Date creationTime;
+
+
 
     public Long getId() {
         return id;

@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface NotificationRepo extends PagingAndSortingRepository<Notification, Long> {
-    List<Notification> findAllByUser(User user);
+    List<Notification> findAllByTarget(User target);
 }
