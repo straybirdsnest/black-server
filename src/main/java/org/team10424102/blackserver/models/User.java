@@ -185,6 +185,7 @@ public class User {
      */
     @ManyToMany
     @JoinTable(
+            name = "t_user_blacklist",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "target_id")
     )
