@@ -7,10 +7,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.team10424102.blackserver.games.Dota2PostExtension;
+import org.team10424102.blackserver.extensions.dota2.Dota2PostExtension;
 import org.team10424102.blackserver.services.PostService;
-import org.team10424102.blackserver.services.extensions.ImagePostExtension;
-import org.team10424102.blackserver.services.extensions.PollPostExtension;
+import org.team10424102.blackserver.extensions.image.ImagePostExtension;
+import org.team10424102.blackserver.extensions.poll.PollPostExtension;
 
 @Component
 public class ApplicationLifecycleManager{

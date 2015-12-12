@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.team10424102.blackserver.App;
 import org.team10424102.blackserver.config.json.Views;
-import org.team10424102.blackserver.models.Game;
+import org.team10424102.blackserver.game.Game;
 import org.team10424102.blackserver.services.GameService;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;

@@ -11,9 +11,8 @@ import java.util.List;
 
 
 @Repository
-@Transactional
 public interface ActivityRepo extends PagingAndSortingRepository<Activity, Long> {
-    List<Activity> findByPromoterProfileCollege(College college, Pageable pageable);
+    List<Activity> findByPromoterCollege(College college, Pageable pageable);
     List<Activity> findByPromoterIn(Collection<User> users, Pageable pageable);
     List<Activity> findByPromoter(User user, Pageable pageable);
 

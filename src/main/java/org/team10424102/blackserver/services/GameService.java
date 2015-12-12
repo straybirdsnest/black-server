@@ -1,6 +1,6 @@
 package org.team10424102.blackserver.services;
 
-import org.team10424102.blackserver.models.Game;
+import org.team10424102.blackserver.game.Game;
 
 /**
  * Created by sk on 15-12-5.

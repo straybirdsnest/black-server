@@ -23,9 +23,6 @@ public interface UserService {
     @NotNull
     User createAndSaveUser(String phone, HttpServletRequest request);
 
-    @NotNull
-    User updateUser(User newUser);
-
     void deleteCurrentUser();
 
     @NotNull
@@ -42,4 +39,6 @@ public interface UserService {
     boolean isTokenValid(String token);
 
     User findByPhone(String phone);
+
+    void saveUser(User user);
 }

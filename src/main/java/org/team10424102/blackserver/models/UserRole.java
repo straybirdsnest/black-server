@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_ROLE")
+@Table(name = "t_role")
 public class UserRole {
     @Id
     @GeneratedValue

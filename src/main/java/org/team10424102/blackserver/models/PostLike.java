@@ -5,7 +5,7 @@ import java.util.Date;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_POST_LIKES")
+@Table(name = "t_post_likes")
 public class PostLike {
     @Id
     @GeneratedValue

@@ -11,9 +11,9 @@ import org.team10424102.blackserver.daos.LikesRepo;
 import org.team10424102.blackserver.daos.PostRepo;
 import org.team10424102.blackserver.models.Friendship;
 import org.team10424102.blackserver.models.Post;
-import org.team10424102.blackserver.services.extensions.PostExtension;
-import org.team10424102.blackserver.services.extensions.PostExtensionData;
-import org.team10424102.blackserver.services.extensions.PostExtensionIdentifier;
+import org.team10424102.blackserver.extensions.PostExtension;
+import org.team10424102.blackserver.extensions.PostExtensionData;
+import org.team10424102.blackserver.extensions.PostExtensionIdentifier;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,7 +51,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> getSchoolMatchPosts(Pageable pageable) {
         User user = userService.getCurrentUser();
-        List<Post> posts = postRepo.findByCommentativeFalseAndSenderProfileCollege(user.getProfile().getCollege(), pageable);
+        List<Post> posts = postRepo.findByCommentativeFalseAndSenderCollege(user.getCollege(), pageable);
         posts.forEach(this::inflatePostExtension);
         return posts;
     }

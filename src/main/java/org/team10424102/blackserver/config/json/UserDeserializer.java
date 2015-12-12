@@ -46,39 +46,39 @@ public class UserDeserializer extends JsonDeserializer<User> {
         User user = new User();
         user.setUsername(phone);
         user.setEmail(email);
-
-        Profile profile = new Profile();
-        profile.setPhone(username);
-        profile.setBirthday(date);
-        profile.setRealName(realName);
-
-        College college = new College();
-        college.setName(collegeName);
-        profile.setCollege(college);
-
-        Academy academy = new Academy();
-        academy.setName(academyName);
-        profile.setAcademy(academy);
-
-        switch (gender) {
-            case "MALE":
-                profile.setGender(Gender.MALE);
-                break;
-            case "FEMALE":
-                profile.setGender(Gender.FEMALE);
-                break;
-            case "SECRET":
-                profile.setGender(Gender.SECRET);
-                break;
-            default:
-                throw new IOException("unknown gender type of " + gender);
-        }
-
-        profile.setGrade(grade);
-        profile.setSignature(signature);
-        profile.setHometown(hometown);
-        profile.setHighschool(highschool);
-        user.setProfile(profile);
+//
+//        Profile profile = new Profile();
+//        profile.setPhone(username);
+//        profile.setBirthday(date);
+//        profile.setRealName(realName);
+//
+//        College college = new College();
+//        college.setName(collegeName);
+//        profile.setCollege(college);
+//
+//        Academy academy = new Academy();
+//        academy.setName(academyName);
+//        profile.setAcademy(academy);
+//
+//        switch (gender) {
+//            case "MALE":
+//                profile.setGender(Gender.MALE);
+//                break;
+//            case "FEMALE":
+//                profile.setGender(Gender.FEMALE);
+//                break;
+//            case "SECRET":
+//                profile.setGender(Gender.SECRET);
+//                break;
+//            default:
+//                throw new IOException("unknown gender type of " + gender);
+//        }
+//
+//        profile.setGrade(grade);
+//        profile.setSignature(signature);
+//        profile.setHometown(hometown);
+//        profile.setHighschool(highschool);
+//        user.setProfile(profile);
 
         return user;
     }

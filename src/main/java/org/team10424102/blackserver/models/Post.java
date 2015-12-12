@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.team10424102.blackserver.config.json.Views;
-import org.team10424102.blackserver.services.extensions.PostExtensionData;
+import org.team10424102.blackserver.extensions.PostExtensionData;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,7 +14,7 @@ import java.util.Set;
 
 @SuppressWarnings("unused")
 @Entity
-@Table(name = "T_POST")
+@Table(name = "t_post")
 public class Post {
     public static final String TAG_MATCH = "战况";
 
@@ -45,7 +45,7 @@ public class Post {
     )
     private Set<Post> comments = new HashSet<>();
 
-    @Column(columnDefinition = "tinyint")
+    //@Column(columnDefinition = "tinyint")
     private boolean commentative;
 
     @Transient
