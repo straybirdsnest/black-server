@@ -8,11 +8,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.team10424102.blackserver.config.security.TokenAuthenticationFilter;
@@ -58,7 +60,7 @@ public class BaseTests {
     protected String getToken() throws Exception {
         if (token != null) return token;
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(API_USER + "/token")
-                .param("phone", "123456789")
+                .param("phone", "18921273088")
                 .param("vcode", "1234"))
                 .andExpect(status().isOk()).andReturn();
         String tokenJson = result.getResponse().getContentAsString();

@@ -37,7 +37,6 @@ public class ExceptionHandlingController {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "请求参数不完整")
     public void handleMissingServletRequestParameter(MissingServletRequestParameterException e) {
-        logger.warn("请求参数不完整", e);
     }
 
 //    @ExceptionHandler(Exception.class)

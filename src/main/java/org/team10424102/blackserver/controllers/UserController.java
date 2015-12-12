@@ -70,6 +70,7 @@ public class UserController {
      */
     @RequestMapping(value = "/token", method = GET)
     public Api.Result getToken(@RequestParam String phone, @RequestParam String vcode, HttpServletRequest request) {
+        // TODO 使用 User 数据模型中 phone 属性的注解来对这里的 phone 做验证
         if (!vcodeService.verify("86", phone, vcode)) {
             throw new VcodeVerificationException(phone, vcode);
         }
