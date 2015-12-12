@@ -291,7 +291,7 @@ public class UserController {
 
         Notification notification = new Notification();
         notification.setTarget(target);
-        notification.setContent(Notification.Type.FRIEND_ADD, application.getId());
+        notification.setContent(Notification.Type.FRIEND_ADD, application.getId().toString());
         notificationRepo.save(notification); // 发出好友申请
     }
 
@@ -308,7 +308,7 @@ public class UserController {
 
                 Notification notification = new Notification();
                 notification.setTarget(friend);
-                notification.setContent(Notification.Type.FRIEND_REMOVE, user.getId());
+                notification.setContent(Notification.Type.FRIEND_REMOVE, user.getId().toString());
                 notificationRepo.save(notification); // 发出友尽通知
                 return true;
             }
