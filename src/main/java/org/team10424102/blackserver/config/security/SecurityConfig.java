@@ -12,7 +12,9 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -25,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableScheduling
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+//@EnableWebSecurity
 //@Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -38,10 +41,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, App.API_USER).permitAll()
-                .antMatchers(HttpMethod.GET, App.API_USER + "/token*").permitAll()
-                .antMatchers(HttpMethod.HEAD + App.API_USER + "/token").permitAll()
-                .antMatchers(HttpMethod.HEAD + App.API_USER + "/phone").permitAll()
+                .antMatchers(HttpMethod.GET, App.API_USER + "/token").permitAll()
+                .antMatchers(HttpMethod.HEAD, App.API_USER + "/token").permitAll()
+                .antMatchers(HttpMethod.HEAD, App.API_USER + "/phone").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
     }

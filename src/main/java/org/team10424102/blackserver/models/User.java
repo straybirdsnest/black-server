@@ -28,7 +28,8 @@ public class User {
      */
     @Id
     @GeneratedValue
-    private Integer id;
+    @Column(columnDefinition = "int")
+    private Long id;
 
     /**
      * 用户名, 使用户在服务器内的唯一标识符, 由英文字母组成
@@ -202,11 +203,11 @@ public class User {
     //<editor-fold desc="=== Getters & Setters ===">
 
     @JsonView(Views.UserSummary.class)
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

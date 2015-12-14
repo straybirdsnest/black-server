@@ -42,17 +42,14 @@ public class Notification {
     @JoinColumn(name = "target_id")
     private User target;
 
-    private Date creationTime;
-
-    private int ttl;
+    private Date expiration;
 
     private int reply;
 
     @Transient
-    @JsonView(Views.Notification.class)
     private Object data;
 
-    @JsonIgnore
+    @JsonView(Views.Notification.class)
     public Long getId() {
         return id;
     }
@@ -61,6 +58,7 @@ public class Notification {
         this.id = id;
     }
 
+    @JsonView(Views.Notification.class)
     public int getType() {
         return type;
     }
@@ -69,6 +67,7 @@ public class Notification {
         this.type = type;
     }
 
+    @JsonView(Views.Notification.class)
     public Long getDataId() {
         return dataId;
     }
@@ -77,20 +76,13 @@ public class Notification {
         this.dataId = dataId;
     }
 
-    public Date getCreationTime() {
-        return creationTime;
+    @JsonIgnore
+    public Date getExpiration() {
+        return expiration;
     }
 
-    public void setCreationTime(Date creationTime) {
-        this.creationTime = creationTime;
-    }
-
-    public int getTtl() {
-        return ttl;
-    }
-
-    public void setTtl(int ttl) {
-        this.ttl = ttl;
+    public void setExpiration(Date expiration) {
+        this.expiration = expiration;
     }
 
     @JsonIgnore
@@ -102,11 +94,21 @@ public class Notification {
         this.target = target;
     }
 
+    @JsonView(Views.Notification.class)
     public Object getData() {
         return data;
     }
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    @JsonView(Views.Notification.class)
+    public int getReply() {
+        return reply;
+    }
+
+    public void setReply(int reply) {
+        this.reply = reply;
     }
 }
