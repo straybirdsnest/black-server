@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.team10424102.blackserver.models.User;
 
 @Repository
-public interface UserRepo extends PagingAndSortingRepository<User, Integer> {
+public interface UserRepo extends PagingAndSortingRepository<User, Long> {
 
     @Query("select case when count(u)>0 then true else false end from User u where u.phone = ?1")
     boolean existsByPhone(String phone);

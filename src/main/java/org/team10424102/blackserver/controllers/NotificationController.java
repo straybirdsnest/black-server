@@ -1,22 +1,26 @@
 package org.team10424102.blackserver.controllers;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.team10424102.blackserver.App;
+import org.team10424102.blackserver.config.json.Views;
 import org.team10424102.blackserver.config.security.CurrentUser;
 import org.team10424102.blackserver.daos.FriendshipApplicationRepo;
 import org.team10424102.blackserver.daos.NotificationRepo;
 import org.team10424102.blackserver.daos.UserRepo;
-import org.team10424102.blackserver.models.Friendship;
-import org.team10424102.blackserver.models.FriendshipApplication;
 import org.team10424102.blackserver.models.Notification;
 import org.team10424102.blackserver.models.User;
+import org.team10424102.blackserver.notifications.AddingFriendHandler;
+import org.team10424102.blackserver.notifications.HandleNotificationType;
+import org.team10424102.blackserver.notifications.NotificationHandler;
+import org.team10424102.blackserver.notifications.RemovingFriendHandler;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import javax.annotation.PostConstruct;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -26,72 +30,46 @@ public class NotificationController {
 
     @Autowired NotificationRepo notificationRepo;
 
-    @Autowired FriendshipApplicationRepo friendshipApplicationRepo;
+    @Autowired ApplicationContext context;
 
-    @Autowired UserRepo userRepo;
+    private Map<Integer, NotificationHandler> handlers = new ConcurrentHashMap<>();
+    private static final Class[] classes = new Class[]{
+            AddingFriendHandler.class,
+            RemovingFriendHandler.class
+    };
+
+    @PostConstruct
+    public void init() {
+        for (Class cls : classes) {
+            HandleNotificationType type =
+                    (HandleNotificationType) cls.getAnnotation(HandleNotificationType.class);
+            int[] values = type.value();
+            for (int value : values) {
+                handlers.put(value, (NotificationHandler) context.getBean(cls));
+            }
+        }
+    }
 
     @RequestMapping(method = RequestMethod.GET)
+    @JsonView(Views.Notification.class)
+    @Transactional
     public List<Notification> getNotifications(@CurrentUser User user) {
         Iterator<Notification> i = notificationRepo.findAllByTarget(user).iterator();
         return StreamSupport
                 .stream(Spliterators.spliteratorUnknownSize(i, Spliterator.ORDERED), false)
                 .map(e -> {
-                    switch (e.getType()) {
-                        case Notification.FRIEND_ADD:
-                            handleFriendAdd(e);
-                            break;
-                        case Notification.FRIEND_REMOVE:
-                            handleFriendRemove(e);
-                            break;
-                    }
+                    NotificationHandler handler = handlers.get(e.getType());
+                    if (handler != null) return handler.inflateData(e);
                     return e;
                 })
                 .collect(Collectors.toList());
     }
 
-    private void handleFriendAdd(Notification n) {
-        Long id = n.getDataId();
-        FriendshipApplication application = friendshipApplicationRepo.findOne(id);
-        n.setData(application);
-    }
-
-    private void handleFriendRemove(Notification n) {
-        Integer id = n.getDataId().intValue();
-        User user = userRepo.findOne(id);
-        n.setData(user);
-    }
-
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @Transactional
-    private void handleReply(@PathVariable Long id, @RequestParam int type, @RequestParam int reply) {
+    public void handleReply(@PathVariable long id, @RequestParam int reply) {
         Notification notification = notificationRepo.findOne(id);
-        if (notification == null) return;
-        switch (type) {
-            case Notification.FRIEND_ADD:
-                if (reply == Notification.REPLY_YES) {
-
-                    handleFriendRemove(notification);
-                    FriendshipApplication application = (FriendshipApplication)notification.getData();
-
-                    User applicant = application.getApplicant();
-                    User target = application.getTarget();
-
-                    Friendship friendship = new Friendship();
-                    friendship.setUser(applicant);
-                    friendship.setFriend(target);
-                    applicant.getFriendshipSet().add(friendship);
-                    userRepo.save(applicant);
-
-                    friendship = new Friendship();
-                    friendship.setUser(target);
-                    friendship.setFriend(applicant);
-                    target.getFriendshipSet().add(friendship);
-                    userRepo.save(target);
-                }
-                break;
-            case Notification.FRIEND_REMOVE:
-                break;
-        }
+        handlers.get(notification.getType()).handleReply(notification, reply);
     }
 
 

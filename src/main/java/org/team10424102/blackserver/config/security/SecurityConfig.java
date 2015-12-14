@@ -25,11 +25,11 @@ import javax.servlet.http.HttpServletResponse;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableScheduling
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+//@EnableWebSecurity
 //@Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    UserService userService;
+    @Autowired UserService userService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -40,10 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .authorizeRequests()
                 .antMatchers("/", "/partials/**").permitAll()
-                .antMatchers(HttpMethod.POST, App.API_USER).permitAll()
-                .antMatchers(HttpMethod.GET, App.API_USER + "/token*").permitAll()
-                .antMatchers(HttpMethod.HEAD + App.API_USER + "/token").permitAll()
-                .antMatchers(HttpMethod.HEAD + App.API_USER + "/phone").permitAll()
+                .antMatchers(HttpMethod.GET, App.API_USER + "/token").permitAll()
+                .antMatchers(HttpMethod.HEAD, App.API_USER + "/token").permitAll()
+                .antMatchers(HttpMethod.HEAD, App.API_USER + "/phone").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint());
     }

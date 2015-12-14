@@ -12,13 +12,7 @@ public interface UserService {
     @NotNull
     User getCurrentUser();
 
-    int getCurrentUserId();
-
-    boolean isSecondsFriend(int firstUid, int secondUid);
-
-    boolean isSecondsFan(int firstUid, int secondUid);
-
-    boolean isSecondsFocus(int firstUid, int secondUid);
+    long getCurrentUserId();
 
     @NotNull
     User createAndSaveUser(String phone, HttpServletRequest request);
@@ -26,7 +20,7 @@ public interface UserService {
     void deleteCurrentUser();
 
     @NotNull
-    User getUserById(int id);
+    User getUserById(long id);
 
     boolean isPhoneExisted(String phone);
 

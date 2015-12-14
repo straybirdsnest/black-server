@@ -2,7 +2,6 @@ package org.team10424102.blackserver.models;
 
 import javax.persistence.*;
 
-@SuppressWarnings("unused")
 @Entity
 @Table(name = "t_membership")
 public class Membership {

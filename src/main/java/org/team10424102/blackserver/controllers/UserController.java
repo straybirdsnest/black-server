@@ -3,6 +3,7 @@ package org.team10424102.blackserver.controllers;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,12 +15,13 @@ import org.team10424102.blackserver.config.security.CurrentUser;
 import org.team10424102.blackserver.daos.FriendshipApplicationRepo;
 import org.team10424102.blackserver.daos.FriendshipRepo;
 import org.team10424102.blackserver.daos.NotificationRepo;
+import org.team10424102.blackserver.daos.UserRepo;
 import org.team10424102.blackserver.exceptions.RequestDataFormatException;
 import org.team10424102.blackserver.exceptions.VcodeVerificationException;
 import org.team10424102.blackserver.models.Friendship;
-import org.team10424102.blackserver.models.FriendshipApplication;
-import org.team10424102.blackserver.models.Notification;
 import org.team10424102.blackserver.models.User;
+import org.team10424102.blackserver.notifications.AddingFriendHandler;
+import org.team10424102.blackserver.notifications.RemovingFriendHandler;
 import org.team10424102.blackserver.services.UserService;
 import org.team10424102.blackserver.services.VcodeService;
 import org.team10424102.blackserver.utils.Api;
@@ -28,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
@@ -48,6 +49,12 @@ public class UserController {
     @Autowired FriendshipApplicationRepo friendshipApplicationRepo;
 
     @Autowired NotificationRepo notificationRepo;
+
+    @Autowired AddingFriendHandler addingFriendHandler;
+
+    @Autowired RemovingFriendHandler removingFriendHandler;
+
+    @Autowired UserRepo userRepo;
 
     /////////////////////////////////////////////////////////////////
     //                                                             //
@@ -115,8 +122,8 @@ public class UserController {
      */
     @RequestMapping(method = GET)
     @JsonView(Views.UserDetails.class)
-    public User getCurrentUsersProfile() {
-        return userService.getCurrentUser();
+    public User getCurrentUsersProfile(@CurrentUser User user) {
+        return user;
     }
 
     /**
@@ -190,7 +197,7 @@ public class UserController {
      */
     @RequestMapping(value = "/{id}", method = GET)
     @JsonView(Views.UserDetails.class)
-    public User getOthersProfile(@PathVariable int id) {
+    public User getOthersProfile(@PathVariable long id) {
         return userService.getUserById(id);
     }
 
@@ -228,7 +235,7 @@ public class UserController {
      * 关注一个用户
      */
     @RequestMapping(value = "/focuses/{id}", method = POST)
-    public void focusSomeone(@PathVariable int id) {
+    public void focusSomeone(@PathVariable long id) {
         User user = userService.getCurrentUser();
         // 不能关注自己
         if (user.getId() == id) return;
@@ -243,7 +250,7 @@ public class UserController {
      * 取消关注一个用户
      */
     @RequestMapping(value = "/focuses/{id}", method = DELETE)
-    public void unfocusSomeone(@PathVariable int id) {
+    public void unfocusSomeone(@PathVariable long id) {
         User user = userService.getCurrentUser();
         user.getFocuses().removeIf(u -> u.getId() == id);
         // 取消关注一个人的同时你也会从他的粉丝列表里消失
@@ -276,30 +283,8 @@ public class UserController {
      */
     @RequestMapping(value = "/friends/{id}", method = POST)
     @Transactional
-    public void friendSomeone(@PathVariable int id, @RequestParam(required = false) String attachment, @CurrentUser User user) {
-        // 不能和自己成为朋友
-        if (user.getId() == id) return;
-
-        User target = userService.getUserById(id);
-        if (target.getBlacklist().contains(user)) return; // 你在对方的黑名单中
-
-        FriendshipApplication application = new FriendshipApplication();
-        application.setApplicant(user);
-        application.setAttachment(attachment);
-        application.setCreationTime(Calendar.getInstance().getTime());
-        application.setTarget(target);
-        application = friendshipApplicationRepo.save(application);
-
-        Notification notification = new Notification();
-        notification.setTarget(target);
-        notification.setType(Notification.FRIEND_ADD);
-        notification.setDataId(application.getId());
-        notificationRepo.save(notification); // 发出好友申请
-
-        notification = new Notification();
-        notification.setTarget(user);
-        notification.setType(Notification.FRIEND_ADD);
-        notification.setDataId(target.getId().longValue());
+    public void friendSomeone(@PathVariable long id, @RequestParam(required = false) String attachment, @CurrentUser User user) {
+        addingFriendHandler.fireRequest(user, userRepo.findOne(id), attachment);
     }
 
     /**
@@ -307,28 +292,15 @@ public class UserController {
      */
     @RequestMapping(value = "/friends/{id}", method = DELETE)
     @Transactional
-    public void unfriendSomeone(@PathVariable int id, @CurrentUser User user) {
-        user.getFriendshipSet().removeIf(f -> {
-            User friend = f.getFriend();
-            if (friend.getId() == id ) {
-                friend.getFriendshipSet().removeIf(e -> e.getFriend().equals(user));
-
-                Notification notification = new Notification();
-                notification.setTarget(friend);
-                notification.setType(Notification.FRIEND_ADD);
-                notification.setDataId(user.getId().longValue());
-                notificationRepo.save(notification); // 发出友尽通知
-                return true;
-            }
-            return false;
-        });
+    public void unfriendSomeone(@PathVariable long id, @CurrentUser User user) {
+        removingFriendHandler.unfriend(user, userRepo.findOne(id));
     }
 
     /**
      * 修改一个朋友的备注名称
      */
     @RequestMapping(value = "/friends/{id}", method = PUT)
-    public void updateFriendAlias(@PathVariable int id, @RequestParam String alias) {
+    public void updateFriendAlias(@PathVariable long id, @RequestParam String alias) {
         User user = userService.getCurrentUser();
         Optional<Friendship> friendship = user.getFriendshipSet().stream()
                 .filter(f -> f.getFriend().getId() == id).findFirst();

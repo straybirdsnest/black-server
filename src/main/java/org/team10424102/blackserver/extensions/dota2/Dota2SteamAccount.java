@@ -8,13 +8,13 @@ import javax.persistence.Id;
 public class Dota2SteamAccount {
     @Id
     @GeneratedValue
-    public Integer id;
+    public Long id;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 }

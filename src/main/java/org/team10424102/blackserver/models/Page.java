@@ -9,17 +9,18 @@ import javax.persistence.Id;
 public class Page {
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
 
     //<editor-fold desc="=== Getters & Setters ===">
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
+
 
     //</editor-fold>
 }

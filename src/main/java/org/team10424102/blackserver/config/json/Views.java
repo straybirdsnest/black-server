@@ -8,6 +8,7 @@ public class Views {
     public interface Post extends PostComment, UserSummary{}
     public interface Group{}
     public interface Game{}
-    public interface Notification extends UserSummary{}
+    public interface Notification extends FriendshipApplication{}
+    public interface FriendshipApplication extends UserSummary{}
     public interface PostComment extends UserSummary{}
 }

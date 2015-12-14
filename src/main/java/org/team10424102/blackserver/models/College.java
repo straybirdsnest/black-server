@@ -11,7 +11,7 @@ public class College {
 
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -28,11 +28,12 @@ public class College {
 
     //<editor-fold desc="=== Getters & Setters ===">
 
-    public Integer getId() {
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

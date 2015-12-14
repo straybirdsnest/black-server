@@ -52,7 +52,16 @@ public class UserServiceImpl implements UserService {
     public UserAuthentication getUserAuthenticationFromToken(String token) {
         Element element = tokenCache.get(token);
         if (element == null) return null;
-        return (UserAuthentication) element.getObjectValue();
+
+        // 因为 Hibernate 的原因, 这里取出来的 User 是没有和数据库关联的, 或者里面的 SessionFactory 已经关闭
+        // 暂且采用这个愚蠢的方法从数据库中再取一个新鲜的 User
+        // TODO 缓存内的 User 保鲜
+        UserAuthentication auth = (UserAuthentication)element.getObjectValue();
+//        User user = (User)auth.getPrincipal();
+//        User freshUser = userRepo.findOne(user.getId());
+//        UserAuthentication freshAuth = new UserAuthentication(freshUser);
+//        return freshAuth;
+        return auth;
     }
 
     @Override
@@ -70,23 +79,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public int getCurrentUserId() {
+    public long getCurrentUserId() {
         return getCurrentUser().getId();
-    }
-
-    @Override
-    public boolean isSecondsFriend(int firstUid, int secondUid) {
-        return userRepo.friendOf(firstUid, secondUid);
-    }
-
-    @Override
-    public boolean isSecondsFan(int firstUid, int secondUid) {
-        return userRepo.fanOf(firstUid, secondUid);
-    }
-
-    @Override
-    public boolean isSecondsFocus(int firstUid, int secondUid) {
-        return userRepo.focusOf(firstUid, secondUid);
     }
 
     @NotNull
@@ -112,13 +106,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteCurrentUser() {
-        int id = getCurrentUserId();
-        userRepo.delete(id);
+        userRepo.delete(getCurrentUserId());
     }
 
     @NotNull
     @Override
-    public User getUserById(int id) {
+    public User getUserById(long id) {
         User user = userRepo.findOne(id);
         if (user == null) throw new UserNotFoundException(id);
         return user;
