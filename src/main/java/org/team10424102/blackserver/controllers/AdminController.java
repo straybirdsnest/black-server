@@ -3,8 +3,10 @@ package org.team10424102.blackserver.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.team10424102.blackserver.daos.ActivityRepo;
 import org.team10424102.blackserver.daos.ImageRepo;
 import org.team10424102.blackserver.daos.UserRepo;
+import org.team10424102.blackserver.models.Activity;
 import org.team10424102.blackserver.models.Image;
 import org.team10424102.blackserver.models.User;
 import org.team10424102.blackserver.services.UserService;
@@ -21,6 +23,8 @@ public class AdminController {
     @Autowired ImageRepo imageRepo;
 
     @Autowired UserService userService;
+
+    @Autowired ActivityRepo activityRepo;
 
     @RequestMapping("/admin/users")
     public Set<User> getAllUsers() {
@@ -47,5 +51,13 @@ public class AdminController {
             result.put(u.getPhone(), userService.generateToken(u));
         }
         return result;
+    }
+
+    @RequestMapping("/admin/activities")
+    public Set<Activity> getAllActivities() {
+        Iterator<Activity> i = activityRepo.findAll().iterator();
+        Stream<Activity> s = StreamSupport.stream(Spliterators.spliteratorUnknownSize(i, Spliterator.ORDERED), false);
+        Set<Activity> activities = s.collect(Collectors.toSet());
+        return activities;
     }
 }

@@ -42,11 +42,23 @@
             </div>
         </div>
     </nav>
-    <div class="container-fluid" ng-view>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar" role="navigation" bs-navbar>
+                    <li data-match-route="/users"><a href="#/users"> 所有用户 <span class="sr-only">(current)</span></a></li>
+                    <li data-match-route="/activities"><a href="#/activities"> 所有活动 <span class="sr-only">所有活动</span></a></li>
+                </ul>
+            </div>
+        </div>
+        <div ng-view>
+        </div>
     </div>
     <script src="../static/js/angular-1.4.7.min.js" th:src="@{/js/angular-1.4.7.min.js}"></script>
-    <script src="../static/js/angular-ui-bootstrap-tpls-0.14.3.min.js"
-            th:src="@{/js/angular-ui-bootstrap-tpls-0.14.3.min.js}"></script>
+    <script src="../static/js/angular-strap-2.3.6.min.js"
+            th:src="@{/js/angular-strap-2.3.6.min.js}"></script>
+    <script src="../static/js/angular-strap.tpl-2.3.6.min.js"
+            th:src="@{/js/angular-strap.tpl-2.3.6.min.js}"></script>
     <script src="../static/js/angular-route-1.4.7.js" th:src="@{/js/angular-route-1.4.7.js}"></script>
     <script src="../static/js/blackserverwebapp.js" th:src="@{/js/blackserverwebapp.js}"></script>
 </div>

@@ -1,12 +1,15 @@
-var blackserverweb = angular.module('blackserverweb', ['ui.bootstrap', 'ngRoute'])
+var blackserverweb = angular.module('blackserverweb', ['mgcrea.ngStrap', 'ngRoute'])
  .config(function($routeProvider, $httpProvider) {
 
 	$routeProvider.when('/home', {
 		templateUrl : '/partials/home',
 		controller : 'home'
 	}).when('/users', {
-       		templateUrl : '/partials/users',
-       		controller : 'users'
+       	templateUrl : '/partials/users',
+       	controller : 'users'
+    }).when('/activities', {
+        templateUrl : '/partials/activities',
+        controller : 'activities'
     }).otherwise('/users');
 
   })
@@ -16,8 +19,7 @@ var blackserverweb = angular.module('blackserverweb', ['ui.bootstrap', 'ngRoute'
  .controller('users', function($rootScope, $scope, $http, $location) {
    var index = 0;
    function getXToken(){
-     $http.get('/api/user/token?phone=123456789&vcode=1234').success(function(data, status)
-     {
+     $http.get('/api/user/token?phone=123456789&vcode=1234').success(function(data, status){
        $scope.xtoken = data.token;
        getAllUsers();
      });
@@ -58,7 +60,55 @@ var blackserverweb = angular.module('blackserverweb', ['ui.bootstrap', 'ngRoute'
              index++;
              getNextAvatarData();
            }
-
+         });
+       }
+     }
+   }
+   getXToken();
+ })
+ .controller('activities', function($rootScope, $scope, $http, $location){
+   var index = 0;
+   function getXToken(){
+     $http.get('/api/user/token?phone=123456789&vcode=1234').success(function(data, status){
+       $scope.xtoken = data.token;
+       getAllActivities();
+     });
+   }
+   function getAllActivities(){
+     $http({
+       url:'/admin/activities',
+       method: 'GET',
+       headers: {
+         'Content-Type': 'application/json',
+         'X-Token': $scope.xtoken
+         }
+       }).success(function(data, status){
+         $scope.activities = data;
+         getNextCoverData();
+       });
+   }
+   function getNextCoverData()
+   {
+     if($scope.xtoken && $scope.activities){
+       if(index < $scope.activities.length){
+         var coverUrl = '/api/image?q='+$scope.activities[index].cover;
+         $http({
+           url: coverUrl,
+           method: 'GET',
+           headers: {
+             'Content-Type': 'application/json',
+             'X-Token': $scope.xtoken
+           },
+           responseType: 'blob'
+         }).success(function(data, status){
+           var fileReader = new FileReader();
+           fileReader.readAsDataURL(data);
+           fileReader.onload = function()
+           {
+             $scope.activities[index].coverData = fileReader.result;
+             index++;
+             getNextCoverData();
+           }
          });
        }
      }
