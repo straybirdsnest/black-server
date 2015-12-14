@@ -58,7 +58,6 @@ var blackserverweb = angular.module('blackserverweb', ['ui.bootstrap', 'ngRoute'
              index++;
              getNextAvatarData();
            }
-
          });
        }
      }
