@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
 import org.team10424102.blackserver.config.json.Views;
 import org.team10424102.blackserver.extensions.PostExtensionData;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,6 +39,7 @@ public class Post {
     private String extension;
 
     @OneToMany(mappedBy = "post")
+    @Cascade(CascadeType.DELETE)
     private Set<PostLike> likes = new HashSet<>();
 
     @OneToMany
@@ -61,7 +66,7 @@ public class Post {
 
     //<editor-fold desc="=== Getters & Setters ===">
 
-    @JsonView(Views.Post.class)
+    @JsonView(Views.PostComment.class)
     public Long getId() {
         return id;
     }
@@ -70,7 +75,7 @@ public class Post {
         this.id = id;
     }
 
-    @JsonView(Views.Post.class)
+    @JsonView(Views.PostComment.class)
     public String getContent() {
         return content;
     }
@@ -79,7 +84,7 @@ public class Post {
         this.content = content;
     }
 
-    @JsonView(Views.Post.class)
+    @JsonView(Views.PostComment.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     public Date getCreationTime() {
         return creationTime;
@@ -89,7 +94,7 @@ public class Post {
         this.creationTime = creationTime;
     }
 
-    @JsonView(Views.Post.class)
+    @JsonView(Views.PostComment.class)
     public User getSender() {
         return sender;
     }

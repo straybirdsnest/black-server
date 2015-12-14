@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.team10424102.blackserver.App;
 import org.team10424102.blackserver.config.json.Views;
 import org.team10424102.blackserver.models.Activity;
+import org.team10424102.blackserver.models.Post;
 import org.team10424102.blackserver.services.ActivityService;
 
 import java.util.List;
@@ -79,5 +80,55 @@ public class ActivityController {
     @JsonView(Views.ActivityDetails.class)
     public void deleteActivity(@PathVariable long id) {
         activityService.deleteActivity(id);
+    }
+
+    /**
+     * 点赞
+     * @param id
+     */
+    @RequestMapping(value = App.API_ACTIVITY + "/{id}/like/add", method = POST)
+    public void likePost(@PathVariable long id) {
+        activityService.likeActivity(id);
+    }
+
+    /**
+     * 取消点赞
+     * @param id
+     */
+    @RequestMapping(value = App.API_ACTIVITY + "/{id}/like/delete", method = POST)
+    public void removeLikePost(@PathVariable long id) {
+        activityService.unlikeActivity(id);
+    }
+
+    /**
+     * 得到所有评论
+     * @param id
+     * @param criteria
+     * @return
+     */
+    @RequestMapping(value = App.API_ACTIVITY + "/{id}/comment", method = GET)
+    @JsonView(Views.PostComment.class)
+    public List<Post> getComments(@PathVariable long id, QueryCriteria criteria) {
+        return activityService.getComments(criteria.toPageRequest(), id);
+    }
+
+    /**
+     * 评论
+     * @param id
+     * @param content
+     */
+    @RequestMapping(value = App.API_ACTIVITY + "/{id}/comment/add", method = POST)
+    public void addComment(@PathVariable long id, @RequestParam String content) {
+        activityService.saveComment(id, content);
+    }
+
+    /**
+     * 删除评论
+     * @param id
+     * @param commentId
+     */
+    @RequestMapping(value = App.API_ACTIVITY + "/{id}/comment/delete/{commentId}", method = DELETE)
+    public void deleteCommentPost(@PathVariable long id, @PathVariable long commentId) {
+        activityService.deleteComment(id, commentId);
     }
 }

@@ -1,6 +1,7 @@
 package org.team10424102.blackserver.daos;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import org.team10424102.blackserver.models.College;
@@ -20,6 +21,7 @@ public interface PostRepo extends PagingAndSortingRepository<Post, Long> {
 
     List<Post> findByCommentativeFalseAndSender(User sender, Pageable pageable);
 
+    @Query("select p.comments from Post p where p.id = ?1")
     List<Post> findCommentsById(Long id, Pageable pageable);
 
     List<PostLike> findLikesById(Long id, Pageable pageable);

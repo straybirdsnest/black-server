@@ -94,9 +94,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getCommentPosts(Pageable pageable, long postId) {
-        List<Post> posts = postRepo.findCommentsById(postId, pageable);
-        posts.forEach(this::inflatePostExtension);
-        return posts;
+        return postRepo.findCommentsById(postId, pageable);
     }
 
     @Override
@@ -118,12 +116,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public void commentPost(long postId, String content) {
+    public void saveCommentPost(long postId, String content) {
         User user = userService.getCurrentUser();
         Post comment = new Post();
         comment.setCreationTime(new Date());
         comment.setSender(user);
         comment.setContent(content);
+        comment.setCommentative(true);
 
         postRepo.save(comment);
 
@@ -131,6 +130,20 @@ public class PostServiceImpl implements PostService {
         post.getComments().add(comment);
 
         postRepo.save(post);
+    }
+
+    @Override
+    public void deleteCommentPost(long postId, long commentId) {
+        User user = userService.getCurrentUser();
+        Post comment = postRepo.findOne(commentId);
+        if (comment.getSender().equals(user)) {
+            Post post = postRepo.findOne(postId);
+            post.getComments().remove(comment);
+            postRepo.save(post);
+
+            comment.getComments().clear();
+            postRepo.delete(comment);
+        }
     }
 
     @Override
@@ -149,6 +162,7 @@ public class PostServiceImpl implements PostService {
         User user = userService.getCurrentUser();
         Post post = postRepo.findOne(postId);
         if (post.getSender().equals(user)) {
+            post.getComments().clear();
             postRepo.delete(post);
         }
     }
