@@ -14,7 +14,7 @@ public class GameServiceImpl implements GameService {
   @Autowired GameRepo gameRepo;
 
   @Override
-  public Game getGame(String identifier) {
-    return gameRepo.findOneByIdentifier(identifier);
+  public Game getGame(String nameKey) {
+    return gameRepo.findOneByNameKey(nameKey);
   }
 }

@@ -7,5 +7,5 @@ import org.team10424102.blackserver.game.Game;
  */
 public interface GameService {
 
-  Game getGame(String identifier);
+  Game getGame(String nameKey);
 }

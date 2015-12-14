@@ -12,7 +12,8 @@ import javax.persistence.*;
 public class Game {
     @Id
     private Long id;
-    private String identifier;
+
+    private String nameKey;
 
     @ManyToOne
     @JoinColumn(name = "logo_id")
@@ -31,12 +32,12 @@ public class Game {
     }
 
     @JsonView(Views.Game.class)
-    public String getIdentifier() {
-        return identifier;
+    public String getNameKey() {
+        return nameKey;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setNameKey(String nameKey) {
+        this.nameKey = nameKey;
     }
 
     @JsonView(Views.Game.class)

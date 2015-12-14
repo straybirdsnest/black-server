@@ -16,9 +16,9 @@ public class GameTests extends BaseTests {
     @Test
     public void getGame_zh_CN() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(App.API_GAME).header(AUTH_HEADER, getToken())
-                .param("identifier", "MINECRAFT").locale(Locale.SIMPLIFIED_CHINESE))
+                .param("key", "MINECRAFT").locale(Locale.SIMPLIFIED_CHINESE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.identifier", is("MINECRAFT")))
+                .andExpect(jsonPath("$.nameKey", is("MINECRAFT")))
                 .andExpect(jsonPath("$.logo", matchesPattern(UUID_PATTERN)))
                 .andExpect(jsonPath("$.localizedName", is("我的世界")));
     }
@@ -26,9 +26,9 @@ public class GameTests extends BaseTests {
     @Test
     public void getGame_en_US() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(App.API_GAME).header(AUTH_HEADER, getToken())
-                .param("identifier", "MINECRAFT").locale(Locale.ENGLISH))
+                .param("key", "MINECRAFT").locale(Locale.ENGLISH))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.identifier", is("MINECRAFT")))
+                .andExpect(jsonPath("$.nameKey", is("MINECRAFT")))
                 .andExpect(jsonPath("$.logo", matchesPattern(UUID_PATTERN)))
                 .andExpect(jsonPath("$.localizedName", is("Minecraft")));
     }
