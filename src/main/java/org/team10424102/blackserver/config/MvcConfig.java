@@ -12,7 +12,6 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.team10424102.blackserver.config.propertyeditors.UserResolver;
 import org.team10424102.blackserver.daos.AcademyRepo;
 import org.team10424102.blackserver.daos.CollegeRepo;
@@ -30,6 +29,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("index");
+        registry.addViewController("/partials/users").setViewName("users");
+        registry.addViewController("/partials/activities").setViewName("activities");
     }
 
     @Override

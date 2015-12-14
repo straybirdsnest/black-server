@@ -1,0 +1,41 @@
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" ng-controller="activities">
+    <h1 class="page-header">所有活动</h1>
+    <div class="row placeholders">
+        <div class="col-xs-6 col-sm-4 placeholder">
+            <h1>{{activities.length}}</h1>
+            <span class="text-muted">活动总数</span>
+        </div>
+        <div class="col-xs-6 col-sm-4 placeholder">
+            <h1>4</h1>
+            <span class="text-muted">今日新增活动</span>
+        </div>
+        <div class="col-xs-6 col-sm-4 placeholder">
+            <h1>0</h1>
+            <span class="text-muted">今日结束活动</span>
+        </div>
+    </div>
+
+    <h2 class="sub-header">活动列表</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>封面</th>
+                <th>标题</th>
+                <th>内容</th>
+                <th>举办者</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="activity in activities" >
+                <td>{{$index+1}}</td>
+                <td><img ng-src="{{activity.coverData}}" class="img-avatar"></td>
+                <td>{{activity.title}}</td>
+                <td>{{activity.content | limitTo: 20}}{{activity.content.length > 20 ? '...' : ''}}</td>
+                <td>{{activity.promoter.nickname}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

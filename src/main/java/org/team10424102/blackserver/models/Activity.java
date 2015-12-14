@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.team10424102.blackserver.config.json.ActivityDeserializer;
 import org.team10424102.blackserver.config.json.Views;
 import org.team10424102.blackserver.game.Game;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,6 +74,7 @@ public class Activity {
     private Set<Post> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "activity")
+    @Cascade(CascadeType.DELETE)
     private Set<ActivityLike> likes = new HashSet<>();
 
 

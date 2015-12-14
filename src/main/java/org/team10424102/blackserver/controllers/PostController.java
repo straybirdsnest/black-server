@@ -56,16 +56,27 @@ public class PostController {
         postService.createPost(content);
     }
 
-    @RequestMapping(value = App.API_POST + "/{id}", method = DELETE)
+    @RequestMapping(value = App.API_POST + "/delete/{id}", method = DELETE)
     public void deletePost(@PathVariable long id) {
         postService.deletePost(id);
     }
 
-    @RequestMapping(value = App.API_POST + "/{id}/like", method = POST)
+    /**
+     * 点赞
+     * @param id
+     */
+    @RequestMapping(value = App.API_POST + "/{id}/like/add", method = POST)
     public void likePost(@PathVariable long id) {
-        Post post = new Post();
-        post.setId(id);
         postService.likePost(id);
+    }
+
+    /**
+     * 取消点赞
+     * @param id
+     */
+    @RequestMapping(value = App.API_POST + "/{id}/like/delete", method = POST)
+    public void unlikePost(@PathVariable long id) {
+        postService.unlikePost(id);
     }
 
     @RequestMapping(value = App.API_POST + "/{id}/like", method = GET)
@@ -75,18 +86,33 @@ public class PostController {
         return postService.getLikes(id, pageable);
     }
 
-    @RequestMapping(value = App.API_POST + "/{id}/comment", method = POST)
-    public void commentPost(@PathVariable long id, @RequestParam String content) {
-        Post post = new Post();
-        post.setId(id);
-        postService.commentPost(id, content);
+    /**
+     * 评论
+     * @param id
+     * @param content
+     */
+    @RequestMapping(value = App.API_POST + "/{id}/comment/add", method = POST)
+    public void CommentPost(@PathVariable long id, @RequestParam String content) {
+        postService.saveCommentPost(id, content);
     }
 
+    /**
+     * 得到所有评论
+     * @param id
+     * @param criteria
+     * @return
+     */
     @RequestMapping(value = App.API_POST + "/{id}/comment", method = GET)
+    @JsonView(Views.PostComment.class)
     public List<Post> getComments(@PathVariable long id, QueryCriteria criteria) {
         Post post = new Post();
         post.setId(id);
         return postService.getCommentPosts(criteria.toPageRequest(), id);
+    }
+
+    @RequestMapping(value = App.API_POST + "/{id}/comment/delete/{commentId}", method = DELETE)
+    public void deleteCommentPost(@PathVariable long id, @PathVariable long commentId) {
+        postService.deleteCommentPost(id, commentId);
     }
 
 }
