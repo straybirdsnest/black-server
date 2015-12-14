@@ -85,7 +85,7 @@ public class UserGroup {
         this.page = page;
     }
 
-    public Integer getPageId() {
+    public Long getPageId() {
         if (page != null) {
             return page.getId();
         }

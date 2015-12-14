@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class Friendship {
     @Id
     @GeneratedValue
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -29,11 +29,11 @@ public class Friendship {
     //<editor-fold desc="=== Getters & Setters ===">
 
     @JsonIgnore
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Table(name = "t_game")
 public class Game {
     @Id
-    private Integer id;
+    private Long id;
     private String identifier;
 
     @ManyToOne
@@ -22,12 +22,11 @@ public class Game {
     private String localizedName;
 
 
-
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

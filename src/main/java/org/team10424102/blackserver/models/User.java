@@ -28,7 +28,6 @@ public class User {
      */
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "int")
     private Long id;
 
     /**

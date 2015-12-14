@@ -5,7 +5,6 @@ import org.team10424102.blackserver.config.json.ImageSerializer;
 
 import javax.persistence.*;
 
-@SuppressWarnings("unused")
 @JsonSerialize(using = ImageSerializer.class)
 @Entity
 public class Image {

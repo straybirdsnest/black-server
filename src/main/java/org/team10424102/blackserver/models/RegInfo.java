@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import javax.persistence.Embeddable;
 import java.util.Date;
 
-@SuppressWarnings("unused")
 @Embeddable
 public class RegInfo {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")

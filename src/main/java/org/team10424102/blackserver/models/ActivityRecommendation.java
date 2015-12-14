@@ -7,7 +7,6 @@ import javax.persistence.*;
 public class ActivityRecommendation {
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "int")
     private Long id;
 
     @OneToOne
