@@ -3,14 +3,15 @@ package org.team10424102.blackserver.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.team10424102.blackserver.daos.ActivityLikeRepo;
 import org.team10424102.blackserver.daos.ActivityRecommendationRepo;
-import org.team10424102.blackserver.models.Activity;
-import org.team10424102.blackserver.models.ActivityRecommendation;
-import org.team10424102.blackserver.models.Friendship;
-import org.team10424102.blackserver.models.User;
+import org.team10424102.blackserver.daos.PostRepo;
+import org.team10424102.blackserver.models.*;
 import org.team10424102.blackserver.daos.ActivityRepo;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,6 +24,10 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired UserService userService;
 
     @Autowired ActivityRecommendationRepo activityRecommendationRepo;
+
+    @Autowired ActivityLikeRepo activityLikeRepo;
+
+    @Autowired PostRepo postRepo;
 
     @Override
     public List<Activity> getRecommendedActivities(Pageable pageable) {
@@ -67,11 +72,67 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public void deleteActivity(long activityId) {
+        Activity activity = activityRepo.findOne(activityId);
+        activity.getComments().clear();
+        activity.getPhotos().clear();
         activityRepo.delete(activityId);
     }
 
     @Override
     public Activity findOne(long activityId) {
         return activityRepo.findOne(activityId);
+    }
+
+    @Override
+    public void likeActivity(long activityId) {
+        User user = userService.getCurrentUser();
+        ActivityLike like = new ActivityLike();
+        like.setUser(user);
+        like.setActivity(activityRepo.findOne(activityId));
+        activityLikeRepo.save(like);
+    }
+
+    @Override
+    public void unlikeActivity(long activityId) {
+        User user = userService.getCurrentUser();
+        ActivityLike like = activityLikeRepo.findOneByActivityIdAndUser(activityId, user);
+        activityLikeRepo.delete(like);
+    }
+
+    @Override
+    public List<Post> getComments(Pageable pageabl, long postId) {
+        return activityRepo.findCommentsById(postId, pageabl);
+    }
+
+    @Override
+    @Transactional
+    public void saveComment(long activityId, String content) {
+        User user = userService.getCurrentUser();
+        Post comment = new Post();
+        comment.setCreationTime(new Date());
+        comment.setSender(user);
+        comment.setContent(content);
+        comment.setCommentative(true);
+
+        postRepo.save(comment);
+
+        Activity activity = activityRepo.findOne(activityId);
+        activity.getComments().add(comment);
+
+        activityRepo.save(activity);
+    }
+
+    @Override
+    public void deleteComment(long activityId, long commentId) {
+        User user = userService.getCurrentUser();
+        Post comment = postRepo.findOne(commentId);
+        if (comment.getSender().equals(user)) {
+            Activity activity = activityRepo.findOne(activityId);
+            activity.getComments().remove(comment);
+            activityRepo.save(activity);
+
+            comment.getComments().clear();
+            postRepo.delete(comment);
+        }
     }
 }

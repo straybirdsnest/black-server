@@ -1,6 +1,7 @@
 package org.team10424102.blackserver.daos;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,8 @@ public interface ActivityRepo extends PagingAndSortingRepository<Activity, Long>
     List<Activity> findByPromoterIn(Collection<User> users, Pageable pageable);
     List<Activity> findByPromoter(User user, Pageable pageable);
 
+    @Query("select ac.comments from Activity ac where ac.id = ?1")
     List<Post> findCommentsById(Long id, Pageable pageable);
-    List<ActivityLike> findLikesById(Long id, Pageable pageable);
 
+    List<ActivityLike> findLikesById(Long id, Pageable pageable);
 }

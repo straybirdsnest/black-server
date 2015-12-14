@@ -25,7 +25,7 @@ public interface PostService {
 
     void unlikePost(long postId);
 
-    void commentPost(long postId, String content);
+    void saveCommentPost(long postId, String content);
 
     void createPost(String content);
 
@@ -33,4 +33,5 @@ public interface PostService {
 
     List<PostLike> getLikes(long postId, Pageable pageable);
 
+    void deleteCommentPost(long postId, long commentId);
 }
