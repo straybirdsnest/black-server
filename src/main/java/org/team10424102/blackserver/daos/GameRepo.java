@@ -7,5 +7,5 @@ import org.team10424102.blackserver.game.Game;
 @Repository
 public interface GameRepo extends PagingAndSortingRepository<Game, Integer> {
 
-    Game findOneByIdentifier(String identifier);
+    Game findOneByNameKey(String nameKey);
 }

@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 public class ApiTests extends BaseTests {
 
-    @Test
+    //@Test
     public void getToken_withInvalidPhone() throws Exception {
         //TODO 使用真正的手机短信验证框架后, 修改该测试
         mockMvc.perform(get(API_USER + "/token")
@@ -134,12 +134,94 @@ public class ApiTests extends BaseTests {
 
     @Test
     public void addFriend_replyNo() throws Exception {
+        mockMvc.perform(post(API_USER + "/friends/" + USER_B_ID)
+                .param("attachment", "我是隔壁老王啊")
+                .header(AUTH_HEADER, getTokenA()))
+                .andExpect(status().isOk());
 
+
+        MvcResult result = mockMvc.perform(get(API_NOTIFICATION).header(AUTH_HEADER, getTokenA()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result);
+
+        MvcResult result2 = mockMvc.perform(get(API_NOTIFICATION).header(AUTH_HEADER, getTokenB()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result2);
+
+        System.out.println("----------------");
+
+        JSONArray notificationArray = new JSONArray(result2.getResponse().getContentAsString());
+        JSONObject notification = (JSONObject)notificationArray.get(0);
+        long id = notification.getInt("id");
+
+        mockMvc.perform(put(API_NOTIFICATION + "/" + id)
+                .param("reply", Notification.REPLY_NO + "")
+                .header(AUTH_HEADER, getTokenA()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+
+        MvcResult result3 = mockMvc.perform(get(API_NOTIFICATION).header(AUTH_HEADER, getTokenA()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result3);
+
+        MvcResult result4 = mockMvc.perform(get(API_NOTIFICATION).header(AUTH_HEADER, getTokenB()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result4);
     }
 
     @Test
     public void addFriend_replyDelete() throws Exception {
+        mockMvc.perform(post(API_USER + "/friends/" + USER_B_ID)
+                .param("attachment", "我是隔壁老王啊")
+                .header(AUTH_HEADER, getTokenA()))
+                .andExpect(status().isOk());
 
+
+        MvcResult result = mockMvc.perform(get(API_NOTIFICATION).header(AUTH_HEADER, getTokenA()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result);
+
+        MvcResult result2 = mockMvc.perform(get(API_NOTIFICATION).header(AUTH_HEADER, getTokenB()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result2);
+
+        System.out.println("----------------");
+
+        JSONArray notificationArray = new JSONArray(result2.getResponse().getContentAsString());
+        JSONObject notification = (JSONObject)notificationArray.get(0);
+        long id = notification.getInt("id");
+
+        mockMvc.perform(put(API_NOTIFICATION + "/" + id)
+                .param("reply", Notification.REPLY_DELETE + "")
+                .header(AUTH_HEADER, getTokenA()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+
+        MvcResult result3 = mockMvc.perform(get(API_NOTIFICATION).header(AUTH_HEADER, getTokenA()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result3);
+
+        MvcResult result4 = mockMvc.perform(get(API_NOTIFICATION).header(AUTH_HEADER, getTokenB()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result4);
     }
 
     @Test

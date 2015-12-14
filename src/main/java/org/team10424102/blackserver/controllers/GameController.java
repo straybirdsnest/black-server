@@ -29,9 +29,9 @@ public class GameController {
      */
     @RequestMapping(value = App.API_GAME, method = GET)
     @JsonView(Views.Game.class)
-    public Game getGame(@RequestParam String identifier) {
-        Game game = gameService.getGame(identifier);
-        game.setLocalizedName(context.getMessage("game." + game.getIdentifier(), null,
+    public Game getGame(@RequestParam String key) {
+        Game game = gameService.getGame(key);
+        game.setLocalizedName(context.getMessage("game." + game.getNameKey(), null,
                 "", LocaleContextHolder.getLocale()));
         return game;
     }
