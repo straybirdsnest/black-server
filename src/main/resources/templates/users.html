@@ -39,7 +39,7 @@
                 <tbody>
                 <tr ng-repeat="user in users" >
                     <td>{{$index+1}}</td>
-                    <td><img ng-src="data:image/png;base64,{{user.avatarData}}" class="img-circle img-avatar"></td>
+                    <td><img ng-src="{{user.avatarData}}" class="img-circle img-avatar"></td>
                     <td>{{user.phone}}</td>
                     <td>{{user.username}}</td>
                     <td>{{user.signature}}</td>

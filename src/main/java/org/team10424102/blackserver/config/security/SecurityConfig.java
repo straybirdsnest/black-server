@@ -28,7 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 //@Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired UserService userService;
+    @Autowired
+    UserService userService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -38,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .httpBasic().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/api/**", "/admin/**", "/partials/**").permitAll()
+                .antMatchers("/", "/partials/**").permitAll()
                 .antMatchers(HttpMethod.POST, App.API_USER).permitAll()
                 .antMatchers(HttpMethod.GET, App.API_USER + "/token*").permitAll()
                 .antMatchers(HttpMethod.HEAD + App.API_USER + "/token").permitAll()
