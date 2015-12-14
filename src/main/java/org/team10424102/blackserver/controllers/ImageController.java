@@ -25,11 +25,14 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class ImageController {
     static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
-    @Autowired ImageRepo imageRepo;
+    @Autowired
+    ImageRepo imageRepo;
 
-    @Autowired ImageService imageService;
+    @Autowired
+    ImageService imageService;
 
-    @Autowired UserService userService;
+    @Autowired
+    UserService userService;
 
     /**
      * 获取图片
