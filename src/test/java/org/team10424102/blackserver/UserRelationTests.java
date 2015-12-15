@@ -8,46 +8,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class UserRelationTests extends BaseTests {
 
-    @Test
-    public void focusSomeone() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post(App.API_USER).param("phone", "1234").param("vcode", "1234"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    public void friendSomeone() {
-
-    }
-
-    @Test
-    public void getFocuses() {
-
-    }
-
-    @Test
-    public void getFans() {
-
-    }
-
-    @Test
-    public void unfocusSomone() {
-
-    }
-
-    @Test
-    public void getFriends() {
-
-    }
-
-    @Test
-    public void unfriendSomeone() {
-
-    }
-
-    @Test
-    public void updateFriendAlias() {
-
-    }
+//    @Test
+//    public void focusSomeone() throws Exception {
+//        mockMvc.perform(MockMvcRequestBuilders.post(App.API_USER).param("phone", "1234").param("vcode", "1234"))
+//                .andExpect(status().isOk());
+//    }
+//
+//    @Test
+//    public void friendSomeone() {
+//
+//    }
+//
+//    @Test
+//    public void getFocuses() {
+//
+//    }
+//
+//    @Test
+//    public void getFans() {
+//
+//    }
+//
+//    @Test
+//    public void unfocusSomone() {
+//
+//    }
+//
+//    @Test
+//    public void getFriends() {
+//
+//    }
+//
+//    @Test
+//    public void unfriendSomeone() {
+//
+//    }
+//
+//    @Test
+//    public void updateFriendAlias() {
+//
+//    }
 
 //    @Autowired
 //    ImageRepo imageRepo;

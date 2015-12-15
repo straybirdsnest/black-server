@@ -52,7 +52,7 @@ public class PostTests extends AbstractTestNGSpringContextTests {
         return obj.getString("token");
     }
 
-    @Test(invocationCount = 500, threadPoolSize = 1000)
+    //@Test(invocationCount = 500, threadPoolSize = 1000)
     public void getSchoolPosts_zh() throws Exception {
         String token = getToken();
 
