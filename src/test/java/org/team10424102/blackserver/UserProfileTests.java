@@ -19,24 +19,24 @@ import static org.team10424102.blackserver.App.API_USER;
 public class UserProfileTests extends BaseTests {
     public static final String UNREGISTERED_PHONE = "13728495536";
 
-    @Autowired UserService userService;
-
-    @Test
-    public void getProfiles() throws Exception {
-        MvcResult result = mockMvc.perform(get(API_USER).header(AUTH_HEADER, getToken()))
-                .andExpect(status().isOk())
-                .andReturn();
-        printFormatedJsonString(result);
-    }
-
-
-    @Test
-    public void getFriends() throws Exception {
-        MvcResult result = mockMvc.perform(get(API_USER + "/friends").header(AUTH_HEADER, getToken()))
-                .andExpect(status().isOk())
-                .andReturn();
-        printFormatedJsonString(result);
-    }
+//    @Autowired UserService userService;
+//
+//    @Test
+//    public void getProfiles() throws Exception {
+//        MvcResult result = mockMvc.perform(get(API_USER).header(AUTH_HEADER, getToken()))
+//                .andExpect(status().isOk())
+//                .andReturn();
+//        printFormatedJsonString(result);
+//    }
+//
+//
+//    @Test
+//    public void getFriends() throws Exception {
+//        MvcResult result = mockMvc.perform(get(API_USER + "/friends").header(AUTH_HEADER, getToken()))
+//                .andExpect(status().isOk())
+//                .andReturn();
+//        printFormatedJsonString(result);
+//    }
 
 
 

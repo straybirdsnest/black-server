@@ -10,16 +10,16 @@ import static junit.framework.TestCase.assertTrue;
 
 public class ImageTests extends BaseTests {
 
-    @Autowired ImageRepo imageRepo;
-
-    @Test
-    public void md5() {
-        Image image = imageRepo.findOne(1L);
-        String md5 = Cryptor.md5_hex(image.getData());
-        assertTrue(md5.equals(image.getHash()));
-    }
-
-
+//    @Autowired ImageRepo imageRepo;
+//
+//    @Test
+//    public void md5() {
+//        Image image = imageRepo.findOne(1L);
+//        String md5 = Cryptor.md5_hex(image.getData());
+//        assertTrue(md5.equals(image.getHash()));
+//    }
+//
+//
 
 
 
