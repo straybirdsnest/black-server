@@ -1,28 +1,27 @@
 package org.team10424102.blackserver;
 
+import org.apache.http.auth.AUTH;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.team10424102.blackserver.models.Notification;
 
-import java.util.List;
+import java.util.Locale;
 
 import static com.jcabi.matchers.RegexMatchers.matchesPattern;
 import static org.hamcrest.CoreMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.team10424102.blackserver.App.API_NOTIFICATION;
-import static org.team10424102.blackserver.App.API_USER;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.team10424102.blackserver.App.*;
 
 public class ApiTests extends BaseTests {
+
+    private static final Logger logger = LoggerFactory.getLogger(ApiTests.class);
 
     //@Test
     public void getToken_withInvalidPhone() throws Exception {
@@ -59,6 +58,11 @@ public class ApiTests extends BaseTests {
     }
 
     @Test
+    public void unregisterAccount() throws Exception {
+        // TODO test: unregister account
+    }
+
+    @Test
     public void getMyProfile() throws Exception {
         MvcResult result = mockMvc.perform(get(API_USER).header(AUTH_HEADER, getToken()))
                 .andExpect(status().isOk())
@@ -86,6 +90,86 @@ public class ApiTests extends BaseTests {
     }
 
     @Test
+    public void updateUsername() throws Exception {
+        // TODO test: update username
+    }
+
+    @Test
+    public void updateNickname() throws Exception {
+        // TODO test: update nickname
+    }
+
+    @Test
+    public void updateEmail() throws Exception {
+        // TODO test: update email
+    }
+
+    @Test
+    public void updateSignature() throws Exception {
+        // TODO test: update signature
+    }
+
+    @Test
+    public void updateGender() throws Exception {
+        // TODO test: update gender
+    }
+
+    @Test
+    public void updateHighschool() throws Exception {
+        // TODO test: udpate highschool
+    }
+
+    @Test
+    public void updateHometown() throws Exception {
+        // TODO test: update hometown
+    }
+
+    @Test
+    public void updateBirthday() throws Exception {
+        // TODO test: udpate birthday
+    }
+
+    @Test
+    public void updateCollege() throws Exception {
+        // TODO test: update college (with academy and grade)
+    }
+
+    @Test
+    public void updateAvatar() throws Exception {
+        // TODO test: udpate avatar
+    }
+
+    @Test
+    public void updateBackground() throws Exception {
+        // TODO test: update background
+    }
+
+    @Test
+    public void getAllFriends() throws Exception {
+        // TODO test: get all friends
+    }
+
+    @Test
+    public void getAllFans() throws Exception {
+        // TODO test: get all friends
+    }
+
+    @Test
+    public void getAllFocuses() throws Exception {
+        // TODO test: get all focuses
+    }
+
+    @Test
+    public void getAllLikes() throws Exception {
+        // TODO test: get all likes (post)
+    }
+
+    @Test
+    public void getAllJoinedGroups() throws Exception {
+        // TODO test: get all joined group
+    }
+
+    @Test
     public void addFriend_replyYes() throws Exception {
         mockMvc.perform(post(API_USER + "/friends/" + USER_B_ID)
                 .param("attachment", "我是隔壁老王啊")
@@ -108,7 +192,7 @@ public class ApiTests extends BaseTests {
         System.out.println("----------------");
 
         JSONArray notificationArray = new JSONArray(result2.getResponse().getContentAsString());
-        JSONObject notification = (JSONObject)notificationArray.get(0);
+        JSONObject notification = (JSONObject) notificationArray.get(0);
         long id = notification.getInt("id");
 
         mockMvc.perform(put(API_NOTIFICATION + "/" + id)
@@ -155,7 +239,7 @@ public class ApiTests extends BaseTests {
         System.out.println("----------------");
 
         JSONArray notificationArray = new JSONArray(result2.getResponse().getContentAsString());
-        JSONObject notification = (JSONObject)notificationArray.get(0);
+        JSONObject notification = (JSONObject) notificationArray.get(0);
         long id = notification.getInt("id");
 
         mockMvc.perform(put(API_NOTIFICATION + "/" + id)
@@ -201,7 +285,7 @@ public class ApiTests extends BaseTests {
         System.out.println("----------------");
 
         JSONArray notificationArray = new JSONArray(result2.getResponse().getContentAsString());
-        JSONObject notification = (JSONObject)notificationArray.get(0);
+        JSONObject notification = (JSONObject) notificationArray.get(0);
         long id = notification.getInt("id");
 
         mockMvc.perform(put(API_NOTIFICATION + "/" + id)
@@ -226,8 +310,271 @@ public class ApiTests extends BaseTests {
 
     @Test
     public void removeFriend() throws Exception {
-
+        // TODO test: remove a friend
     }
 
+    @Test
+    public void focusSomeone() throws Exception {
+        // TODO test: focus someone
+    }
+
+    @Test
+    public void unfocusSomeone() throws Exception {
+        // TODO test: unfocus someone
+    }
+
+    @Test
+    public void joinActivity_replyYes() throws Exception {
+        // TODO test: join a activity (reply yes)
+    }
+
+    @Test
+    public void joinActivity_replyNO() throws Exception {
+        // TODO test: join a activity (reply no)
+    }
+
+    @Test
+    public void joinActivity_replyDelete() throws Exception {
+        // TODO test: join a activity (reply delete)
+    }
+
+    @Test
+    public void leaveActivity() throws Exception {
+        // TODO test: leave a activity
+    }
+
+    @Test
+    public void getRecommendedActivities() throws Exception {
+        String token = getToken();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(App.API_ACTIVITY).header("X-Token", token)
+                .param("category", "recommendations")
+                .param("page", "0")
+                .param("size", "5")
+        )
+                .andExpect(status().isOk())
+                .andReturn();
+        printFormatedJsonString(result);
+    }
+
+    @Test
+    public void getSameSchoolActivities() throws Exception {
+        String token = getToken();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(App.API_ACTIVITY).header("X-Token", token)
+                .param("category", "school")
+                .param("page", "0")
+                .param("size", "5")
+        )
+                .andExpect(status().isOk())
+                .andReturn();
+        printFormatedJsonString(result);
+    }
+
+    @Test
+    public void getFriendsActivities() throws Exception {
+        // TODO test: get friends' activities
+    }
+
+    @Test
+    public void getFocusesActivities() throws Exception {
+        // TODO test: get focuses' activities
+    }
+
+    @Test
+    public void getActivityDetails() throws Exception {
+        String token = getToken();
+        MvcResult result = mockMvc.perform(get(App.API_ACTIVITY + "/1").header("X-Token", token))
+                .andExpect(status().isOk())
+                .andReturn();
+        printFormatedJsonString(result);
+    }
+
+    @Test
+    public void getActivitiesComments() throws Exception {
+        String token = getToken();
+
+        MvcResult result = mockMvc.perform(get(App.API_ACTIVITY + "/2/comment")
+            .header("X-Token", token)
+            .header("Accept-Language", "zh_CN"))
+            .andExpect(status().isOk())
+            .andReturn();
+        printFormatedJsonString(result);
+    }
+
+    @Test
+    public void commentActivity() throws Exception {
+        String token = getToken();
+        mockMvc.perform(post(App.API_ACTIVITY + "/2/comment/add")
+            .header("X-Token", token)
+            .header("Accept-Language", "zh_CN")
+            .param("content", "梅杰菜狗"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteActivityComment() throws Exception {
+        String token = getToken();
+        mockMvc.perform(delete(App.API_ACTIVITY + "/2/comment/delete/29")
+            .header("X-Token", token)
+            .header("Accept-Language", "zh_CN"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getGame_zh_CN() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(App.API_GAME).header(AUTH_HEADER, getToken())
+                .param("key", "MINECRAFT").locale(Locale.SIMPLIFIED_CHINESE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nameKey", is("MINECRAFT")))
+                .andExpect(jsonPath("$.logo", matchesPattern(UUID_PATTERN)))
+                .andExpect(jsonPath("$.localizedName", is("我的世界")));
+    }
+
+    @Test
+    public void getGame_en_US() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(App.API_GAME).header(AUTH_HEADER, getToken())
+                .param("key", "MINECRAFT").locale(Locale.ENGLISH))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nameKey", is("MINECRAFT")))
+                .andExpect(jsonPath("$.logo", matchesPattern(UUID_PATTERN)))
+                .andExpect(jsonPath("$.localizedName", is("Minecraft")));
+    }
+
+    @Test
+    public void getSameSchoolPosts() throws Exception {
+        String token = getToken();
+
+        MvcResult result = mockMvc.perform(get(App.API_POST + "/SCHOOL?page=0&size=5")
+                .header("X-Token", token))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result);
+
+        // TODO i18n test here
+    }
+
+    @Test
+    public void getFriendsPosts() throws Exception {
+        // TODO test: get friends' posts
+    }
+
+    @Test
+    public void getFocusesPosts() throws Exception {
+        // TODO test: get focuses's posts
+    }
+
+    @Test
+    public void deletePost() {
+        // TODO test: delete post
+    }
+
+    /**
+     * 创建推文
+     */
+    @Test
+    public void postCrud() throws Exception {
+        MvcResult result;
+
+        result = mockMvc.perform(post(API_POST)
+                .param("content", "测试推文")
+                .header(AUTH_HEADER, getToken()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        long id = getId(result);
+
+        // 回复
+        result = mockMvc.perform(post(API_POST + "/" + id + "/comments")
+                .param("content", "测试回复")
+                .header(AUTH_HEADER, getToken()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //点赞
+        result = mockMvc.perform(post(API_POST + "/" + id + "/likes")
+                .header(AUTH_HEADER, getToken()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        Thread.sleep(3000);
+
+        //获取我自己发的推文
+        result = mockMvc.perform(get(API_POST)
+                .param("category", "myself")
+                .header(AUTH_HEADER, getToken()))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        printFormatedJsonString(result);
+    }
+
+    private long getId(MvcResult result) throws Exception {
+        return new JSONObject(result.getResponse().getContentAsString()).getLong("id");
+    }
+
+
+    @Test
+    public void getPostComments() throws Exception {
+        String token = getToken();
+
+        MvcResult result = mockMvc.perform(get(App.API_POST + "/6/comment")
+            .header("X-Token", token)
+            .header("Accept-Language", "zh_CN"))
+            .andExpect(status().isOk())
+            .andReturn();
+        printFormatedJsonString(result);
+    }
+
+    @Test
+    public void commentPost() throws Exception {
+        String token = getToken();
+        mockMvc.perform(post(App.API_POST + "/6/comment/add")
+                .header("X-Token", token)
+                .header("Accept-Language", "zh_CN")
+                .param("content", "梅杰菜狗"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deletePostComment() throws Exception {
+        String token = getToken();
+        mockMvc.perform(delete(App.API_POST + "/6/comment/delete/28")
+            .header("X-Token", token)
+            .header("Accept-Language", "zh_CN"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void likePost() throws Exception {
+        String token = getToken();
+        mockMvc.perform(post(App.API_POST + "/28/like/add")
+            .header("X-Token", token)
+            .header("Accept-Language", "zh_CN"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void unlikePost() throws Exception {
+        String token = getToken();
+        mockMvc.perform(post(App.API_POST + "/6/like/delete")
+            .header("X-Token", token)
+            .header("Accept-Language", "zh_CN"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void searchUsers() throws Exception {
+        // TODO test: search for users
+    }
+
+    @Test
+    public void searchActivities() throws Exception {
+        // TODO test: search for activities
+    }
+
+    @Test
+    public void searchPosts() throws Exception {
+        // TODO test: search for posts
+    }
 
 }

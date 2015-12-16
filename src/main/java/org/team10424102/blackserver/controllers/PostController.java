@@ -2,117 +2,177 @@ package org.team10424102.blackserver.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.team10424102.blackserver.App;
 import org.team10424102.blackserver.config.json.Views;
-import org.team10424102.blackserver.models.PostLike;
-import org.team10424102.blackserver.services.PostService;
+import org.team10424102.blackserver.config.security.CurrentUser;
+import org.team10424102.blackserver.daos.LikesRepo;
+import org.team10424102.blackserver.daos.PostRepo;
+import org.team10424102.blackserver.extensions.PostExtension;
+import org.team10424102.blackserver.extensions.PostExtensionData;
 import org.team10424102.blackserver.models.Post;
+import org.team10424102.blackserver.models.PostLike;
+import org.team10424102.blackserver.models.User;
+import org.team10424102.blackserver.utils.Api;
 
+import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
+@RequestMapping(App.API_POST)
+@Transactional
 public class PostController {
     public static final String TYPE_SCHOOL = "school";
     public static final String TYPE_FRIENDS = "friends";
     public static final String TYPE_FOCUSES = "focuses";
     public static final String TYPE_MYSELF = "myself";
 
-    @Autowired PostService postService;
+    private final Map<String, PostExtension> extensions = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    public void init() {
+        extensions.putAll(context.getBeansOfType(PostExtension.class));
+    }
+
+    private void inflateExtensionData(Post post) {
+        String ext = post.getExtension();
+        if (ext == null) return;
+        String[] parts = ext.split(" ");
+        PostExtension pe = extensions.get(parts[0]);
+        if (pe != null) {
+            Object data = pe.getData(parts[1]);
+            post.setExtData(new PostExtensionData(parts[0], data));
+        }
+    }
+
+    @Autowired PostRepo postRepo;
+
+    @Autowired ApplicationContext context;
+
+    @Autowired LikesRepo likesRepo;
 
     /**
      * 获取不同类别的 post, 目前以比赛战绩为主
      *
      * @param category school|friends|focuses|myself 对应于校园战况, 朋友战况, 关注的人战况, 自己发的推文
      */
-    @RequestMapping(value = App.API_POST + "/{category}", method = GET)
+    @RequestMapping(method = GET)
     @JsonView(Views.Post.class)
-    public List<Post> getPosts(@PathVariable String category, Pageable pageable) {
+    public List<Post> getPosts(@RequestParam String category, Pageable pageable, @CurrentUser User user) {
         List<Post> posts = null;
         switch (category.toLowerCase()) {
             case TYPE_SCHOOL:
-                posts = postService.getSchoolMatchPosts(pageable);
+                posts = postRepo.findByCommentativeFalseAndSenderCollege(user.getCollege(), pageable);
                 break;
             case TYPE_FRIENDS:
-                posts = postService.getFriendsMatchPosts(pageable);
+                posts = postRepo.findByCommentativeFalseAndSenderIn(user.getFriends(), pageable);
                 break;
             case TYPE_FOCUSES:
-                posts = postService.getFocusesMatchPosts(pageable);
+                posts = postRepo.findByCommentativeFalseAndSenderIn(user.getFocuses(), pageable);
                 break;
             case TYPE_MYSELF:
-                posts = postService.getMyMatchPosts(pageable);
+                posts = postRepo.findByCommentativeFalseAndSender(user, pageable);
                 break;
         }
+        if (posts != null) posts.forEach(this::inflateExtensionData);
         return posts;
     }
 
-    @RequestMapping(value = App.API_POST, method = POST)
-    public void createPost(@RequestParam String content) {
-        postService.createPost(content);
+    /**
+     * 创建一条推文
+     */
+    @RequestMapping(method = POST)
+    @JsonView(Views.Post.class)
+    public Post createPost(@RequestParam String content, @CurrentUser User user) {
+        Post post = new Post();
+        post.setCreationTime(new Date());
+        post.setSender(user);
+        post.setContent(content);
+        return postRepo.save(post);
     }
 
-    @RequestMapping(value = App.API_POST + "/delete/{id}", method = DELETE)
-    public void deletePost(@PathVariable long id) {
-        postService.deletePost(id);
+    /**
+     * 删除一条推文
+     */
+    @RequestMapping(value = "/{id}", method = DELETE)
+    @JsonView(Views.Post.class)
+    public void deletePost(@PathVariable long id, @CurrentUser User user) {
+        Post post = postRepo.findOne(id);
+        if (post != null && post.getSender().equals(user)) {
+            postRepo.delete(post); // TODO check if deleted all related comments and likes
+        }
+    }
+
+    @RequestMapping(value = "/{id}/likes", method = GET)
+    public List<PostLike> getLikes(@PathVariable long id, Pageable pageable) {
+        return postRepo.findLikesById(id, pageable);
     }
 
     /**
      * 点赞
-     * @param id
      */
-    @RequestMapping(value = App.API_POST + "/{id}/like/add", method = POST)
-    public void likePost(@PathVariable long id) {
-        postService.likePost(id);
+    @RequestMapping(value = "/{id}/likes", method = POST)
+    public void likePost(@PathVariable long id, @CurrentUser User user) {
+        Post post = postRepo.findOne(id);
+        if (post == null) return;
+        PostLike like = new PostLike();
+        like.setCreationTime(new Date());
+        like.setPost(post);
+        like.setUser(user);
+        likesRepo.save(like);
     }
 
     /**
      * 取消点赞
-     * @param id
      */
-    @RequestMapping(value = App.API_POST + "/{id}/like/delete", method = POST)
-    public void unlikePost(@PathVariable long id) {
-        postService.unlikePost(id);
-    }
-
-    @RequestMapping(value = App.API_POST + "/{id}/like", method = GET)
-    public List<PostLike> getLikes(@PathVariable long id, Pageable pageable) {
-        Post post = new Post();
-        post.setId(id);
-        return postService.getLikes(id, pageable);
+    @RequestMapping(value = "/{id}/likes", method = DELETE)
+    public void unlikePost(@PathVariable long id, @CurrentUser User user) {
+        PostLike like = likesRepo.findOneByPostIdAndUser(id, user);
+        if (like == null) return;
+        likesRepo.delete(like);
     }
 
     /**
      * 评论
-     * @param id
-     * @param content
      */
-    @RequestMapping(value = App.API_POST + "/{id}/comment/add", method = POST)
-    public void CommentPost(@PathVariable long id, @RequestParam String content) {
-        postService.saveCommentPost(id, content);
+    @RequestMapping(value = "/{id}/comments", method = POST)
+    @JsonView(Views.Post.class)
+    public Post CommentPost(@PathVariable long id, @RequestParam String content, @CurrentUser User user) {
+        Post post = postRepo.findOne(id);
+        if (post == null) return null;
+
+        Post comment = new Post();
+        comment.setCreationTime(new Date());
+        comment.setSender(user);
+        comment.setContent(content);
+        comment.setCommentative(true);
+        postRepo.save(comment);
+
+        post.getComments().add(comment);
+        postRepo.save(post);
+
+        return comment;
     }
 
     /**
      * 得到所有评论
-     * @param id
-     * @param criteria
-     * @return
      */
-    @RequestMapping(value = App.API_POST + "/{id}/comment", method = GET)
+    @RequestMapping(value = "/{id}/comments", method = GET)
     @JsonView(Views.PostComment.class)
-    public List<Post> getComments(@PathVariable long id, QueryCriteria criteria) {
-        Post post = new Post();
-        post.setId(id);
-        return postService.getCommentPosts(criteria.toPageRequest(), id);
-    }
-
-    @RequestMapping(value = App.API_POST + "/{id}/comment/delete/{commentId}", method = DELETE)
-    public void deleteCommentPost(@PathVariable long id, @PathVariable long commentId) {
-        postService.deleteCommentPost(id, commentId);
+    public Collection<Post> getComments(@PathVariable long id, Pageable pageable) {
+        Post post = postRepo.findOne(id);
+        if (post == null) return null; // TODO check if equals to return new ArrayList<>();
+        return post.getComments();
     }
 
 }

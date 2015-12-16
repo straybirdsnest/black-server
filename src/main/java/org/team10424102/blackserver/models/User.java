@@ -11,7 +11,9 @@ import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 正常的用户从 UID_BASE 开始编号
@@ -474,6 +476,10 @@ public class User {
             return focuses.size();
         }
         return 0;
+    }
+
+    public List<User> getFriends() {
+        return getFriendshipSet().stream().map(Friendship::getFriend).collect(Collectors.toList());
     }
 
     //</editor-fold>

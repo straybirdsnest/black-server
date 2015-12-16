@@ -14,12 +14,14 @@ public class App {
     public static final String DEFAULT_AVATAR_TAG = "默认用户头像";
     public static final String DEFAULT_BACKGROUND_TAG = "默认用户背景";
     public static final String DEFAULT_COVER_TAG = "默认活动封面";
-    public static final String API_USER = "/api/user";
-    public static final String API_IMAGE = "/api/image";
-    public static final String API_POST = "/api/post";
-    public static final String API_ACTIVITY = "/api/activity";
-    public static final String API_GAME = "/api/game";
-    public static final String API_NOTIFICATION = "/api/notification";
+
+    public static final String API_USER = "/api/users";
+    public static final String API_IMAGE = "/api/images";
+    public static final String API_POST = "/api/posts";
+    public static final String API_ACTIVITY = "/api/activities";
+    public static final String API_GAME = "/api/games";
+    public static final String API_NOTIFICATION = "/api/notifications";
+
     public static SpringApplication handle;
 
     public static void main(String[] args) {

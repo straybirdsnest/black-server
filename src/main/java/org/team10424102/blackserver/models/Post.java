@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import org.hibernate.annotations.*;
-import org.hibernate.annotations.CascadeType;
 import org.team10424102.blackserver.config.json.Views;
 import org.team10424102.blackserver.extensions.PostExtensionData;
 
@@ -38,8 +36,7 @@ public class Post {
 
     private String extension;
 
-    @OneToMany(mappedBy = "post")
-    @Cascade(CascadeType.DELETE)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PostLike> likes = new HashSet<>();
 
     @OneToMany
