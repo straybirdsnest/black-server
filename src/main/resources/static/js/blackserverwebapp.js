@@ -10,7 +10,13 @@ var blackserverweb = angular.module('blackserverweb', ['mgcrea.ngStrap', 'ngRout
     }).when('/activities', {
         templateUrl : '/partials/activities',
         controller : 'activities'
-    }).otherwise('/users');
+    }).when('/chatroom', {
+        templateUrl : '/partials/chatroom',
+        controller : 'chatroom'
+    }).when('/login', {
+        templateUrl : '/partials/login',
+        controller : 'login'
+    }).otherwise('/login');
 
   })
  .controller('navigation', function($rootScope, $scope, $http, $location) {
@@ -19,7 +25,7 @@ var blackserverweb = angular.module('blackserverweb', ['mgcrea.ngStrap', 'ngRout
  .controller('users', function($rootScope, $scope, $http, $location) {
    var index = 0;
    function getXToken(){
-     $http.get('/api/user/token?phone=123456789&vcode=1234').success(function(data, status){
+     $http.get('/api/users/token?phone=123456789&vcode=1234').success(function(data, status){
        $scope.xtoken = data.token;
        getAllUsers();
      });
@@ -69,7 +75,7 @@ var blackserverweb = angular.module('blackserverweb', ['mgcrea.ngStrap', 'ngRout
  .controller('activities', function($rootScope, $scope, $http, $location){
    var index = 0;
    function getXToken(){
-     $http.get('/api/user/token?phone=123456789&vcode=1234').success(function(data, status){
+     $http.get('/api/users/token?phone=123456789&vcode=1234').success(function(data, status){
        $scope.xtoken = data.token;
        getAllActivities();
      });
@@ -114,4 +120,23 @@ var blackserverweb = angular.module('blackserverweb', ['mgcrea.ngStrap', 'ngRout
      }
    }
    getXToken();
+ })
+ .controller('login', function($rootScope, $scope, $http, $location, $log){
+   $scope.closeAlert = function(index) {
+      $scope.alerts.splice(index, 1);
+      $scope.error = false;
+   };
+   $scope.userLogin=function() {
+     $scope.alerts = [];
+     if($scope.login) {
+       var tokenUrl = '/api/users/token?phone='+$scope.login.phone+'&vcode='+$scope.login.vcode;
+       $http.get(tokenUrl).success(function(data, status){
+         $scope.xtoken = data.token;
+         $log.log(xtoken);
+       });
+     }
+   }
+ })
+ .controller('chatroom', function($rootScope, $scope, $http, $location){
+   $location.path('/login');
  })
