@@ -6,13 +6,11 @@ import org.team10424102.blackserver.daos.ImageRepo;
 import org.team10424102.blackserver.models.Image;
 import org.team10424102.blackserver.services.ImageService;
 import org.team10424102.blackserver.extensions.PostExtension;
-import org.team10424102.blackserver.extensions.PostExtensionIdentifier;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@PostExtensionIdentifier("image")
-@Component
+@Component("image")
 public class ImagePostExtension implements PostExtension {
 
     @Autowired ImageRepo imageRepo;
