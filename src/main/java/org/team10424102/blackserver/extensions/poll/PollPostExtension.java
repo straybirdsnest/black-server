@@ -3,10 +3,8 @@ package org.team10424102.blackserver.extensions.poll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.team10424102.blackserver.extensions.PostExtension;
-import org.team10424102.blackserver.extensions.PostExtensionIdentifier;
 
-@PostExtensionIdentifier("poll")
-@Component
+@Component("poll")
 public class PollPostExtension implements PostExtension {
 
     @Autowired PollRepo pollRepo;

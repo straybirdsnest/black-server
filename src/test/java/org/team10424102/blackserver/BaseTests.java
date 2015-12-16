@@ -5,6 +5,8 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -35,6 +37,8 @@ import static org.team10424102.blackserver.App.*;
 @IntegrationTest("server.port:0") // random port
 @Transactional
 public class BaseTests {
+    private static final Logger logger = LoggerFactory.getLogger(BaseTests.class);
+
     protected MockMvc mockMvc;
     @Autowired WebApplicationContext context;
     @Autowired Filter springSecurityFilterChain;
@@ -47,6 +51,7 @@ public class BaseTests {
     public static final int USER_A_ID = 3;
     public static final int USER_B_ID = 4;
     public static final int USER_C_ID = 5;
+    protected final ObjectMapper mapper = new ObjectMapper();
 
     protected RestTemplate rest = new TestRestTemplate();
 
@@ -62,9 +67,16 @@ public class BaseTests {
 
     protected void printFormatedJsonString(MvcResult result) throws Exception {
         String json = result.getResponse().getContentAsString();
-        ObjectMapper mapper = new ObjectMapper();
+
+//        System.out.println("\n=========================================================================");
+//        System.out.println(new JSONObject(json).toString(4));
+//        System.out.println("=========================================================================\n");
+
         Object obj = mapper.readValue(json, Object.class);
+        System.out.println("\n=========================================================================");
         System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj));
+        System.out.println("=========================================================================\n");
+        //logger.debug(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj));
     }
 
     protected String getToken() throws Exception {
