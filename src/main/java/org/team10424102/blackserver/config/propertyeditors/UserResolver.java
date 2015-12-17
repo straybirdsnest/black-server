@@ -1,26 +1,28 @@
 package org.team10424102.blackserver.config.propertyeditors;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.team10424102.blackserver.daos.AcademyRepo;
-import org.team10424102.blackserver.daos.CollegeRepo;
+import org.team10424102.blackserver.models.AcademyRepo;
+import org.team10424102.blackserver.models.CollegeRepo;
 import org.team10424102.blackserver.models.*;
 import org.team10424102.blackserver.services.ImageService;
+import org.team10424102.blackserver.services.TokenService;
 
 import java.text.SimpleDateFormat;
 
 public class UserResolver implements HandlerMethodArgumentResolver {
     private final CollegeRepo collegeRepo;
     private final AcademyRepo academyRepo;
-    private final ImageService imageService;
+    private final TokenService tokenService;
 
-    public UserResolver(CollegeRepo collegeRepo, AcademyRepo academyRepo, ImageService imageService) {
-        this.collegeRepo = collegeRepo;
-        this.academyRepo = academyRepo;
-        this.imageService = imageService;
+    public UserResolver(ApplicationContext context) {
+        this.collegeRepo = context.getBean(CollegeRepo.class);
+        this.academyRepo = context.getBean(AcademyRepo.class);
+        this.tokenService = context.getBean(TokenService.class);
     }
 
     @Override
@@ -44,13 +46,13 @@ public class UserResolver implements HandlerMethodArgumentResolver {
         // TODO avatar
         String avatarToken = request.getParameter("avatar");
         if (avatarToken != null) {
-            Image avatar = imageService.getImageFromAccessToken(avatarToken);
+            Image avatar = (Image)tokenService.getObjectFromToken(avatarToken);
             user.setAvatar(avatar);
         }
         // TODO background
         String backgroundToken = request.getParameter("background");
         if (backgroundToken != null) {
-            Image background = imageService.getImageFromAccessToken(backgroundToken);
+            Image background = (Image)tokenService.getObjectFromToken(backgroundToken);
             user.setBackground(background);
         }
         String birthdayStr = request.getParameter("birthday");

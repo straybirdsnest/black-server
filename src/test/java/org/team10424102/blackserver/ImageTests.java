@@ -1,11 +1,5 @@
 package org.team10424102.blackserver;
 
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.team10424102.blackserver.daos.ImageRepo;
-import org.team10424102.blackserver.models.Image;
-import org.team10424102.blackserver.utils.Cryptor;
-
 import static junit.framework.TestCase.assertTrue;
 
 public class ImageTests extends BaseTests {

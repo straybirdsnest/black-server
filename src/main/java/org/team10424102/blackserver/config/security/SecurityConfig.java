@@ -2,6 +2,7 @@ package org.team10424102.blackserver.config.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -17,7 +18,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.team10424102.blackserver.App;
-import org.team10424102.blackserver.services.UserService;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,15 +25,13 @@ import javax.servlet.http.HttpServletResponse;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableScheduling
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
-//@EnableWebSecurity
-//@Order(ManagementServerProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired UserService userService;
+    @Autowired ApplicationContext context;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.addFilterBefore(new TokenAuthenticationFilter(userService), BasicAuthenticationFilter.class)
+        http.addFilterBefore(new TokenAuthenticationFilter(context), BasicAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .csrf().disable()

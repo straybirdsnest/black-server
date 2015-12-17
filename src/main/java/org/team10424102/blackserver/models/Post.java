@@ -10,6 +10,7 @@ import org.team10424102.blackserver.extensions.PostExtensionData;
 import javax.persistence.*;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -52,6 +53,25 @@ public class Post {
 
     @Transient
     private PostExtensionData extData;
+
+    /////////////////////////////////////////////////////////////////
+    //                                                             //
+    //                    ~~~~~~~~~~~~~~~~~                        //
+    //                       CONSTRUCTORS                          //
+    //                    =================                        //
+    //                                                             //
+    /////////////////////////////////////////////////////////////////
+
+    public Post(){}
+
+    public Post(User sender, String content, boolean commentative) {
+        this.sender = sender;
+        this.content = content;
+        this.commentative = commentative;
+        this.creationTime = new Date();
+    }
+
+
 
     /////////////////////////////////////////////////////////////////
     //                                                             //

@@ -1,20 +1,20 @@
 package org.team10424102.blackserver.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.team10424102.blackserver.config.propertyeditors.UserResolver;
-import org.team10424102.blackserver.daos.AcademyRepo;
-import org.team10424102.blackserver.daos.CollegeRepo;
+import org.team10424102.blackserver.models.AcademyRepo;
+import org.team10424102.blackserver.models.CollegeRepo;
 import org.team10424102.blackserver.services.ImageService;
 
 import java.util.List;
@@ -22,9 +22,7 @@ import java.util.List;
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
-    @Autowired CollegeRepo collegeRepo;
-    @Autowired AcademyRepo academyRepo;
-    @Autowired ImageService imageService;
+    @Autowired ApplicationContext context;
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
@@ -57,7 +55,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(new AuthenticationPrincipalArgumentResolver()); // TODO kill it
-        argumentResolvers.add(new UserResolver(collegeRepo, academyRepo, imageService));
+        argumentResolvers.add(new UserResolver(context));
     }
 
     @Bean

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.team10424102.blackserver.models.Image;
 import org.team10424102.blackserver.services.ImageService;
+import org.team10424102.blackserver.services.TokenService;
 
 import java.io.IOException;
 
@@ -17,11 +18,11 @@ import java.io.IOException;
 public class ImageSerializer extends JsonSerializer<Image> {
     private static final Logger logger = LoggerFactory.getLogger(ImageSerializer.class);
 
-    @Autowired ImageService imageService;
+    @Autowired TokenService tokenService;
 
     @Override
     public void serialize(Image image, JsonGenerator jg, SerializerProvider provider) throws IOException, JsonProcessingException {
-        String token = imageService.generateAccessToken(image);
-        jg.writeString(token);
+        String token = tokenService.generateToken(image);
+        jg.writeString(token + "~" + image.getHash());
     }
 }

@@ -5,11 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
 import org.team10424102.blackserver.config.json.ActivityDeserializer;
 import org.team10424102.blackserver.config.json.Views;
-import org.team10424102.blackserver.game.Game;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
@@ -72,10 +69,6 @@ public class Activity {
             inverseJoinColumns = @JoinColumn(name = "post_id")
     )
     private Set<Post> comments = new HashSet<>();
-
-    @OneToMany(mappedBy = "activity")
-    @Cascade(CascadeType.DELETE)
-    private Set<ActivityLike> likes = new HashSet<>();
 
 
     /////////////////////////////////////////////////////////////////
@@ -228,14 +221,6 @@ public class Activity {
         this.comments = comments;
     }
 
-    public Set<ActivityLike> getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Set<ActivityLike> likes) {
-        this.likes = likes;
-    }
-
     //</editor-fold>
 
     @JsonProperty("game")
@@ -254,13 +239,6 @@ public class Activity {
             return group.getId();
         }
         return null;
-    }
-
-    @JsonProperty("likes")
-    @JsonView(Views.ActivityDetails.class)
-    public int getLikesCount() {
-        if (likes!=null) return likes.size();
-        return 0;
     }
 
     @JsonProperty("comments")

@@ -10,8 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 import org.team10424102.blackserver.utils.Api;
-import org.team10424102.blackserver.exceptions.BusinessException;
-import org.team10424102.blackserver.exceptions.SystemException;
+import org.team10424102.blackserver.controllers.exceptions.BusinessException;
+import org.team10424102.blackserver.controllers.exceptions.SystemException;
 
 @ControllerAdvice
 @RestController
