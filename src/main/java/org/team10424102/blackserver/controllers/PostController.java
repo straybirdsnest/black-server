@@ -4,20 +4,18 @@ import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.team10424102.blackserver.App;
 import org.team10424102.blackserver.config.json.Views;
 import org.team10424102.blackserver.config.security.CurrentUser;
-import org.team10424102.blackserver.daos.LikesRepo;
-import org.team10424102.blackserver.daos.PostRepo;
+import org.team10424102.blackserver.models.LikesRepo;
+import org.team10424102.blackserver.models.PostRepo;
 import org.team10424102.blackserver.extensions.PostExtension;
 import org.team10424102.blackserver.extensions.PostExtensionData;
 import org.team10424102.blackserver.models.Post;
 import org.team10424102.blackserver.models.PostLike;
 import org.team10424102.blackserver.models.User;
-import org.team10424102.blackserver.utils.Api;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -147,17 +145,8 @@ public class PostController {
      */
     @RequestMapping(value = "/{id}/comments", method = POST)
     @JsonView(Views.Post.class)
-    public Post CommentPost(@PathVariable long id, @RequestParam String content, @CurrentUser User user) {
-        Post post = postRepo.findOne(id);
-        if (post == null) return null;
-
-        Post comment = new Post();
-        comment.setCreationTime(new Date());
-        comment.setSender(user);
-        comment.setContent(content);
-        comment.setCommentative(true);
-        postRepo.save(comment);
-
+    public Post CommentPost(@PathVariable(value = "id") Post post, @RequestParam String content, @CurrentUser User user) {
+        Post comment = new Post(user, content, true);
         post.getComments().add(comment);
         postRepo.save(post);
 
@@ -170,9 +159,7 @@ public class PostController {
     @RequestMapping(value = "/{id}/comments", method = GET)
     @JsonView(Views.PostComment.class)
     public Collection<Post> getComments(@PathVariable long id, Pageable pageable) {
-        Post post = postRepo.findOne(id);
-        if (post == null) return null; // TODO check if equals to return new ArrayList<>();
-        return post.getComments();
+        return postRepo.findCommentsById(id, pageable);
     }
 
 }

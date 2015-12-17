@@ -3,7 +3,6 @@ package org.team10424102.blackserver.controllers;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,17 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.team10424102.blackserver.App;
 import org.team10424102.blackserver.config.json.Views;
 import org.team10424102.blackserver.config.security.CurrentUser;
-import org.team10424102.blackserver.daos.FriendshipApplicationRepo;
-import org.team10424102.blackserver.daos.FriendshipRepo;
-import org.team10424102.blackserver.daos.NotificationRepo;
-import org.team10424102.blackserver.daos.UserRepo;
-import org.team10424102.blackserver.exceptions.RequestDataFormatException;
-import org.team10424102.blackserver.exceptions.VcodeVerificationException;
-import org.team10424102.blackserver.models.Friendship;
-import org.team10424102.blackserver.models.User;
+import org.team10424102.blackserver.config.security.SpringSecurityUserAdapter;
+import org.team10424102.blackserver.models.*;
+import org.team10424102.blackserver.controllers.exceptions.RequestDataFormatException;
+import org.team10424102.blackserver.controllers.exceptions.VcodeVerificationException;
 import org.team10424102.blackserver.notifications.AddingFriendHandler;
 import org.team10424102.blackserver.notifications.RemovingFriendHandler;
-import org.team10424102.blackserver.services.UserService;
+import org.team10424102.blackserver.services.TokenService;
 import org.team10424102.blackserver.services.VcodeService;
 import org.team10424102.blackserver.utils.Api;
 
@@ -30,31 +25,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping(value = App.API_USER, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = App.API_USER)
 public class UserController {
 
-    @Autowired UserService userService;
-
+    @Autowired UserRepo userRepo;
     @Autowired FriendshipRepo friendshipRepo;
+    @Autowired FriendshipApplicationRepo friendshipApplicationRepo;
+    @Autowired NotificationRepo notificationRepo;
+    @Autowired ImageRepo imageRepo;
 
     @Autowired VcodeService vcodeService;
-
-    @Autowired FriendshipApplicationRepo friendshipApplicationRepo;
-
-    @Autowired NotificationRepo notificationRepo;
+    @Autowired TokenService tokenService;
 
     @Autowired AddingFriendHandler addingFriendHandler;
-
     @Autowired RemovingFriendHandler removingFriendHandler;
 
-    @Autowired UserRepo userRepo;
 
     /////////////////////////////////////////////////////////////////
     //                                                             //
@@ -69,8 +59,9 @@ public class UserController {
     /**
      * 获取 token, 如果手机号没有注册则注册新用户
      *
-     * @return {
-     * "token": "3b92e87b-69c1-41fe-9b3d-923e2138c00b"
+     * @return
+     * {
+     *     "token": "fjdsfijasdfjadskfa"
      * }
      * <p>
      * 如果手机号码不存在这里就是创建用户
@@ -82,29 +73,49 @@ public class UserController {
             throw new VcodeVerificationException(phone, vcode);
         }
         User user;
-        if (!userService.isPhoneExisted(phone)) {
-            user = userService.createAndSaveUser(phone, request);
+        if (!userRepo.isPhoneExists(phone)) {
+            user = new User();
+            user.setPhone(phone);
+            user.setUsername(phone);
+            user.setEnabled(true);
+            user.setGender(Gender.UNKNOWN);
+            // TODO 使用查询缓存来优化下面这两句话
+            user.setAvatar(imageRepo.findOneByTags(App.DEFAULT_AVATAR_TAG));
+            user.setBackground(imageRepo.findOneByTags(App.DEFAULT_BACKGROUND_TAG));
+
+            RegInfo regInfo = new RegInfo();
+            regInfo.setRegIp(request.getRemoteAddr());
+            regInfo.setRegTime(new Date());
+
+            user = userRepo.save(user);
+
         } else {
-            user = userService.findByPhone(phone);
+            user = userRepo.findByPhone(phone);
         }
-        return Api.result().param("token", userService.generateToken(user));
+        return Api.result().param("token", generateToken(user));
+    }
+
+    private String generateToken(User user) {
+        SpringSecurityUserAdapter securityUser = new SpringSecurityUserAdapter(user);
+        return tokenService.generateToken(securityUser);
     }
 
     /**
      * 检查可用性
      * type = phone|token
      *
-     * @return {
-     * "result": true|false
+     * @return
+     * {
+     *     "result": true|false
      * }
      */
     @RequestMapping(value = "/{type}", method = HEAD)
-    public Api.Result isAvailable(@PathVariable String type, @RequestParam(value = "q") String content) {
+    public Api.Result isAvailable(@PathVariable String type, String q) {
         switch (type) {
             case "phone":
-                return Api.result().param("result", !userService.isPhoneExisted(content));
+                return Api.result().param("result", !userRepo.isPhoneExists(q));
             case "token":
-                return Api.result().param("result", userService.isTokenValid(content));
+                return Api.result().param("result", tokenService.isTokenValid(q));
         }
         return Api.result().param("result", false);
     }
@@ -113,8 +124,8 @@ public class UserController {
      * 注销当前用户
      */
     @RequestMapping(method = DELETE)
-    public void unregister() {
-        userService.deleteCurrentUser();
+    public void unregister(@CurrentUser User user) {
+        userRepo.delete(user);
     }
 
     /**
@@ -127,17 +138,26 @@ public class UserController {
     }
 
     /**
+     * 查看其他用户的 Profile
+     */
+    @RequestMapping(value = "/{id}", method = GET)
+    @JsonView(Views.UserSummary.class)
+    public User getOthersProfile(@PathVariable long id) {
+        return userRepo.findOne(id);
+    }
+
+    /**
      * 更新当前用户的个人信息
      */
     @RequestMapping(method = PUT)
     public void updateCurrentUsersProfile(@Valid User user) {
-        userService.saveUser(user);
+        userRepo.save(user);
     }
 
     @RequestMapping(value = "/nickname", method = PATCH)
     public void updateNickName(@RequestParam String val, @CurrentUser User user) {
         user.setNickname(val);
-        userService.saveUser(user);
+        userRepo.save(user);
     }
 
     @RequestMapping(value = "/signature", method = PATCH)
@@ -191,16 +211,6 @@ public class UserController {
 //
 //    }
 
-
-    /**
-     * 查看其他用户的 Profile
-     */
-    @RequestMapping(value = "/{id}", method = GET)
-    @JsonView(Views.UserDetails.class)
-    public User getOthersProfile(@PathVariable long id) {
-        return userService.getUserById(id);
-    }
-
     //</editor-fold>
 
     /////////////////////////////////////////////////////////////////
@@ -218,8 +228,8 @@ public class UserController {
      */
     @RequestMapping(value = "/focuses", method = GET)
     @JsonView(Views.UserSummary.class)
-    public Set<User> getCurrentUsersFocuses() {
-        return userService.getCurrentUser().getFocuses();
+    public Set<User> getCurrentUsersFocuses(@CurrentUser User user) {
+        return user.getFocuses();
     }
 
     /**
@@ -227,34 +237,30 @@ public class UserController {
      */
     @RequestMapping(value = "/fans", method = GET)
     @JsonView(Views.UserSummary.class)
-    public Set<User> getCurrentUsersFans() {
-        return userService.getCurrentUser().getFocuses();
+    public Set<User> getCurrentUsersFans(@CurrentUser User user) {
+        return user.getFans();
     }
 
     /**
      * 关注一个用户
      */
     @RequestMapping(value = "/focuses/{id}", method = POST)
-    public void focusSomeone(@PathVariable long id) {
-        User user = userService.getCurrentUser();
-        // 不能关注自己
-        if (user.getId() == id) return;
-        User focus = userService.getUserById(id);
-        user.getFocuses().add(focus);
-        userService.saveUser(user);
-        // 关注另一个人的同时你也成为了他的粉丝
-        // TODO 检查实体 cascade 是否成立
+    public void focusSomeone(@PathVariable long id, @CurrentUser User user) {
+        if (user.getId() == id) return; // 不能关注自己
+
+        User focusUser = userRepo.findOne(id);
+        if (focusUser == null) return;
+
+        user.getFocuses().add(focusUser);
+        userRepo.save(user);
     }
 
     /**
      * 取消关注一个用户
      */
     @RequestMapping(value = "/focuses/{id}", method = DELETE)
-    public void unfocusSomeone(@PathVariable long id) {
-        User user = userService.getCurrentUser();
+    public void unfocusSomeone(@PathVariable long id, @CurrentUser User user) {
         user.getFocuses().removeIf(u -> u.getId() == id);
-        // 取消关注一个人的同时你也会从他的粉丝列表里消失
-        // TODO 检查实体 cascade 是否成立
     }
 
     //</editor-fold>
@@ -274,8 +280,8 @@ public class UserController {
      */
     @RequestMapping(value = "/friends", method = GET)
     @JsonView(Views.UserSummary.class)
-    public Set<Friendship> getCurrentUsersFriends() {
-        return userService.getCurrentUser().getFriendshipSet();
+    public Collection<User> getCurrentUsersFriends(@CurrentUser User user) {
+        return user.getFriends();
     }
 
     /**
@@ -300,8 +306,7 @@ public class UserController {
      * 修改一个朋友的备注名称
      */
     @RequestMapping(value = "/friends/{id}", method = PUT)
-    public void updateFriendAlias(@PathVariable long id, @RequestParam String alias) {
-        User user = userService.getCurrentUser();
+    public void updateFriendAlias(@PathVariable long id, @RequestParam String alias, @CurrentUser User user) {
         Optional<Friendship> friendship = user.getFriendshipSet().stream()
                 .filter(f -> f.getFriend().getId() == id).findFirst();
         if (friendship.isPresent()) {

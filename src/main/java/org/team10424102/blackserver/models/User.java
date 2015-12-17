@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.transaction.annotation.Transactional;
 import org.team10424102.blackserver.config.json.UserDeserializer;
 import org.team10424102.blackserver.config.json.Views;
 
@@ -192,6 +193,9 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "target_id")
     )
     private Set<User> blacklist = new HashSet<>();
+
+    @Transient
+    private String alias;
 
     /////////////////////////////////////////////////////////////////
     //                                                             //
@@ -479,7 +483,19 @@ public class User {
     }
 
     public List<User> getFriends() {
-        return getFriendshipSet().stream().map(Friendship::getFriend).collect(Collectors.toList());
+        return getFriendshipSet().stream().map(e -> {
+            User friend = e.getFriend();
+            friend.setAlias(e.getFriendAlias());
+            return friend;
+        }).collect(Collectors.toList());
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     //</editor-fold>

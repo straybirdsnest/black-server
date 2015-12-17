@@ -14,6 +14,7 @@ public class Image {
 
     @Lob
     @Column(columnDefinition = "mediumblob")
+    @Basic(fetch = FetchType.LAZY)
     private byte[] data;
 
     @Column(columnDefinition = "char", length = 32)

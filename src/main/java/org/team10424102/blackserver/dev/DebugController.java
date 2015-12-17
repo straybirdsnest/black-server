@@ -3,13 +3,14 @@ package org.team10424102.blackserver.dev;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.team10424102.blackserver.daos.UserRepo;
+import org.team10424102.blackserver.models.UserRepo;
 import org.team10424102.blackserver.models.RegInfo;
 import org.team10424102.blackserver.models.User;
-import org.team10424102.blackserver.services.UserService;
+import org.team10424102.blackserver.services.TokenService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class DebugController {
 
     @Autowired UserRepo userRepo;
 
-    @Autowired UserService userService;
+    @Autowired TokenService tokenService;
 
     @RequestMapping("/requests")
     public String getAllRequests(Model model) {
@@ -37,7 +38,7 @@ public class DebugController {
         for (User user : users) {
             UserWithToken u = new UserWithToken();
             u.setPhone(user.getPhone());
-            u.setToken(userService.generateToken(user));
+            u.setToken(tokenService.generateToken(user));
             tokens.add(u);
         }
         model.addAttribute("tokens", tokens);
@@ -46,7 +47,7 @@ public class DebugController {
 
     @RequestMapping(value = "/api/reginfo", method = GET)
     public ResponseEntity<?> getMyRegInfo() {
-        User user = userService.getCurrentUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user != null) {
             RegInfo regInfo = user.getRegInfo();
             return new ResponseEntity<>(regInfo, HttpStatus.OK);

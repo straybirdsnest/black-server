@@ -9,21 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.team10424102.blackserver.config.json.Views;
-import org.team10424102.blackserver.daos.UserRepo;
-import org.team10424102.blackserver.services.UserService;
-import org.team10424102.blackserver.daos.GroupRepo;
+import org.team10424102.blackserver.models.UserRepo;
+import org.team10424102.blackserver.models.GroupRepo;
 import org.team10424102.blackserver.models.UserGroup;
 
 @RestController
 public class GroupController {
-    @Autowired
-    GroupRepo groupRepo;
+    @Autowired GroupRepo groupRepo;
 
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    UserRepo userRepo;
+    @Autowired UserRepo userRepo;
 
     @RequestMapping(value = "/api/groups/{id}", method = RequestMethod.GET)
     @JsonView(Views.Group.class)
