@@ -1,8 +1,10 @@
-<div class="row" ng-show="error">
-    <uib-alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</uib-alert>
+<div id="alerts-container" data-show="true" data-placement="top" data-duration="100"
+     data-animation="am-fade-and-slide-top" data-keyboard="true" title="{{alert.title}}"
+     data-content="{{alert.content}}" data-type="{{alert.type}}" data-container="#alerts-container" bs-alert>
 </div>
 <div class="card card-container">
-    <img id="profile-img" ng-show="!authenticated" class="profile-img-card" src="../images/avatar_2x.png" th:src="@{../images/avatar_2x.png}"/>
+    <img id="profile-img" ng-show="!authenticated" class="profile-img-card" src="../images/avatar_2x.png"
+         th:src="@{../images/avatar_2x.png}"/>
 
     <p id="profile-name" class="profile-name-card"></p>
 

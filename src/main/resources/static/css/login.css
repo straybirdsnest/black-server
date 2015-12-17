@@ -5,6 +5,7 @@
  * General styles
  */
 body {
+    margin-top: 70px;
 }
 
 .card-container.card {
