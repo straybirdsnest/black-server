@@ -22,7 +22,7 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
   .controller("navigation", function($rootScope, $scope, $http, $location) {
 
   })
-  .controller("users", function($rootScope, $scope, $http, $location) {
+  .controller("users", function($rootScope, $scope, $http, $location, $log) {
     if ($rootScope.xtoken) {
       var index = 0;
 
@@ -44,13 +44,14 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
       function getNextAvatarData() {
         if ($scope.xtoken && $scope.users) {
           if (index < $scope.users.length) {
-            var avatarUrl = "/api/image?q=" + $scope.users[index].avatar;
+            var avatarUrl = "/api/image?q=" + $scope.users[index].avatar.split("~")[0];
+            $log.log(avatarUrl);
             $http({
               url: avatarUrl,
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                "X-Token": $scope.xtoken
+                "X-Token": $rootScope.xtoken
               },
               responseType: "blob"
             }).success(function(data, status) {
@@ -80,7 +81,7 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-Token": $scope.xtoken
+            "X-Token": $rootScope.xtoken
           }
         }).success(function(data, status) {
           $scope.activities = data;
@@ -91,13 +92,13 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
       function getNextCoverData() {
         if ($scope.xtoken && $scope.activities) {
           if (index < $scope.activities.length) {
-            var coverUrl = "/api/image?q=" + $scope.activities[index].cover;
+            var coverUrl = "/api/image?q=" + $scope.activities[index].cover.split("~")[0];
             $http({
               url: coverUrl,
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                "X-Token": $scope.xtoken
+                "X-Token": $rootScope.xtoken
               },
               responseType: "blob"
             }).success(function(data, status) {
@@ -123,6 +124,7 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
         var tokenUrl = "/api/users/token?phone=" + $scope.login.phone + "&vcode=" + $scope.login.vcode;
         $http.get(tokenUrl).success(function(data, status) {
           $rootScope.xtoken = data.token;
+          $log.log("login success");
         }).error(function(data, status) {
           $scope.alert = {
             "title": "message",
@@ -135,9 +137,7 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
     }
   })
   .controller("chatroom", function($rootScope, $scope, $http, $location, $log) {
-    if ($rootScope.xtoken) {
-      $log.log("this is called");
-    } else {
+    if ($rootScope.xtoken) {} else {
       $location.path("/login");
     }
   })
