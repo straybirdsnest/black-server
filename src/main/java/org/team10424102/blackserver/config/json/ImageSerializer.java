@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.team10424102.blackserver.models.Image;
-import org.team10424102.blackserver.services.ImageService;
 import org.team10424102.blackserver.services.TokenService;
 
 import java.io.IOException;

@@ -12,19 +12,11 @@ import org.team10424102.blackserver.App;
 import org.team10424102.blackserver.config.json.Views;
 import org.team10424102.blackserver.config.security.CurrentUser;
 import org.team10424102.blackserver.config.security.SpringSecurityUserAdapter;
-import org.team10424102.blackserver.models.FriendshipApplicationRepo;
-import org.team10424102.blackserver.models.FriendshipRepo;
-import org.team10424102.blackserver.models.NotificationRepo;
-import org.team10424102.blackserver.models.UserRepo;
+import org.team10424102.blackserver.models.*;
 import org.team10424102.blackserver.controllers.exceptions.RequestDataFormatException;
 import org.team10424102.blackserver.controllers.exceptions.VcodeVerificationException;
-import org.team10424102.blackserver.models.Friendship;
-import org.team10424102.blackserver.models.Gender;
-import org.team10424102.blackserver.models.RegInfo;
-import org.team10424102.blackserver.models.User;
 import org.team10424102.blackserver.notifications.AddingFriendHandler;
 import org.team10424102.blackserver.notifications.RemovingFriendHandler;
-import org.team10424102.blackserver.services.ImageService;
 import org.team10424102.blackserver.services.TokenService;
 import org.team10424102.blackserver.services.VcodeService;
 import org.team10424102.blackserver.utils.Api;
@@ -38,15 +30,15 @@ import java.util.*;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping(value = App.API_USER, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = App.API_USER)
 public class UserController {
 
     @Autowired UserRepo userRepo;
     @Autowired FriendshipRepo friendshipRepo;
     @Autowired FriendshipApplicationRepo friendshipApplicationRepo;
     @Autowired NotificationRepo notificationRepo;
+    @Autowired ImageRepo imageRepo;
 
-    @Autowired ImageService imageService;
     @Autowired VcodeService vcodeService;
     @Autowired TokenService tokenService;
 
@@ -87,8 +79,9 @@ public class UserController {
             user.setUsername(phone);
             user.setEnabled(true);
             user.setGender(Gender.UNKNOWN);
-            user.setAvatar(imageService.getDefault().avatar());
-            user.setBackground(imageService.getDefault().background());
+            // TODO 使用查询缓存来优化下面这两句话
+            user.setAvatar(imageRepo.findOneByTags(App.DEFAULT_AVATAR_TAG));
+            user.setBackground(imageRepo.findOneByTags(App.DEFAULT_BACKGROUND_TAG));
 
             RegInfo regInfo = new RegInfo();
             regInfo.setRegIp(request.getRemoteAddr());

@@ -13,9 +13,6 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.team10424102.blackserver.config.propertyeditors.UserResolver;
-import org.team10424102.blackserver.models.AcademyRepo;
-import org.team10424102.blackserver.models.CollegeRepo;
-import org.team10424102.blackserver.services.ImageService;
 
 import java.util.List;
 

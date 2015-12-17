@@ -4,16 +4,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.team10424102.blackserver.models.Image;
-import org.team10424102.blackserver.services.ImageService;
 import org.team10424102.blackserver.services.TokenService;
 
-import javax.persistence.EntityManager;
 import java.io.IOException;
 
 @Component
