@@ -1,7 +1,7 @@
 package org.team10424102.blackserver.utils;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import org.team10424102.blackserver.exceptions.BusinessException;
+import org.team10424102.blackserver.controllers.exceptions.BusinessException;
 
 import java.util.HashMap;
 import java.util.Map;

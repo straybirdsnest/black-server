@@ -1,8 +1,10 @@
 package org.team10424102.blackserver.config.security;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.team10424102.blackserver.services.UserService;
+import org.team10424102.blackserver.controllers.UserController;
+import org.team10424102.blackserver.services.TokenService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -15,10 +17,10 @@ import java.io.IOException;
  */
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     public static final String HTTP_HEADER = "X-Token";
-    private final UserService userService;
+    private final TokenService tokenService;
 
-    public TokenAuthenticationFilter(UserService userService) {
-        this.userService = userService;
+    public TokenAuthenticationFilter(ApplicationContext context) {
+        tokenService  = context.getBean(TokenService.class);
     }
 
     @Override
@@ -29,7 +31,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-        UserAuthentication auth = userService.getUserAuthenticationFromToken(token);
+        SpringSecurityUserAdapter auth = (SpringSecurityUserAdapter)tokenService.getObjectFromToken(token);
         if (auth != null) {
             SecurityContextHolder.getContext().setAuthentication(auth);
         } else {

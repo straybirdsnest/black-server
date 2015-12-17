@@ -2,9 +2,9 @@ package org.team10424102.blackserver.notifications;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.team10424102.blackserver.daos.FriendshipApplicationRepo;
-import org.team10424102.blackserver.daos.NotificationRepo;
-import org.team10424102.blackserver.daos.UserRepo;
+import org.team10424102.blackserver.models.FriendshipApplicationRepo;
+import org.team10424102.blackserver.models.NotificationRepo;
+import org.team10424102.blackserver.models.UserRepo;
 import org.team10424102.blackserver.models.Friendship;
 import org.team10424102.blackserver.models.FriendshipApplication;
 import org.team10424102.blackserver.models.Notification;

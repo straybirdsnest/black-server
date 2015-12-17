@@ -4,7 +4,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.team10424102.blackserver.exceptions.SystemException;
+import org.team10424102.blackserver.controllers.exceptions.SystemException;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

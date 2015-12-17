@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.team10424102.blackserver.App;
 import org.team10424102.blackserver.config.json.Views;
-import org.team10424102.blackserver.game.Game;
-import org.team10424102.blackserver.services.GameService;
+import org.team10424102.blackserver.models.GameRepo;
+import org.team10424102.blackserver.models.Game;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -20,7 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RestController
 public class GameController {
 
-    @Autowired GameService gameService;
+    @Autowired GameRepo gameRepo;
 
     @Autowired ApplicationContext context;
 
@@ -30,7 +30,7 @@ public class GameController {
     @RequestMapping(value = App.API_GAME, method = GET)
     @JsonView(Views.Game.class)
     public Game getGame(@RequestParam String key) {
-        Game game = gameService.getGame(key);
+        Game game = gameRepo.findOneByNameKey(key);
         game.setLocalizedName(context.getMessage("game." + game.getNameKey(), null,
                 "", LocaleContextHolder.getLocale()));
         return game;

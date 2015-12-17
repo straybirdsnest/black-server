@@ -3,13 +3,12 @@ package org.team10424102.blackserver.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.team10424102.blackserver.daos.ActivityRepo;
-import org.team10424102.blackserver.daos.ImageRepo;
-import org.team10424102.blackserver.daos.UserRepo;
+import org.team10424102.blackserver.models.ActivityRepo;
+import org.team10424102.blackserver.models.ImageRepo;
+import org.team10424102.blackserver.models.UserRepo;
 import org.team10424102.blackserver.models.Activity;
 import org.team10424102.blackserver.models.Image;
 import org.team10424102.blackserver.models.User;
-import org.team10424102.blackserver.services.UserService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,8 +20,6 @@ public class AdminController {
     @Autowired UserRepo userRepo;
 
     @Autowired ImageRepo imageRepo;
-
-    @Autowired UserService userService;
 
     @Autowired ActivityRepo activityRepo;
 
@@ -48,7 +45,7 @@ public class AdminController {
         Map<String, String> result = new HashMap<>();
         while (i.hasNext()) {
             User u = i.next();
-            result.put(u.getPhone(), userService.generateToken(u));
+            result.put(u.getPhone(), "尚未实现"); // TODO 获取特定用户的 token, 是根据 value 来查找 key
         }
         return result;
     }
