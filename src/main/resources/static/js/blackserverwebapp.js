@@ -23,13 +23,12 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
 
   })
   .controller("users", function($scope, $http, $location, $log, authService, userService) {
-    function notifyUsersData(data) {
-      $scope.users = data;
-      $log.log($scope.users);
-    }
     if (authService.getXToken()) {
-      userService.registerCallback(notifyUsersData);
-      userService.requestAllUsers();
+      userService.requestAllUsers().then(function(data) {
+        $scope.users = data;
+      }, function(reason) {
+        $log.log(reason);
+      });
     } else {
       $location.path("/login");
     }
@@ -120,11 +119,10 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
     };
     return serviceInstance;
   })
-  .factory("imageService", function($http, $log, authService) {
+  .factory("imageService", function($q, $http, $log, authService) {
     var serviceInstance = {
-      requestImage: function(url, /*opetional index */ index, /* opetional cakllback function */ receiver) {
-        index = index || undefined;
-        receiver = receiver || undefined;
+      requestImage: function(url) {
+        var defferred = $q.defer();
         $http({
           url: url,
           method: "GET",
@@ -135,40 +133,22 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
           responseType: "blob"
         }).success(function(data, status) {
           var fileReader = new FileReader();
-          fileReader.readAsDataURL(data);
           fileReader.onload = function() {
-            if (receiver === undefined) {
-              $log.error("not callback");
-              return;
-            } else {
-              if (index === undefined) {
-                $log.error("not index");
-                //receiver.call(this, fileReader.result);
-              } else {
-                receiver.call(this, index, fileReader.result);
-              }
-            }
-          }
+            defferred.resolve(fileReader.result);
+          };
+          fileReader.readAsDataURL(data);
+        }).error(function(data, status) {
+          defferred.reject("Fail with status " + status);
         });
+        return defferred.promise;
       }
     }
     return serviceInstance;
   })
-  .factory("userService", function($http, $log, authService, imageService) {
-    var users;
-    var registerCallbackFunction;
-
-    function setUserAvatarData(index, data) {
-      if (index === undefined || data === undefined) {
-        $log.error("input error!");
-        return;
-      }
-      $log.log("index" + index);
-      users[index].avatarData = data;
-      registerCallbackFunction(users);
-    }
-    var serviceInstance = {
-      requestAllUsers: function() {
+  .factory("userService", function($q, $http, $log, authService, imageService) {
+    function requestBasicAll() {
+      if (authService.getXToken()) {
+        var defferred = $q.defer();
         if (authService.getXToken()) {
           $http({
             url: "/admin/users",
@@ -179,16 +159,42 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
             }
           }).success(function(data, status) {
             // 注意所有http服务器的callback都是异步的，而为了浏览器能响应，异步操作不会block而是直接继续执行
-            users = data;
-            for (var index = 0; index < users.length; index++) {
-              avatarUrl = "/api/image?q=" + users[index].avatar.split("~")[0];
-              imageService.requestImage(avatarUrl, index, setUserAvatarData);
-            }
+            defferred.resolve(data);
+          }).error(function(data, status) {
+            defferred.reject("Fail with status " + status);
           });
         }
-      },
-      registerCallback: function(receiver) {
-        registerCallbackFunction = receiver;
+        return defferred.promise;
+      }
+    }
+
+    function requestAvatarAll(mutilUrl) {
+      return $q.all(mutilUrl.map(function(url) {
+        return imageService.requestImage(url);
+      }));
+    }
+
+    var serviceInstance = {
+      requestAllUsers: function() {
+        var defferred = $q.defer();
+        var users;
+        requestBasicAll().then(function(data) {
+          users = data;
+        }).then(function(data) {
+          var avatarUrlList = [];
+          for (var index = 0; index < users.length; index++) {
+            var avatarUrl = "/api/image?q=" + users[index].avatar.split("~")[0];
+            avatarUrlList.push(avatarUrl);
+          }
+          requestAvatarAll(avatarUrlList).then(function(results) {
+            results.forEach(function(value, index) {
+              users[index].avatarData = value;
+            });
+            $log.log(users);
+            defferred.resolve(users);
+          });
+        });
+        return defferred.promise;
       }
     }
     return serviceInstance;
