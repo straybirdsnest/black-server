@@ -23,11 +23,11 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
 
   })
   .controller("users", function($scope, $http, $location, $log, authService, userService) {
-    function notifyUsersData(index, data) {
-      $scope.users[index] = data;
+    function notifyUsersData(data) {
+      $scope.users = data;
+      $log.log($scope.users);
     }
     if (authService.getXToken()) {
-      $scope.users = [];
       userService.registerCallback(notifyUsersData);
       userService.requestAllUsers();
     } else {
@@ -138,10 +138,12 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
           fileReader.readAsDataURL(data);
           fileReader.onload = function() {
             if (receiver === undefined) {
-              return fileReader.result;
+              $log.error("not callback");
+              return;
             } else {
               if (index === undefined) {
-                receiver.call(this, fileReader.result);
+                $log.error("not index");
+                //receiver.call(this, fileReader.result);
               } else {
                 receiver.call(this, index, fileReader.result);
               }
@@ -157,9 +159,13 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
     var registerCallbackFunction;
 
     function setUserAvatarData(index, data) {
-      $log.log("index" + index + " data" + data);
+      if (index === undefined || data === undefined) {
+        $log.error("input error!");
+        return;
+      }
+      $log.log("index" + index);
       users[index].avatarData = data;
-      registerCallbackFunction(index, users[index]);
+      registerCallbackFunction(users);
     }
     var serviceInstance = {
       requestAllUsers: function() {
