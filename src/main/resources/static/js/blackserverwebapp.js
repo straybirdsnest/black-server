@@ -34,9 +34,9 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
       $location.path("/login");
     }
   })
-  .controller("activities", function($rootScope, $scope, $http, $location) {
-    if ($rootScope.xtoken) {
-      var index = 0;
+  .controller("activities", function($scope, $http, $location, $log, authService) {
+    if (authService.getXToken()) {
+      var current = 0;
 
       function getAllActivities() {
         $http({
@@ -44,7 +44,7 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-Token": $rootScope.xtoken
+            "X-Token": authService.getXToken()
           }
         }).success(function(data, status) {
           $scope.activities = data;
@@ -53,23 +53,23 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
       }
 
       function getNextCoverData() {
-        if ($scope.xtoken && $scope.activities) {
-          if (index < $scope.activities.length) {
-            var coverUrl = "/api/image?q=" + $scope.activities[index].cover.split("~")[0];
+        if (authService.getXToken() && $scope.activities) {
+          if (current < $scope.activities.length) {
+            var coverUrl = "/api/image?q=" + $scope.activities[current].cover.split("~")[0];
             $http({
               url: coverUrl,
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                "X-Token": $rootScope.xtoken
+                "X-Token": authService.getXToken()
               },
               responseType: "blob"
             }).success(function(data, status) {
               var fileReader = new FileReader();
               fileReader.readAsDataURL(data);
               fileReader.onload = function() {
-                $scope.activities[index].coverData = fileReader.result;
-                index++;
+                $scope.activities[current].coverData = fileReader.result;
+                current++;
                 getNextCoverData();
               }
             });
@@ -138,12 +138,12 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
           fileReader.readAsDataURL(data);
           fileReader.onload = function() {
             if (receiver === undefined) {
-              return data;
+              return fileReader.result;
             } else {
               if (index === undefined) {
-                receiver.call(this, data);
+                receiver.call(this, fileReader.result);
               } else {
-                receiver.call(this, index, data);
+                receiver.call(this, index, fileReader.result);
               }
             }
           }
