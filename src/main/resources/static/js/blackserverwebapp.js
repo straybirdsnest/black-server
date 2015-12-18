@@ -33,49 +33,13 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
       $location.path("/login");
     }
   })
-  .controller("activities", function($scope, $http, $location, $log, authService) {
+  .controller("activities", function($scope, $location, $log, authService, activitityServie) {
     if (authService.getXToken()) {
-      var current = 0;
-
-      function getAllActivities() {
-        $http({
-          url: "/admin/activities",
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Token": authService.getXToken()
-          }
-        }).success(function(data, status) {
-          $scope.activities = data;
-          getNextCoverData();
-        });
-      }
-
-      function getNextCoverData() {
-        if (authService.getXToken() && $scope.activities) {
-          if (current < $scope.activities.length) {
-            var coverUrl = "/api/image?q=" + $scope.activities[current].cover.split("~")[0];
-            $http({
-              url: coverUrl,
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Token": authService.getXToken()
-              },
-              responseType: "blob"
-            }).success(function(data, status) {
-              var fileReader = new FileReader();
-              fileReader.readAsDataURL(data);
-              fileReader.onload = function() {
-                $scope.activities[current].coverData = fileReader.result;
-                current++;
-                getNextCoverData();
-              }
-            });
-          }
-        }
-      }
-      getAllActivities();
+      activitityServie.requestAllActivities().then(function(data) {
+        $scope.activities = data;
+      }, function(reason) {
+        $log.log(reason);
+      });
     } else {
       $location.path("/login");
     }
@@ -122,7 +86,7 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
   .factory("imageService", function($q, $http, $log, authService) {
     var serviceInstance = {
       requestImage: function(url) {
-        var defferred = $q.defer();
+        var deferred = $q.defer();
         $http({
           url: url,
           method: "GET",
@@ -134,13 +98,13 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
         }).success(function(data, status) {
           var fileReader = new FileReader();
           fileReader.onload = function() {
-            defferred.resolve(fileReader.result);
+            deferred.resolve(fileReader.result);
           };
           fileReader.readAsDataURL(data);
         }).error(function(data, status) {
-          defferred.reject("Fail with status " + status);
+          deferred.reject("Fail with status " + status);
         });
-        return defferred.promise;
+        return deferred.promise;
       }
     }
     return serviceInstance;
@@ -148,7 +112,7 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
   .factory("userService", function($q, $http, $log, authService, imageService) {
     function requestBasicAll() {
       if (authService.getXToken()) {
-        var defferred = $q.defer();
+        var deferred = $q.defer();
         if (authService.getXToken()) {
           $http({
             url: "/admin/users",
@@ -159,12 +123,12 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
             }
           }).success(function(data, status) {
             // 注意所有http服务器的callback都是异步的，而为了浏览器能响应，异步操作不会block而是直接继续执行
-            defferred.resolve(data);
+            deferred.resolve(data);
           }).error(function(data, status) {
-            defferred.reject("Fail with status " + status);
+            deferred.reject("Fail with status " + status);
           });
         }
-        return defferred.promise;
+        return deferred.promise;
       }
     }
 
@@ -176,7 +140,7 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
 
     var serviceInstance = {
       requestAllUsers: function() {
-        var defferred = $q.defer();
+        var deferred = $q.defer();
         var users;
         requestBasicAll().then(function(data) {
           users = data;
@@ -190,11 +154,62 @@ var blackserverweb = angular.module("blackserverweb", ["mgcrea.ngStrap", "ngRout
             results.forEach(function(value, index) {
               users[index].avatarData = value;
             });
-            $log.log(users);
-            defferred.resolve(users);
+            deferred.resolve(users);
           });
         });
-        return defferred.promise;
+        return deferred.promise;
+      }
+    }
+    return serviceInstance;
+  })
+  .factory("activitityServie", function($q, $http, $log, authService, imageService) {
+    function requestBasicAll() {
+      if (authService.getXToken()) {
+        var deferred = $q.defer();
+        if (authService.getXToken()) {
+          $http({
+            url: "/admin/activities",
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Token": authService.getXToken()
+            }
+          }).success(function(data, status) {
+            deferred.resolve(data);
+          }).error(function(data, status) {
+            deferred.reject("Fail with status " + status);
+          });
+        }
+        return deferred.promise;
+      }
+    }
+
+    function requestCoverAll(mutilUrl) {
+      return $q.all(mutilUrl.map(function(url) {
+        return imageService.requestImage(url);
+      }));
+    }
+
+    var serviceInstance = {
+      requestAllActivities: function() {
+        var deferred = $q.defer();
+        var activities;
+        requestBasicAll().then(function(data) {
+          activities = data;
+        }).then(function(data) {
+          var coverUrlList = [];
+          for (var index = 0; index < activities.length; index++) {
+            var coverUrl = "/api/image?q=" + activities[index].cover.split("~")[0];
+            coverUrlList.push(coverUrl);
+          }
+          requestCoverAll(coverUrlList).then(function(results) {
+            results.forEach(function(value, index) {
+              activities[index].coverData = value;
+            });
+            deferred.resolve(activities);
+          });
+        });
+        return deferred.promise;
       }
     }
     return serviceInstance;
